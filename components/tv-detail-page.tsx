@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Star, Plus, ChevronDown, Loader2 } from "lucide-react"
 import { MovieCard } from "@/components/movie-card"
-import { moviesAPI, watchlistAPI, ratingsAPI } from "@/lib/api"
+import { tvAPI, watchlistAPI, ratingsAPI } from "@/lib/api"
 import { useRouter } from "next/navigation"
 
 interface Cast {
@@ -22,24 +22,26 @@ interface Video {
   type: string
 }
 
-interface Movie {
+interface TVShow {
   id: number
-  title: string
+  name: string
   tagline: string
   vote_average: number
   genres: { id: number; name: string }[]
-  release_date: string
-  runtime: number
+  first_air_date: string
+  number_of_seasons: number
+  number_of_episodes: number
+  episode_run_time: number[]
   overview: string
   poster_path: string | null
   backdrop_path: string | null
 }
 
-export function MovieDetailPage({ movieId }: { movieId: string }) {
-  const [movie, setMovie] = useState<Movie | null>(null)
+export function TVDetailPage({ tvId }: { tvId: string }) {
+  const [show, setShow] = useState<TVShow | null>(null)
   const [cast, setCast] = useState<Cast[]>([])
   const [trailer, setTrailer] = useState<Video | null>(null)
-  const [similarMovies, setSimilarMovies] = useState<any[]>([])
+  const [similarShows, setSimilarShows] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showRatingMenu, setShowRatingMenu] = useState(false)
@@ -55,53 +57,50 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   ]
 
   useEffect(() => {
-    const fetchMovieData = async () => {
+    const fetchShowData = async () => {
       try {
         setIsLoading(true)
         setError(null)
 
-        // Fetch movie details, credits, and videos in parallel
-        const [movieData, creditsData, videosData] = await Promise.all([
-          moviesAPI.getDetails(parseInt(movieId)),
-          moviesAPI.getCredits(parseInt(movieId)),
-          moviesAPI.getVideos(parseInt(movieId)),
+        const [showData, creditsData, videosData] = await Promise.all([
+          tvAPI.getDetails(parseInt(tvId)),
+          tvAPI.getCredits(parseInt(tvId)),
+          tvAPI.getVideos(parseInt(tvId)),
         ])
 
-        setMovie(movieData)
+        setShow(showData)
         setCast(creditsData.cast?.slice(0, 10) || [])
 
-        // Find trailer (prefer official trailer, fallback to teaser)
         const trailerVideo = videosData.results?.find(
           (v: Video) => v.type === "Trailer" && v.site === "YouTube"
         ) || videosData.results?.[0]
         setTrailer(trailerVideo || null)
 
-        // Fetch similar movies
-        const trendingData = await moviesAPI.getTrending()
-        const transformedMovies = trendingData.results.slice(0, 8).map((m: any) => ({
-          id: m.id,
-          title: m.title,
-          rating: m.vote_average,
-          poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : "",
-          year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+        const trendingData = await tvAPI.getTrending()
+        const transformedShows = trendingData.results.slice(0, 8).map((s: any) => ({
+          id: s.id,
+          title: s.name,
+          rating: s.vote_average,
+          poster: s.poster_path ? `https://image.tmdb.org/t/p/w500${s.poster_path}` : "",
+          year: s.first_air_date ? new Date(s.first_air_date).getFullYear() : 2024,
         }))
-        setSimilarMovies(transformedMovies)
+        setSimilarShows(transformedShows)
 
       } catch (err) {
-        console.error("Failed to fetch movie data:", err)
-        setError("Failed to load movie details. Please try again.")
+        console.error("Failed to fetch TV show data:", err)
+        setError("Failed to load TV show details. Please try again.")
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchMovieData()
-  }, [movieId])
+    fetchShowData()
+  }, [tvId])
 
   const handleAddToWatchlist = async () => {
     setIsAddingToWatchlist(true)
     try {
-      await watchlistAPI.add({ tmdb_id: parseInt(movieId), media_type: "movie" })
+      await watchlistAPI.add({ tmdb_id: parseInt(tvId), media_type: "tv" })
       alert("Added to watchlist!")
     } catch (error) {
       alert("Failed to add to watchlist. Please login first.")
@@ -112,20 +111,11 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
   const handleRating = async (ratingValue: string) => {
     try {
-      await ratingsAPI.create({ tmdb_id: parseInt(movieId), media_type: "movie", rating: ratingValue })
+      await ratingsAPI.create({ tmdb_id: parseInt(tvId), media_type: "tv", rating: ratingValue })
       setShowRatingMenu(false)
       alert(`Rated as ${ratingOptions.find(r => r.value === ratingValue)?.label}!`)
     } catch (error) {
       alert("Failed to rate. Please login first.")
-    }
-  }
-
-  const handleScroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const scrollAmount = 400
-      const newScrollLeft =
-        direction === "left" ? scrollRef.current.scrollLeft - scrollAmount : scrollRef.current.scrollLeft + scrollAmount
-      scrollRef.current.scrollTo({ left: newScrollLeft, behavior: "smooth" })
     }
   }
 
@@ -137,32 +127,31 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
     )
   }
 
-  if (error || !movie) {
+  if (error || !show) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground mb-4">Oops! Something went wrong</h2>
-          <p className="text-muted-foreground mb-6">{error || "Movie not found"}</p>
+          <p className="text-muted-foreground mb-6">{error || "TV show not found"}</p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/tv")}
             className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-colors"
           >
-            Go Home
+            Go to TV Shows
           </motion.button>
         </div>
       </div>
     )
   }
 
-  const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "/placeholder.svg"
-  const backdropUrl = movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : "/placeholder.svg"
+  const posterUrl = show.poster_path ? `https://image.tmdb.org/t/p/w500${show.poster_path}` : "/placeholder.svg"
+  const backdropUrl = show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : "/placeholder.svg"
   const trailerUrl = trailer ? `https://www.youtube.com/embed/${trailer.key}` : null
-
+const avgRuntime = show.episode_run_time?.[0] || 45
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section with Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -170,16 +159,14 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
       >
         <img
           src={backdropUrl}
-          alt={movie.title}
+          alt={show.name}
           className="w-full h-full object-cover brightness-50"
         />
         <div className="absolute inset-0 bg-linear-to-t from-background to-transparent" />
       </motion.div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-7 gap-8 mb-12">
-          {/* Poster */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -189,42 +176,38 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             <div className="glass-dark rounded-lg overflow-hidden">
               <img
                 src={posterUrl}
-                alt={movie.title}
+                alt={show.name}
                 className="w-full h-auto rounded-lg"
               />
             </div>
           </motion.div>
 
-          {/* Info Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="md:col-span-5 space-y-6"
           >
-            {/* Title & Tagline */}
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{movie.title}</h1>
-              {movie.tagline && <p className="text-lg text-muted-foreground italic">{movie.tagline}</p>}
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{show.name}</h1>
+              {show.tagline && <p className="text-lg text-muted-foreground italic">{show.tagline}</p>}
             </div>
 
-            {/* Rating */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-5 h-5 ${i < Math.floor(movie.vote_average / 2) ? "fill-primary text-primary" : "text-muted-foreground"}`}
+                    className={`w-5 h-5 ${i < Math.floor(show.vote_average / 2) ? "fill-primary text-primary" : "text-muted-foreground"}`}
                   />
                 ))}
               </div>
-              <span className="text-lg font-semibold text-foreground">{movie.vote_average.toFixed(1)}/10</span>
+              <span className="text-lg font-semibold text-foreground">{show.vote_average.toFixed(1)}/10</span>
             </div>
 
-            {/* Genres & Details */}
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {movie.genres.map((genre) => (
+                {show.genres.map((genre) => (
                   <span
                     key={genre.id}
                     className="px-3 py-1 rounded-full bg-secondary/50 text-sm text-foreground border border-white/10"
@@ -236,19 +219,26 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Release Date</p>
+                  <p className="text-muted-foreground">First Air Date</p>
                   <p className="text-foreground font-semibold">
-                    {new Date(movie.release_date).toLocaleDateString()}
+                    {new Date(show.first_air_date).toLocaleDateString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Runtime</p>
-                  <p className="text-foreground font-semibold">{movie.runtime} minutes</p>
+                  <p className="text-muted-foreground">Seasons</p>
+                  <p className="text-foreground font-semibold">{show.number_of_seasons} Season{show.number_of_seasons !== 1 ? 's' : ''}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Episodes</p>
+                  <p className="text-foreground font-semibold">{show.number_of_episodes} Episodes</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Episode Runtime</p>
+                  <p className="text-foreground font-semibold">{avgRuntime} min</p>
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -292,15 +282,13 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               </div>
             </div>
 
-            {/* Overview */}
             <div className="pt-6 border-t border-white/10">
               <h3 className="text-lg font-semibold text-foreground mb-3">Overview</h3>
-              <p className="text-muted-foreground leading-relaxed">{movie.overview}</p>
+              <p className="text-muted-foreground leading-relaxed">{show.overview}</p>
             </div>
           </motion.div>
         </div>
 
-        {/* Trailer Section */}
         {trailerUrl && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -314,7 +302,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 width="100%"
                 height="100%"
                 src={trailerUrl}
-                title="Movie Trailer"
+                title="TV Show Trailer"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="rounded-lg"
@@ -323,7 +311,6 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
           </motion.div>
         )}
 
-        {/* Cast Section */}
         {cast.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -350,20 +337,19 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
           </motion.div>
         )}
 
-        {/* Similar Movies Section */}
-        {similarMovies.length > 0 && (
+        {similarShows.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
             className="mb-12"
           >
-            <h3 className="text-2xl font-bold text-foreground mb-4">Similar Movies</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Similar Shows</h3>
             <div className="relative">
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-                {similarMovies.map((movie) => (
-                  <motion.div key={movie.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
-                    <MovieCard movie={movie} />
+                {similarShows.map((show) => (
+                  <motion.div key={show.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
+                    <MovieCard movie={show} mediaType="tv" />
                   </motion.div>
                 ))}
               </div>

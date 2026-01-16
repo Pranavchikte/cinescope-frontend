@@ -15,9 +15,10 @@ interface Movie {
 interface MovieGridProps {
   movies: Movie[]
   isLoading?: boolean
+  mediaType?: "movie" | "tv"
 }
 
-export function MovieGrid({ movies, isLoading = false }: MovieGridProps) {
+export function MovieGrid({ movies, isLoading = false, mediaType = "movie" }: MovieGridProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {isLoading
@@ -29,7 +30,7 @@ export function MovieGrid({ movies, isLoading = false }: MovieGridProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <MovieCard movie={movie} />
+              <MovieCard movie={movie} mediaType={mediaType} />
             </motion.div>
           ))}
     </div>

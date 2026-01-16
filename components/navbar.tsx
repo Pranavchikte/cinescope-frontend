@@ -64,6 +64,22 @@ export function Navbar() {
             <h1 className="text-xl font-bold hidden sm:block">CineScope</h1>
           </div>
 
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-4 ml-8">
+            <button
+              onClick={() => router.push("/")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Movies
+            </button>
+            <button
+              onClick={() => router.push("/tv")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              TV Shows
+            </button>
+          </div>
+
           {/* Search (Desktop) */}
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 mx-8 max-w-md">
             <div className="relative w-full">
@@ -160,6 +176,26 @@ export function Navbar() {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="fixed top-16 left-0 w-64 h-[calc(100vh-64px)] glass-dark border-r border-white/10 z-40 md:hidden"
             >
+              <button
+                  onClick={() => {
+                    setIsOpen(false)
+                    router.push("/")
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-secondary/50"
+                >
+                  Movies
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsOpen(false)
+                    router.push("/tv")
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-secondary/50"
+                >
+                  TV Shows
+                </button>
+
               <div className="p-4 space-y-4">
                 <button
                   onClick={() => {

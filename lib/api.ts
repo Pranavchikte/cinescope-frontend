@@ -39,6 +39,26 @@ export const authAPI = {
     logout: () => {
         clearTokens()
     },
+
+    forgotPassword: async (email: string) => {
+        const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    resetPassword: async (token: string, newPassword: string) => {
+        const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, new_password: newPassword }),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
 }
 
 // Movies API
@@ -70,6 +90,39 @@ export const moviesAPI = {
 
     getVideos: async (id: number) => {
         const res = await fetch(`${API_BASE_URL}/movies/${id}/videos`)
+        return res.json()
+    },
+}
+
+// TV Shows API
+export const tvAPI = {
+    getTrending: async () => {
+        const res = await fetch(`${API_BASE_URL}/tv/trending`)
+        return res.json()
+    },
+
+    getPopular: async () => {
+        const res = await fetch(`${API_BASE_URL}/tv/popular`)
+        return res.json()
+    },
+
+    search: async (query: string) => {
+        const res = await fetch(`${API_BASE_URL}/tv/search?query=${encodeURIComponent(query)}`)
+        return res.json()
+    },
+
+    getDetails: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}`)
+        return res.json()
+    },
+
+    getCredits: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/credits`)
+        return res.json()
+    },
+
+    getVideos: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/videos`)
         return res.json()
     },
 }

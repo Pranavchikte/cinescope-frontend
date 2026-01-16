@@ -88,7 +88,7 @@ function ScrollContainer({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 >
                   <MovieCard movie={movie} />
                 </motion.div>
