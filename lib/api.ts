@@ -74,6 +74,39 @@ export const moviesAPI = {
     },
 }
 
+// TV Shows API
+export const tvAPI = {
+    getTrending: async () => {
+        const res = await fetch(`${API_BASE_URL}/tv/trending`)
+        return res.json()
+    },
+
+    getPopular: async () => {
+        const res = await fetch(`${API_BASE_URL}/tv/popular`)
+        return res.json()
+    },
+
+    search: async (query: string) => {
+        const res = await fetch(`${API_BASE_URL}/tv/search?query=${encodeURIComponent(query)}`)
+        return res.json()
+    },
+
+    getDetails: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}`)
+        return res.json()
+    },
+
+    getCredits: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/credits`)
+        return res.json()
+    },
+
+    getVideos: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/videos`)
+        return res.json()
+    },
+}
+
 // Watchlist API (protected)
 export const watchlistAPI = {
     get: async () => {

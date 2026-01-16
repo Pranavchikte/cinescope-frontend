@@ -17,9 +17,12 @@ interface Movie {
 
 interface MovieCardProps {
   movie: Movie
+  mediaType?: "movie" | "tv"  
+
 }
 
-export function MovieCard({ movie }: MovieCardProps) {
+export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps)  {
+  
   const [isInWatchlist, setIsInWatchlist] = useState(false)
   const [showRatingMenu, setShowRatingMenu] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -49,7 +52,7 @@ export function MovieCard({ movie }: MovieCardProps) {
         setIsInWatchlist(false)
         showNotification("Removed from watchlist", "success")
       } else {
-        await watchlistAPI.add({ tmdb_id: movie.id, media_type: "movie" })
+        await watchlistAPI.add({ tmdb_id: movie.id, media_type: mediaType })
         setIsInWatchlist(true)
         showNotification("Added to watchlist!", "success")
       }
@@ -66,7 +69,7 @@ export function MovieCard({ movie }: MovieCardProps) {
     
     setIsLoading(true)
     try {
-      await ratingsAPI.create({ tmdb_id: movie.id, media_type: "movie", rating: ratingValue })
+      await ratingsAPI.create({ tmdb_id: movie.id, media_type: mediaType, rating: ratingValue })
       setShowRatingMenu(false)
       showNotification(`Rated as ${ratingOptions.find(r => r.value === ratingValue)?.label}!`, "success")
     } catch (error) {
@@ -78,7 +81,7 @@ export function MovieCard({ movie }: MovieCardProps) {
 
   return (
     <>
-      <Link href={`/movie/${movie.id}`}>
+      <Link href={`/${mediaType}/${movie.id}`}>
         <motion.div
           whileHover={{ y: -4 }}
           className="relative group cursor-pointer w-[185px] bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all"

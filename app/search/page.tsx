@@ -1,11 +1,11 @@
 "use client"
 
+import { moviesAPI, tvAPI } from "@/lib/api"
 import { Suspense } from "react"
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Search, Loader2 } from "lucide-react"
-import { moviesAPI } from "@/lib/api"
 import { MovieCard } from "@/components/movie-card"
 
 interface TMDBMovie {
@@ -37,18 +37,39 @@ function SearchResults() {
         setIsLoading(true)
         setError(null)
 
-        const data = await moviesAPI.search(query)
+        // Search both movies and TV shows
+        const [moviesData, tvData] = await Promise.all([
+          moviesAPI.search(query),
+          tvAPI.search(query),
+        ])
 
-        // Transform TMDB data to our format
-        const transformMovie = (m: TMDBMovie) => ({
+        // Transform movies
+        const transformMovie = (m: any) => ({
           id: m.id,
           title: m.title,
           rating: m.vote_average,
           poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : "",
           year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+          mediaType: "movie" as const,
         })
 
-        setResults(data.results.map(transformMovie))
+        // Transform TV shows
+        const transformTV = (s: any) => ({
+          id: s.id,
+          title: s.name,
+          rating: s.vote_average,
+          poster: s.poster_path ? `https://image.tmdb.org/t/p/w500${s.poster_path}` : "",
+          year: s.first_air_date ? new Date(s.first_air_date).getFullYear() : 2024,
+          mediaType: "tv" as const,
+        })
+
+        // Combine and sort by rating
+        const allResults = [
+          ...moviesData.results.map(transformMovie),
+          ...tvData.results.map(transformTV),
+        ].sort((a, b) => b.rating - a.rating)
+
+        setResults(allResults)
       } catch (err) {
         console.error("Search failed:", err)
         setError("Failed to search. Please try again.")
@@ -139,7 +160,7 @@ function SearchResults() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <MovieCard movie={movie} />
+              <MovieCard movie={movie} mediaType={movie.mediaType} />
             </motion.div>
           ))}
         </motion.div>
