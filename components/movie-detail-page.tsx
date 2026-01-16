@@ -166,14 +166,14 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="relative h-96 md:h-[500px] overflow-hidden"
+        className="relative h-96 md:h-125 overflow-hidden"
       >
         <img
           src={backdropUrl}
           alt={movie.title}
           className="w-full h-full object-cover brightness-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-background to-transparent" />
       </motion.div>
 
       {/* Main Content */}
@@ -334,7 +334,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             <h3 className="text-2xl font-bold text-foreground mb-4">Cast</h3>
             <div className="flex gap-6 overflow-x-auto hide-scrollbar pb-2">
               {cast.map((member) => (
-                <div key={member.id} className="flex-shrink-0 text-center">
+                <div key={member.id} className="shrink-0 text-center">
                   <div className="w-24 h-24 rounded-full overflow-hidden glass-dark mb-3 mx-auto">
                     <img
                       src={member.profile_path ? `https://image.tmdb.org/t/p/w185${member.profile_path}` : "/placeholder.svg"}

@@ -84,10 +84,10 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps)  {
       <Link href={`/${mediaType}/${movie.id}`}>
         <motion.div
           whileHover={{ y: -4 }}
-          className="relative group cursor-pointer w-[185px] bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all"
+          className="relative group cursor-pointer w-46.25 bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all"
         >
           {/* Poster */}
-          <div className="relative aspect-[2/3] bg-muted">
+          <div className="relative aspect-2/3 bg-muted">
             <img
               src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
@@ -116,7 +116,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps)  {
             </div>
 
             {/* Rate Button - Bottom Overlay on Hover */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="relative">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
