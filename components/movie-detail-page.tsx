@@ -362,7 +362,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             <div className="relative">
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
                 {similarMovies.map((movie) => (
-                  <motion.div key={movie.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-shrink-0">
+                  <motion.div key={movie.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
                     <MovieCard movie={movie} />
                   </motion.div>
                 ))}
