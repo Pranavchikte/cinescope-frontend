@@ -1,104 +1,112 @@
-"use client"
+"use client";
 
-import { authAPI } from "@/lib/api"
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, Eye, EyeOff } from "lucide-react"
-import { useForm } from "react-hook-form"
-
+import { authAPI } from "@/lib/api";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Eye, EyeOff } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 interface AuthModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 interface LoginFormData {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 interface RegisterFormData {
-  username: string
-  email: string
-  password: string
+  username: string;
+  email: string;
+  password: string;
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [tab, setTab] = useState<"login" | "register">("login")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [tab, setTab] = useState<"login" | "register">("login");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const loginForm = useForm<LoginFormData>({
     mode: "onBlur",
-  })
+  });
 
   const registerForm = useForm<RegisterFormData>({
     mode: "onBlur",
-  })
+  });
 
   const handleLoginSubmit = async (data: LoginFormData) => {
-  if (!data.email || !data.password) {
-    if (!data.email) loginForm.setError("email", { message: "Email is required" })
-    if (!data.password) loginForm.setError("password", { message: "Password is required" })
-    return
-  }
+    if (!data.email || !data.password) {
+      if (!data.email)
+        loginForm.setError("email", { message: "Email is required" });
+      if (!data.password)
+        loginForm.setError("password", { message: "Password is required" });
+      return;
+    }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(data.email)) {
-    loginForm.setError("email", { message: "Please enter a valid email" })
-    return
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      loginForm.setError("email", { message: "Please enter a valid email" });
+      return;
+    }
 
-  try {
-    await authAPI.login(data)
-    setIsSuccess(true)
-    setTimeout(() => {
-      onClose()
-      setIsSuccess(false)
-      setTab("login")
-      loginForm.reset()
-      window.location.reload() // Refresh to update auth state
-    }, 1500)
-  } catch (error) {
-    loginForm.setError("email", { message: "Invalid credentials" })
-  }
-}
+    try {
+      await authAPI.login(data);
+      setIsSuccess(true);
+      setTimeout(() => {
+        onClose();
+        setIsSuccess(false);
+        setTab("login");
+        loginForm.reset();
+        window.location.reload(); // Refresh to update auth state
+      }, 1500);
+    } catch (error) {
+      loginForm.setError("email", { message: "Invalid credentials" });
+    }
+  };
 
   const handleRegisterSubmit = async (data: RegisterFormData) => {
-  if (!data.username || !data.email || !data.password) {
-    if (!data.username) registerForm.setError("username", { message: "Username is required" })
-    if (!data.email) registerForm.setError("email", { message: "Email is required" })
-    if (!data.password) registerForm.setError("password", { message: "Password is required" })
-    return
-  }
+    if (!data.username || !data.email || !data.password) {
+      if (!data.username)
+        registerForm.setError("username", { message: "Username is required" });
+      if (!data.email)
+        registerForm.setError("email", { message: "Email is required" });
+      if (!data.password)
+        registerForm.setError("password", { message: "Password is required" });
+      return;
+    }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(data.email)) {
-    registerForm.setError("email", { message: "Please enter a valid email" })
-    return
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      registerForm.setError("email", { message: "Please enter a valid email" });
+      return;
+    }
 
-  if (data.password.length < 8) {
-    registerForm.setError("password", { message: "Password must be at least 8 characters" })
-    return
-  }
+    if (data.password.length < 8) {
+      registerForm.setError("password", {
+        message: "Password must be at least 8 characters",
+      });
+      return;
+    }
 
-  try {
-    await authAPI.register(data)
-    // Auto login after register
-    await authAPI.login({ email: data.email, password: data.password })
-    setIsSuccess(true)
-    setTimeout(() => {
-      onClose()
-      setIsSuccess(false)
-      setTab("login")
-      registerForm.reset()
-      window.location.reload()
-    }, 1500)
-  } catch (error) {
-    registerForm.setError("email", { message: "Registration failed. Email may already exist." })
-  }
-}
+    try {
+      await authAPI.register(data);
+      // Auto login after register
+      await authAPI.login({ email: data.email, password: data.password });
+      setIsSuccess(true);
+      setTimeout(() => {
+        onClose();
+        setIsSuccess(false);
+        setTab("login");
+        registerForm.reset();
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      registerForm.setError("email", {
+        message: "Registration failed. Email may already exist.",
+      });
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -146,15 +154,27 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     transition={{ type: "spring", stiffness: 200 }}
                     className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4"
                   >
-                    <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-8 h-8 text-primary"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </motion.div>
                   <h2 className="text-xl font-bold text-foreground mb-2">
                     {tab === "login" ? "Welcome back!" : "Account created!"}
                   </h2>
                   <p className="text-muted-foreground">
-                    {tab === "login" ? "You're all set to start exploring." : "You can now start tracking your movies."}
+                    {tab === "login"
+                      ? "You're all set to start exploring."
+                      : "You can now start tracking your movies."}
                   </p>
                 </motion.div>
               ) : (
@@ -167,7 +187,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           key={t}
                           onClick={() => setTab(t)}
                           className={`pb-3 px-1 relative font-semibold transition-colors ${
-                            tab === t ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                            tab === t
+                              ? "text-foreground"
+                              : "text-muted-foreground hover:text-foreground"
                           }`}
                         >
                           {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -196,7 +218,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         >
                           {/* Email Input */}
                           <div>
-                            <label className="text-sm font-medium text-foreground mb-2 block">Email</label>
+                            <label className="text-sm font-medium text-foreground mb-2 block">
+                              Email
+                            </label>
                             <input
                               type="email"
                               placeholder="you@example.com"
@@ -212,7 +236,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                           {/* Password Input */}
                           <div>
-                            <label className="text-sm font-medium text-foreground mb-2 block">Password</label>
+                            <label className="text-sm font-medium text-foreground mb-2 block">
+                              Password
+                            </label>
                             <div className="relative">
                               <input
                                 type={showPassword ? "text" : "password"}
@@ -225,7 +251,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                               >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                {showPassword ? (
+                                  <EyeOff className="w-4 h-4" />
+                                ) : (
+                                  <Eye className="w-4 h-4" />
+                                )}
                               </button>
                             </div>
                             {loginForm.formState.errors.password && (
@@ -237,12 +267,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                           {/* Forgot Password */}
                           <div className="flex justify-end pt-2">
-                            <button
-                              type="button"
+                            <a
+                              href="/forgot-password"
                               className="text-xs text-primary hover:text-primary/80 transition-colors"
                             >
                               Forgot password?
-                            </button>
+                            </a>
                           </div>
 
                           {/* Submit Button */}
@@ -261,12 +291,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -20 }}
-                          onSubmit={registerForm.handleSubmit(handleRegisterSubmit)}
+                          onSubmit={registerForm.handleSubmit(
+                            handleRegisterSubmit
+                          )}
                           className="space-y-4"
                         >
                           {/* Username Input */}
                           <div>
-                            <label className="text-sm font-medium text-foreground mb-2 block">Username</label>
+                            <label className="text-sm font-medium text-foreground mb-2 block">
+                              Username
+                            </label>
                             <input
                               type="text"
                               placeholder="cinephile"
@@ -282,7 +316,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                           {/* Email Input */}
                           <div>
-                            <label className="text-sm font-medium text-foreground mb-2 block">Email</label>
+                            <label className="text-sm font-medium text-foreground mb-2 block">
+                              Email
+                            </label>
                             <input
                               type="email"
                               placeholder="you@example.com"
@@ -298,7 +334,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                           {/* Password Input */}
                           <div>
-                            <label className="text-sm font-medium text-foreground mb-2 block">Password</label>
+                            <label className="text-sm font-medium text-foreground mb-2 block">
+                              Password
+                            </label>
                             <div className="relative">
                               <input
                                 type={showPassword ? "text" : "password"}
@@ -311,7 +349,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                               >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                {showPassword ? (
+                                  <EyeOff className="w-4 h-4" />
+                                ) : (
+                                  <Eye className="w-4 h-4" />
+                                )}
                               </button>
                             </div>
                             {registerForm.formState.errors.password && (
@@ -341,5 +383,5 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </>
       )}
     </AnimatePresence>
-  )
+  );
 }
