@@ -56,8 +56,13 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps)  {
         setIsInWatchlist(true)
         showNotification("Added to watchlist!", "success")
       }
-    } catch (error) {
-      showNotification("Failed. Please login first.", "error")
+    } catch (error: any) {
+      const errorText = error.message || ""
+      if (errorText.includes("verify your email")) {
+        showNotification("Please verify your email first", "error")
+      } else {
+        showNotification("Failed. Please login first.", "error")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -72,8 +77,13 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps)  {
       await ratingsAPI.create({ tmdb_id: movie.id, media_type: mediaType, rating: ratingValue })
       setShowRatingMenu(false)
       showNotification(`Rated as ${ratingOptions.find(r => r.value === ratingValue)?.label}!`, "success")
-    } catch (error) {
-      showNotification("Failed to rate. Please login first.", "error")
+    } catch (error: any) {
+      const errorText = error.message || ""
+      if (errorText.includes("verify your email")) {
+        showNotification("Please verify your email first", "error")
+      } else {
+        showNotification("Failed to rate. Please login first.", "error")
+      }
     } finally {
       setIsLoading(false)
     }

@@ -59,7 +59,35 @@ export const authAPI = {
         if (!res.ok) throw new Error(await res.text())
         return res.json()
     },
+
+    verifyEmail: async (token: string) => {
+        const res = await fetch(`${API_BASE_URL}/auth/verify-email?token=${token}`, {
+            method: 'POST',
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    resendVerification: async () => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    getCurrentUser: async () => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
 }
+
 
 // Movies API
 export const moviesAPI = {
