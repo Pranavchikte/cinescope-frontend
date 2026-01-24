@@ -1,14 +1,11 @@
 "use client"
 
-import { useEffect, useState as useReactState } from "react"
+import { useEffect, useState as useReactState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
-
-import { authAPI, getAccessToken } from "@/lib/api"
-
+import { authAPI, getAccessToken, moviesAPI, tvAPI } from "@/lib/api"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Menu, X, Film, ChevronDown } from "lucide-react"
-
+import { Search, Menu, X, Film, ChevronDown, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -18,16 +15,107 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+interface SearchResult {
+  id: number
+  title: string
+  poster: string
+  year: number
+  mediaType: "movie" | "tv"
+  rating: number
+}
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  // 🔐 Auth state
+  // Auth state
   const [isAuthenticated, setIsAuthenticated] = useReactState(false)
   const router = useRouter()
 
   useEffect(() => {
     setIsAuthenticated(!!getAccessToken())
+  }, [])
+
+  // Optimized search with abort controller
+  const performSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([])
+      setShowResults(false)
+      setIsSearching(false)
+      return
+    }
+
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    abortControllerRef.current = new AbortController()
+    setIsSearching(true)
+
+    try {
+      // Parallel requests with abort signal
+      const [moviesData, tvData] = await Promise.all([
+        moviesAPI.search(query),
+        tvAPI.search(query),
+      ])
+
+      // Quick transform (limit to 4 total for speed)
+      const movies = moviesData.results.slice(0, 2).map((m: any) => ({
+        id: m.id,
+        title: m.title,
+        poster: m.poster_path ? `https://image.tmdb.org/t/p/w92${m.poster_path}` : "",
+        year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+        mediaType: "movie" as const,
+        rating: m.vote_average,
+      }))
+
+      const tvShows = tvData.results.slice(0, 2).map((s: any) => ({
+        id: s.id,
+        title: s.name,
+        poster: s.poster_path ? `https://image.tmdb.org/t/p/w92${s.poster_path}` : "",
+        year: s.first_air_date ? new Date(s.first_air_date).getFullYear() : 2024,
+        mediaType: "tv" as const,
+        rating: s.vote_average,
+      }))
+
+      const combined = [...movies, ...tvShows].sort((a, b) => b.rating - a.rating)
+
+      setSearchResults(combined)
+      setShowResults(true)
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error("Search failed:", error)
+      }
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Debounced search with faster timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      performSearch(searchQuery)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery, performSearch])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   const handleLogout = () => {
@@ -41,7 +129,14 @@ export function Navbar() {
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery("")
+      setShowResults(false)
     }
+  }
+
+  const handleResultClick = (result: SearchResult) => {
+    router.push(`/${result.mediaType}/${result.id}`)
+    setSearchQuery("")
+    setShowResults(false)
   }
 
   const menuVariants = {
@@ -81,17 +176,81 @@ export function Navbar() {
           </div>
 
           {/* Search (Desktop) */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 mx-8 max-w-md">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search movies & TV shows..."
-                className="w-full pl-10 pr-4 py-2 bg-secondary/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary/50"
-              />
-            </div>
-          </form>
+          <div className="hidden md:flex flex-1 mx-8 max-w-md relative" ref={searchRef}>
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery && setShowResults(true)}
+                  placeholder="Search movies & TV shows..."
+                  className="w-full pl-10 pr-10 py-2 bg-secondary/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary/50 transition-colors"
+                  autoComplete="off"
+                />
+                {isSearching && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary animate-spin" />
+                )}
+              </div>
+            </form>
+
+            {/* Search Results Dropdown */}
+            <AnimatePresence>
+              {showResults && searchResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full mt-2 left-0 right-0 bg-secondary/95 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden shadow-2xl z-50"
+                >
+                  {searchResults.map((result) => (
+                    <div
+                      key={`${result.mediaType}-${result.id}`}
+                      onClick={() => handleResultClick(result)}
+                      className="flex items-center gap-3 p-2.5 cursor-pointer hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors"
+                    >
+                      {/* Poster */}
+                      <div className="w-10 h-14 bg-muted rounded overflow-hidden shrink-0">
+                        {result.poster ? (
+                          <img
+                            src={result.poster}
+                            alt={result.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Film className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-foreground truncate">
+                          {result.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <span>{result.year}</span>
+                          <span>•</span>
+                          <span className="capitalize">{result.mediaType}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* View All Results */}
+                  <button
+                    onClick={handleSearch}
+                    className="w-full p-2.5 text-xs text-primary font-semibold text-center hover:bg-white/5 border-t border-white/10 transition-colors"
+                  >
+                    View all results
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Desktop Menu */}
           {isAuthenticated && (

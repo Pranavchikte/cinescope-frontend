@@ -120,6 +120,31 @@ export const moviesAPI = {
         const res = await fetch(`${API_BASE_URL}/movies/${id}/videos`)
         return res.json()
     },
+
+    getGenres: async () => {
+        const res = await fetch(`${API_BASE_URL}/movies/genres`)
+        return res.json()
+    },
+
+    discover: async (params: {
+        genre?: string
+        year?: number
+        language?: string
+        country?: string
+        sort_by?: string
+        page?: number
+    }) => {
+        const queryParams = new URLSearchParams()
+        if (params.genre) queryParams.append('genre', params.genre)
+        if (params.year) queryParams.append('year', params.year.toString())
+        if (params.language) queryParams.append('language', params.language)
+        if (params.country) queryParams.append('country', params.country)
+        if (params.sort_by) queryParams.append('sort_by', params.sort_by)
+        if (params.page) queryParams.append('page', params.page.toString())
+
+        const res = await fetch(`${API_BASE_URL}/movies/discover?${queryParams}`)
+        return res.json()
+    },
 }
 
 // TV Shows API
@@ -151,6 +176,31 @@ export const tvAPI = {
 
     getVideos: async (id: number) => {
         const res = await fetch(`${API_BASE_URL}/tv/${id}/videos`)
+        return res.json()
+    },
+
+    getGenres: async () => {
+        const res = await fetch(`${API_BASE_URL}/tv/genres`)
+        return res.json()
+    },
+
+    discover: async (params: {
+        genre?: string
+        year?: number
+        language?: string
+        country?: string
+        sort_by?: string
+        page?: number
+    }) => {
+        const queryParams = new URLSearchParams()
+        if (params.genre) queryParams.append('genre', params.genre)
+        if (params.year) queryParams.append('year', params.year.toString())
+        if (params.language) queryParams.append('language', params.language)
+        if (params.country) queryParams.append('country', params.country)
+        if (params.sort_by) queryParams.append('sort_by', params.sort_by)
+        if (params.page) queryParams.append('page', params.page.toString())
+
+        const res = await fetch(`${API_BASE_URL}/tv/discover?${queryParams}`)
         return res.json()
     },
 }
