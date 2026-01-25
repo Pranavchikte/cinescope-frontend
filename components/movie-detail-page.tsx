@@ -39,12 +39,14 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   const [movie, setMovie] = useState<Movie | null>(null)
   const [cast, setCast] = useState<Cast[]>([])
   const [trailer, setTrailer] = useState<Video | null>(null)
+  const [recommendations, setRecommendations] = useState<any[]>([])
   const [similarMovies, setSimilarMovies] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showRatingMenu, setShowRatingMenu] = useState(false)
   const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRef2 = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
   const ratingOptions = [
@@ -76,16 +78,22 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         ) || videosData.results?.[0]
         setTrailer(trailerVideo || null)
 
-        // Fetch similar movies
-        const trendingData = await moviesAPI.getTrending()
-        const transformedMovies = trendingData.results.slice(0, 8).map((m: any) => ({
+        // Fetch recommendations and similar movies
+        const [recommendationsData, similarData] = await Promise.all([
+          moviesAPI.getRecommendations(parseInt(movieId)),
+          moviesAPI.getSimilar(parseInt(movieId)),
+        ])
+
+        const transformMovie = (m: any) => ({
           id: m.id,
           title: m.title,
           rating: m.vote_average,
           poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : "",
           year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
-        }))
-        setSimilarMovies(transformedMovies)
+        })
+
+        setRecommendations(recommendationsData.results?.slice(0, 10).map(transformMovie) || [])
+        setSimilarMovies(similarData.results?.slice(0, 10).map(transformMovie) || [])
 
       } catch (err) {
         console.error("Failed to fetch movie data:", err)
@@ -350,17 +358,38 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
           </motion.div>
         )}
 
-        {/* Similar Movies Section */}
-        {similarMovies.length > 0 && (
+        {/* Recommended Movies Section */}
+        {recommendations.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
             className="mb-12"
           >
-            <h3 className="text-2xl font-bold text-foreground mb-4">Similar Movies</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Recommended for You</h3>
             <div className="relative">
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
+                {recommendations.map((movie) => (
+                  <motion.div key={movie.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
+                    <MovieCard movie={movie} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Similar Movies Section */}
+        {similarMovies.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="mb-12"
+          >
+            <h3 className="text-2xl font-bold text-foreground mb-4">More Like This</h3>
+            <div className="relative">
+              <div ref={scrollRef2} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
                 {similarMovies.map((movie) => (
                   <motion.div key={movie.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
                     <MovieCard movie={movie} />

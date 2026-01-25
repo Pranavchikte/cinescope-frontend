@@ -8,6 +8,7 @@ interface FilterBarProps {
   onFilterChange: (filters: FilterState) => void
   mediaType: "movie" | "tv"
   genres: { id: number; name: string }[]
+  providers: { provider_id: number; provider_name: string; logo_path: string }[]
 }
 
 export interface FilterState {
@@ -15,7 +16,13 @@ export interface FilterState {
   year: number | null
   language: string
   country: string
+  provider: string
   sort_by: string
+  vote_count_min: number
+  vote_average_min: number | null
+  vote_average_max: number | null
+  runtime_min: number | null
+  runtime_max: number | null
 }
 
 const LANGUAGES = [
@@ -49,20 +56,29 @@ const SORT_OPTIONS = [
 
 const YEARS = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i)
 
-export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps) {
+export function FilterBar({ onFilterChange, mediaType, genres, providers }: FilterBarProps) {
   const [filters, setFilters] = useState<FilterState>({
     genre: "",
     year: null,
     language: "",
     country: "",
+    provider: "",
     sort_by: "popularity.desc",
+    vote_count_min: 100,
+    vote_average_min: null,
+    vote_average_max: null,
+    runtime_min: null,
+    runtime_max: null,
   })
 
   const [showGenres, setShowGenres] = useState(false)
   const [showYears, setShowYears] = useState(false)
   const [showLanguages, setShowLanguages] = useState(false)
   const [showCountries, setShowCountries] = useState(false)
+  const [showProviders, setShowProviders] = useState(false)
   const [showSort, setShowSort] = useState(false)
+  const [showQuality, setShowQuality] = useState(false)
+  const [showRuntime, setShowRuntime] = useState(false)
 
   useEffect(() => {
     onFilterChange(filters)
@@ -78,16 +94,38 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
       year: null,
       language: "",
       country: "",
+      provider: "",
       sort_by: "popularity.desc",
+      vote_count_min: 100,
+      vote_average_min: null,
+      vote_average_max: null,
+      runtime_min: null,
+      runtime_max: null,
     })
   }
 
-  const hasActiveFilters = filters.genre || filters.year || filters.language || filters.country
+  const hasActiveFilters = 
+    filters.genre || 
+    filters.year || 
+    filters.language || 
+    filters.country || 
+    filters.provider || 
+    filters.vote_count_min !== 100 ||
+    filters.vote_average_min !== null ||
+    filters.vote_average_max !== null ||
+    filters.runtime_min !== null ||
+    filters.runtime_max !== null
 
   const getGenreName = () => {
     if (!filters.genre) return "Genre"
     const genre = genres.find((g) => g.id.toString() === filters.genre)
     return genre?.name || "Genre"
+  }
+
+  const getProviderName = () => {
+    if (!filters.provider) return "Streaming"
+    const provider = providers.find((p) => p.provider_id.toString() === filters.provider)
+    return provider?.provider_name || "Streaming"
   }
 
   return (
@@ -100,11 +138,12 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                setShowGenres(!showGenres)
                 setShowYears(false)
                 setShowLanguages(false)
                 setShowCountries(false)
+                setShowProviders(false)
                 setShowSort(false)
+                setShowGenres(!showGenres)
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 filters.genre
@@ -150,17 +189,82 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
             </AnimatePresence>
           </div>
 
+          {/* Streaming Provider Filter */}
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                setShowGenres(false)
+                setShowYears(false)
+                setShowLanguages(false)
+                setShowCountries(false)
+                setShowSort(false)
+                setShowProviders(!showProviders)
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                filters.provider
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary/50 text-foreground hover:bg-secondary"
+              } border border-white/10`}
+            >
+              {getProviderName()}
+              <ChevronDown className="w-4 h-4" />
+            </motion.button>
+
+            <AnimatePresence>
+              {showProviders && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full mt-2 left-0 bg-secondary border border-white/10 rounded-lg overflow-hidden shadow-xl z-50 min-w-56 max-h-80 overflow-y-auto"
+                >
+                  <button
+                    onClick={() => {
+                      updateFilter("provider", "")
+                      setShowProviders(false)
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-white/5 transition-colors border-b border-white/5"
+                  >
+                    All Platforms
+                  </button>
+                  {providers.map((provider) => (
+                    <button
+                      key={provider.provider_id}
+                      onClick={() => {
+                        updateFilter("provider", provider.provider_id.toString())
+                        setShowProviders(false)
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-white/5 transition-colors flex items-center gap-3"
+                    >
+                      {provider.logo_path && (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                          alt={provider.provider_name}
+                          className="w-8 h-8 rounded object-cover"
+                        />
+                      )}
+                      <span>{provider.provider_name}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {/* Year Filter */}
           <div className="relative">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                setShowYears(!showYears)
                 setShowGenres(false)
                 setShowLanguages(false)
                 setShowCountries(false)
+                setShowProviders(false)
                 setShowSort(false)
+                setShowYears(!showYears)
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 filters.year
@@ -212,11 +316,12 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                setShowLanguages(!showLanguages)
                 setShowGenres(false)
                 setShowYears(false)
                 setShowCountries(false)
+                setShowProviders(false)
                 setShowSort(false)
+                setShowLanguages(!showLanguages)
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 filters.language
@@ -259,11 +364,12 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                setShowCountries(!showCountries)
                 setShowGenres(false)
                 setShowYears(false)
                 setShowLanguages(false)
+                setShowProviders(false)
                 setShowSort(false)
+                setShowCountries(!showCountries)
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 filters.country
@@ -299,6 +405,171 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
               )}
             </AnimatePresence>
           </div>
+          
+          {/* Quality Filter */}
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                setShowGenres(false)
+                setShowYears(false)
+                setShowLanguages(false)
+                setShowCountries(false)
+                setShowProviders(false)
+                setShowSort(false)
+                setShowRuntime(false)
+                setShowQuality(!showQuality)
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                filters.vote_count_min !== 100 || filters.vote_average_min || filters.vote_average_max
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary/50 text-foreground hover:bg-secondary"
+              } border border-white/10`}
+            >
+              Quality
+              <ChevronDown className="w-4 h-4" />
+            </motion.button>
+
+            <AnimatePresence>
+              {showQuality && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full mt-2 left-0 bg-secondary border border-white/10 rounded-lg overflow-hidden shadow-xl z-50 min-w-64 p-4 space-y-4"
+                >
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">
+                      Min Votes: {filters.vote_count_min}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      step="50"
+                      value={filters.vote_count_min}
+                      onChange={(e) => updateFilter("vote_count_min", parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">
+                      Min Rating: {filters.vote_average_min || "Any"}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      step="0.5"
+                      value={filters.vote_average_min || 0}
+                      onChange={(e) => updateFilter("vote_average_min", parseFloat(e.target.value) || null)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">
+                      Max Rating: {filters.vote_average_max || "Any"}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      step="0.5"
+                      value={filters.vote_average_max || 10}
+                      onChange={(e) => updateFilter("vote_average_max", parseFloat(e.target.value) || null)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => setShowQuality(false)}
+                    className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+                  >
+                    Apply
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Runtime Filter (Movies Only) */}
+          {mediaType === "movie" && (
+            <div className="relative">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setShowGenres(false)
+                  setShowYears(false)
+                  setShowLanguages(false)
+                  setShowCountries(false)
+                  setShowProviders(false)
+                  setShowSort(false)
+                  setShowQuality(false)
+                  setShowRuntime(!showRuntime)
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  filters.runtime_min || filters.runtime_max
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary/50 text-foreground hover:bg-secondary"
+                } border border-white/10`}
+              >
+                Runtime
+                <ChevronDown className="w-4 h-4" />
+              </motion.button>
+
+              <AnimatePresence>
+                {showRuntime && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full mt-2 left-0 bg-secondary border border-white/10 rounded-lg overflow-hidden shadow-xl z-50 min-w-64 p-4 space-y-4"
+                  >
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-2 block">
+                        Min Runtime: {filters.runtime_min || "Any"} min
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="240"
+                        step="15"
+                        value={filters.runtime_min || 0}
+                        onChange={(e) => updateFilter("runtime_min", parseInt(e.target.value) || null)}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-2 block">
+                        Max Runtime: {filters.runtime_max || "Any"} min
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="240"
+                        step="15"
+                        value={filters.runtime_max || 240}
+                        onChange={(e) => updateFilter("runtime_max", parseInt(e.target.value) || null)}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <button
+                      onClick={() => setShowRuntime(false)}
+                      className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+                    >
+                      Apply
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* Sort By */}
           <div className="relative">
@@ -306,11 +577,12 @@ export function FilterBar({ onFilterChange, mediaType, genres }: FilterBarProps)
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                setShowSort(!showSort)
                 setShowGenres(false)
                 setShowYears(false)
                 setShowLanguages(false)
                 setShowCountries(false)
+                setShowProviders(false)
+                setShowSort(!showSort)
               }}
               className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all bg-secondary/50 text-foreground hover:bg-secondary border border-white/10"
             >

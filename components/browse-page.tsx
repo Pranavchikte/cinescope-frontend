@@ -1,6 +1,6 @@
 "use client"
 
-import { moviesAPI } from "@/lib/api"
+import { moviesAPI, getAccessToken } from "@/lib/api"
 import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
@@ -104,15 +104,24 @@ export function BrowsePage() {
   const [trendingMovies, setTrendingMovies] = useState<any[]>([])
   const [popularMovies, setPopularMovies] = useState<any[]>([])
   const [filteredMovies, setFilteredMovies] = useState<any[]>([])
+  const [personalizedMovies, setPersonalizedMovies] = useState<any[]>([])
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([])
+  const [providers, setProviders] = useState<{ provider_id: number; provider_name: string; logo_path: string }[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isFiltering, setIsFiltering] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [currentFilters, setCurrentFilters] = useState<FilterState>({
     genre: "",
     year: null,
     language: "",
     country: "",
+    provider: "",
     sort_by: "popularity.desc",
+    vote_count_min: 100,
+    vote_average_min: null,
+    vote_average_max: null,
+    runtime_min: null,
+    runtime_max: null,
   })
 
   // Fetch initial data
@@ -120,10 +129,11 @@ export function BrowsePage() {
     const fetchInitialData = async () => {
       try {
         setIsLoading(true)
-        const [trending, popular, genresData] = await Promise.all([
+        const [trending, popular, genresData, providersData] = await Promise.all([
           moviesAPI.getTrending(),
           moviesAPI.getPopular(),
           moviesAPI.getGenres(),
+          moviesAPI.getProviders("IN"),
         ])
 
         const transformMovie = (m: TMDBMovie) => ({
@@ -138,6 +148,7 @@ export function BrowsePage() {
         setPopularMovies(popular.results.map(transformMovie))
         setFilteredMovies(popular.results.map(transformMovie))
         setGenres(genresData.genres || [])
+        setProviders(providersData.results || [])
       } catch (error) {
         console.error("Failed to fetch movies:", error)
       } finally {
@@ -146,6 +157,33 @@ export function BrowsePage() {
     }
 
     fetchInitialData()
+  }, [])
+
+  // Fetch personalized movies if authenticated
+  useEffect(() => {
+    const fetchPersonalized = async () => {
+      try {
+        const token = getAccessToken()
+        if (token) {
+          setIsAuthenticated(true)
+          const data = await moviesAPI.getPersonalized(1, 500, 6.5)
+          
+          const transformMovie = (m: TMDBMovie) => ({
+            id: m.id,
+            title: m.title,
+            rating: m.vote_average,
+            poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : "",
+            year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+          })
+
+          setPersonalizedMovies(data.results.map(transformMovie))
+        }
+      } catch (error) {
+        console.error("Failed to fetch personalized movies:", error)
+      }
+    }
+
+    fetchPersonalized()
   }, [])
 
   // Fetch filtered data when filters change
@@ -157,12 +195,18 @@ export function BrowsePage() {
         const params: any = {
           sort_by: currentFilters.sort_by,
           page: 1,
+          vote_count_min: currentFilters.vote_count_min,
         }
 
         if (currentFilters.genre) params.genre = currentFilters.genre
         if (currentFilters.year) params.year = currentFilters.year
         if (currentFilters.language) params.language = currentFilters.language
         if (currentFilters.country) params.country = currentFilters.country
+        if (currentFilters.provider) params.provider = currentFilters.provider
+        if (currentFilters.vote_average_min !== null) params.vote_average_min = currentFilters.vote_average_min
+        if (currentFilters.vote_average_max !== null) params.vote_average_max = currentFilters.vote_average_max
+        if (currentFilters.runtime_min !== null) params.runtime_min = currentFilters.runtime_min
+        if (currentFilters.runtime_max !== null) params.runtime_max = currentFilters.runtime_max
 
         const data = await moviesAPI.discover(params)
 
@@ -189,12 +233,22 @@ export function BrowsePage() {
     setCurrentFilters(filters)
   }
 
-  const hasActiveFilters = currentFilters.genre || currentFilters.year || currentFilters.language || currentFilters.country
+  const hasActiveFilters = 
+    currentFilters.genre || 
+    currentFilters.year || 
+    currentFilters.language || 
+    currentFilters.country || 
+    currentFilters.provider ||
+    currentFilters.vote_count_min !== 100 ||
+    currentFilters.vote_average_min !== null ||
+    currentFilters.vote_average_max !== null ||
+    currentFilters.runtime_min !== null ||
+    currentFilters.runtime_max !== null
 
   return (
     <div className="space-y-8">
       {/* Filter Bar */}
-      <FilterBar onFilterChange={handleFilterChange} mediaType="movie" genres={genres} />
+      <FilterBar onFilterChange={handleFilterChange} mediaType="movie" genres={genres} providers={providers} />
 
       <div className="space-y-12 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
@@ -204,6 +258,11 @@ export function BrowsePage() {
               <h1 className="text-4xl font-bold text-foreground">Discover</h1>
               <p className="text-muted-foreground mt-2">Explore trending movies and TV shows</p>
             </div>
+
+            {/* Personalized Section */}
+            {isAuthenticated && personalizedMovies.length > 0 && (
+              <ScrollContainer title="For You" movies={personalizedMovies} isLoading={isLoading} />
+            )}
 
             <ScrollContainer title="Trending Movies" movies={trendingMovies} isLoading={isLoading} />
             <ScrollContainer title="Popular Movies" movies={popularMovies} isLoading={isLoading} />

@@ -1,6 +1,6 @@
 "use client"
 
-import { tvAPI } from "@/lib/api"
+import { tvAPI, getAccessToken } from "@/lib/api"
 import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
@@ -104,15 +104,24 @@ export function TVBrowsePage() {
   const [trendingShows, setTrendingShows] = useState<any[]>([])
   const [popularShows, setPopularShows] = useState<any[]>([])
   const [filteredShows, setFilteredShows] = useState<any[]>([])
+  const [personalizedShows, setPersonalizedShows] = useState<any[]>([])
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([])
+  const [providers, setProviders] = useState<{ provider_id: number; provider_name: string; logo_path: string }[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isFiltering, setIsFiltering] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [currentFilters, setCurrentFilters] = useState<FilterState>({
     genre: "",
     year: null,
     language: "",
     country: "",
+    provider: "",
     sort_by: "popularity.desc",
+    vote_count_min: 100,
+    vote_average_min: null,
+    vote_average_max: null,
+    runtime_min: null,
+    runtime_max: null,
   })
 
   // Fetch initial data
@@ -120,10 +129,11 @@ export function TVBrowsePage() {
     const fetchInitialData = async () => {
       try {
         setIsLoading(true)
-        const [trending, popular, genresData] = await Promise.all([
+        const [trending, popular, genresData, providersData] = await Promise.all([
           tvAPI.getTrending(),
           tvAPI.getPopular(),
           tvAPI.getGenres(),
+          tvAPI.getProviders("IN"),
         ])
 
         const transformShow = (s: TMDBShow) => ({
@@ -138,6 +148,7 @@ export function TVBrowsePage() {
         setPopularShows(popular.results.map(transformShow))
         setFilteredShows(popular.results.map(transformShow))
         setGenres(genresData.genres || [])
+        setProviders(providersData.results || [])
       } catch (error) {
         console.error("Failed to fetch TV shows:", error)
       } finally {
@@ -146,6 +157,33 @@ export function TVBrowsePage() {
     }
 
     fetchInitialData()
+  }, [])
+
+  // Fetch personalized TV shows if authenticated
+  useEffect(() => {
+    const fetchPersonalized = async () => {
+      try {
+        const token = getAccessToken()
+        if (token) {
+          setIsAuthenticated(true)
+          const data = await tvAPI.getPersonalized(1, 500, 6.5)
+          
+          const transformShow = (s: TMDBShow) => ({
+            id: s.id,
+            title: s.name,
+            rating: s.vote_average,
+            poster: s.poster_path ? `https://image.tmdb.org/t/p/w500${s.poster_path}` : "",
+            year: s.first_air_date ? new Date(s.first_air_date).getFullYear() : 2024,
+          })
+
+          setPersonalizedShows(data.results.map(transformShow))
+        }
+      } catch (error) {
+        console.error("Failed to fetch personalized TV shows:", error)
+      }
+    }
+
+    fetchPersonalized()
   }, [])
 
   // Fetch filtered data when filters change
@@ -157,12 +195,16 @@ export function TVBrowsePage() {
         const params: any = {
           sort_by: currentFilters.sort_by,
           page: 1,
+          vote_count_min: currentFilters.vote_count_min,
         }
 
         if (currentFilters.genre) params.genre = currentFilters.genre
         if (currentFilters.year) params.year = currentFilters.year
         if (currentFilters.language) params.language = currentFilters.language
         if (currentFilters.country) params.country = currentFilters.country
+        if (currentFilters.provider) params.provider = currentFilters.provider
+        if (currentFilters.vote_average_min !== null) params.vote_average_min = currentFilters.vote_average_min
+        if (currentFilters.vote_average_max !== null) params.vote_average_max = currentFilters.vote_average_max
 
         const data = await tvAPI.discover(params)
 
@@ -189,12 +231,20 @@ export function TVBrowsePage() {
     setCurrentFilters(filters)
   }
 
-  const hasActiveFilters = currentFilters.genre || currentFilters.year || currentFilters.language || currentFilters.country
+  const hasActiveFilters = 
+    currentFilters.genre || 
+    currentFilters.year || 
+    currentFilters.language || 
+    currentFilters.country || 
+    currentFilters.provider ||
+    currentFilters.vote_count_min !== 100 ||
+    currentFilters.vote_average_min !== null ||
+    currentFilters.vote_average_max !== null
 
   return (
     <div className="space-y-8">
       {/* Filter Bar */}
-      <FilterBar onFilterChange={handleFilterChange} mediaType="tv" genres={genres} />
+      <FilterBar onFilterChange={handleFilterChange} mediaType="tv" genres={genres} providers={providers} />
 
       <div className="space-y-12 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
@@ -204,6 +254,11 @@ export function TVBrowsePage() {
               <h1 className="text-4xl font-bold text-foreground">TV Shows</h1>
               <p className="text-muted-foreground mt-2">Explore trending and popular TV shows</p>
             </div>
+
+            {/* Personalized Section */}
+            {isAuthenticated && personalizedShows.length > 0 && (
+              <ScrollContainer title="For You" shows={personalizedShows} isLoading={isLoading} />
+            )}
 
             <ScrollContainer title="Trending TV Shows" shows={trendingShows} isLoading={isLoading} />
             <ScrollContainer title="Popular TV Shows" shows={popularShows} isLoading={isLoading} />

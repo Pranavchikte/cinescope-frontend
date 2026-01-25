@@ -88,7 +88,6 @@ export const authAPI = {
     },
 }
 
-
 // Movies API
 export const moviesAPI = {
     getTrending: async () => {
@@ -126,23 +125,66 @@ export const moviesAPI = {
         return res.json()
     },
 
+    getRecommendations: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/recommendations?page=${page}`)
+        return res.json()
+    },
+
+    getSimilar: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/similar?page=${page}`)
+        return res.json()
+    },
+
+    getPersonalized: async (page: number = 1, vote_count_min: number = 500, vote_average_min: number = 6.5) => {
+        const token = getAccessToken()
+        const res = await fetch(
+            `${API_BASE_URL}/movies/personalized?page=${page}&vote_count_min=${vote_count_min}&vote_average_min=${vote_average_min}`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        )
+        return res.json()
+    },
+
     discover: async (params: {
         genre?: string
         year?: number
         language?: string
         country?: string
+        provider?: string
         sort_by?: string
         page?: number
+        vote_count_min?: number
+        vote_average_min?: number
+        vote_average_max?: number
+        runtime_min?: number
+        runtime_max?: number
     }) => {
         const queryParams = new URLSearchParams()
         if (params.genre) queryParams.append('genre', params.genre)
         if (params.year) queryParams.append('year', params.year.toString())
         if (params.language) queryParams.append('language', params.language)
         if (params.country) queryParams.append('country', params.country)
+        if (params.provider) queryParams.append('provider', params.provider)
         if (params.sort_by) queryParams.append('sort_by', params.sort_by)
         if (params.page) queryParams.append('page', params.page.toString())
+        if (params.vote_count_min !== undefined) queryParams.append('vote_count_min', params.vote_count_min.toString())
+        if (params.vote_average_min !== undefined) queryParams.append('vote_average_min', params.vote_average_min.toString())
+        if (params.vote_average_max !== undefined) queryParams.append('vote_average_max', params.vote_average_max.toString())
+        if (params.runtime_min !== undefined) queryParams.append('runtime_min', params.runtime_min.toString())
+        if (params.runtime_max !== undefined) queryParams.append('runtime_max', params.runtime_max.toString())
 
         const res = await fetch(`${API_BASE_URL}/movies/discover?${queryParams}`)
+        return res.json()
+    },
+
+    getProviders: async (region: string = "IN") => {
+        const res = await fetch(`${API_BASE_URL}/movies/providers?region=${region}`)
+        return res.json()
+    },
+
+    getMovieProviders: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/providers`)
         return res.json()
     },
 }
@@ -184,23 +226,62 @@ export const tvAPI = {
         return res.json()
     },
 
+    getRecommendations: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/recommendations?page=${page}`)
+        return res.json()
+    },
+
+    getSimilar: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/similar?page=${page}`)
+        return res.json()
+    },
+
+    getPersonalized: async (page: number = 1, vote_count_min: number = 500, vote_average_min: number = 6.5) => {
+        const token = getAccessToken()
+        const res = await fetch(
+            `${API_BASE_URL}/tv/personalized?page=${page}&vote_count_min=${vote_count_min}&vote_average_min=${vote_average_min}`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        )
+        return res.json()
+    },
+
     discover: async (params: {
         genre?: string
         year?: number
         language?: string
         country?: string
+        provider?: string
         sort_by?: string
         page?: number
+        vote_count_min?: number
+        vote_average_min?: number
+        vote_average_max?: number
     }) => {
         const queryParams = new URLSearchParams()
         if (params.genre) queryParams.append('genre', params.genre)
         if (params.year) queryParams.append('year', params.year.toString())
         if (params.language) queryParams.append('language', params.language)
         if (params.country) queryParams.append('country', params.country)
+        if (params.provider) queryParams.append('provider', params.provider)
         if (params.sort_by) queryParams.append('sort_by', params.sort_by)
         if (params.page) queryParams.append('page', params.page.toString())
+        if (params.vote_count_min !== undefined) queryParams.append('vote_count_min', params.vote_count_min.toString())
+        if (params.vote_average_min !== undefined) queryParams.append('vote_average_min', params.vote_average_min.toString())
+        if (params.vote_average_max !== undefined) queryParams.append('vote_average_max', params.vote_average_max.toString())
 
         const res = await fetch(`${API_BASE_URL}/tv/discover?${queryParams}`)
+        return res.json()
+    },
+
+    getProviders: async (region: string = "IN") => {
+        const res = await fetch(`${API_BASE_URL}/tv/providers?region=${region}`)
+        return res.json()
+    },
+
+    getTVProviders: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/providers`)
         return res.json()
     },
 }

@@ -41,12 +41,14 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   const [show, setShow] = useState<TVShow | null>(null)
   const [cast, setCast] = useState<Cast[]>([])
   const [trailer, setTrailer] = useState<Video | null>(null)
+  const [recommendations, setRecommendations] = useState<any[]>([])
   const [similarShows, setSimilarShows] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showRatingMenu, setShowRatingMenu] = useState(false)
   const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRef2 = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
   const ratingOptions = [
@@ -76,15 +78,22 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
         ) || videosData.results?.[0]
         setTrailer(trailerVideo || null)
 
-        const trendingData = await tvAPI.getTrending()
-        const transformedShows = trendingData.results.slice(0, 8).map((s: any) => ({
+        // Fetch recommendations and similar shows
+        const [recommendationsData, similarData] = await Promise.all([
+          tvAPI.getRecommendations(parseInt(tvId)),
+          tvAPI.getSimilar(parseInt(tvId)),
+        ])
+
+        const transformShow = (s: any) => ({
           id: s.id,
           title: s.name,
           rating: s.vote_average,
           poster: s.poster_path ? `https://image.tmdb.org/t/p/w500${s.poster_path}` : "",
           year: s.first_air_date ? new Date(s.first_air_date).getFullYear() : 2024,
-        }))
-        setSimilarShows(transformedShows)
+        })
+
+        setRecommendations(recommendationsData.results?.slice(0, 10).map(transformShow) || [])
+        setSimilarShows(similarData.results?.slice(0, 10).map(transformShow) || [])
 
       } catch (err) {
         console.error("Failed to fetch TV show data:", err)
@@ -337,16 +346,38 @@ const avgRuntime = show.episode_run_time?.[0] || 45
           </motion.div>
         )}
 
-        {similarShows.length > 0 && (
+        {/* Recommended Shows Section */}
+        {recommendations.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
             className="mb-12"
           >
-            <h3 className="text-2xl font-bold text-foreground mb-4">Similar Shows</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Recommended for You</h3>
             <div className="relative">
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
+                {recommendations.map((show) => (
+                  <motion.div key={show.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
+                    <MovieCard movie={show} mediaType="tv" />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Similar Shows Section */}
+        {similarShows.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="mb-12"
+          >
+            <h3 className="text-2xl font-bold text-foreground mb-4">More Like This</h3>
+            <div className="relative">
+              <div ref={scrollRef2} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
                 {similarShows.map((show) => (
                   <motion.div key={show.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="shrink-0">
                     <MovieCard movie={show} mediaType="tv" />
