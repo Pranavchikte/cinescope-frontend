@@ -366,3 +366,99 @@ export const ratingsAPI = {
         return res.json()
     },
 }
+
+// Creator Requests API
+export const creatorRequestsAPI = {
+    create: async (message?: string) => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/creator-requests`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ message }),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    getMyRequest: async () => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/creator-requests/my-request`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    getAll: async (statusFilter?: string) => {
+        const token = getAccessToken()
+        const url = statusFilter
+            ? `${API_BASE_URL}/creator-requests?status_filter=${statusFilter}`
+            : `${API_BASE_URL}/creator-requests`
+        const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    approve: async (requestId: string) => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/creator-requests/${requestId}/approve`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    reject: async (requestId: string) => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/creator-requests/${requestId}/reject`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+}
+
+// Creators API
+export const creatorsAPI = {
+    getAll: async () => {
+        const res = await fetch(`${API_BASE_URL}/creators`)
+        return res.json()
+    },
+
+    getRatings: async (username: string, ratingFilter?: string, mediaType?: string) => {
+        const params = new URLSearchParams()
+        if (ratingFilter) params.append('rating_filter', ratingFilter)
+        if (mediaType) params.append('media_type', mediaType)
+
+        const url = params.toString()
+            ? `${API_BASE_URL}/creators/${username}/ratings?${params}`
+            : `${API_BASE_URL}/creators/${username}/ratings`
+
+        const res = await fetch(url)
+        return res.json()
+    },
+}
+
+// Update profile API
+export const profileAPI = {
+    update: async (data: { is_public_profile?: boolean }) => {
+        const token = getAccessToken()
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+}
