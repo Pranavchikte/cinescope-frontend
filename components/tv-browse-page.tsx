@@ -2,11 +2,10 @@
 
 import { tvAPI, getAccessToken } from "@/lib/api"
 import { useState, useRef, useEffect } from "react"
-import { motion } from "framer-motion"
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, ChevronRight, Loader2, Tv, TrendingUp, Star } from "lucide-react"
 import { MovieCard } from "@/components/movie-card"
 import { MovieGrid } from "@/components/movie-grid"
-import { MovieCardSkeleton } from "@/components/movie-card-skeleton"
 import { FilterBar, FilterState } from "@/components/filter-bar"
 
 interface TMDBShow {
@@ -21,10 +20,12 @@ function ScrollContainer({
   title,
   shows,
   isLoading = false,
+  icon: Icon,
 }: {
   title: string
   shows: any[]
   isLoading?: boolean
+  icon?: any
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -40,61 +41,97 @@ function ScrollContainer({
 
   useEffect(() => {
     checkScroll()
-    window.addEventListener("resize", checkScroll)
-    return () => window.removeEventListener("resize", checkScroll)
+    const element = scrollContainerRef.current
+    if (element) {
+      element.addEventListener("scroll", checkScroll)
+      return () => element.removeEventListener("scroll", checkScroll)
+    }
+  }, [shows])
+
+  useEffect(() => {
+    const handleResize = () => checkScroll()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
   const scroll = (direction: "left" | "right") => {
     const element = scrollContainerRef.current
     if (element) {
-      const scrollAmount = 400
-      const newScrollLeft = direction === "left" ? element.scrollLeft - scrollAmount : element.scrollLeft + scrollAmount
-      element.scrollTo({ left: newScrollLeft, behavior: "smooth" })
-      setTimeout(checkScroll, 300)
+      const scrollAmount = element.clientWidth * 0.8
+      element.scrollBy({ 
+        left: direction === "left" ? -scrollAmount : scrollAmount, 
+        behavior: "smooth" 
+      })
     }
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-      <div className="relative group">
-        {canScrollLeft && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/60 hover:bg-black/80 p-2 rounded-full text-white transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </motion.button>
-        )}
-
-        {canScrollRight && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/60 hover:bg-black/80 p-2 rounded-full text-white transition-colors"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </motion.button>
-        )}
-
-        <div ref={scrollContainerRef} onScroll={checkScroll} className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-          {isLoading
-            ? Array.from({ length: 6 }).map((_, i) => <MovieCardSkeleton key={i} />)
-            : shows.map((show) => (
-                <motion.div
-                  key={show.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="shrink-0"
-                >
-                  <MovieCard movie={show} mediaType="tv" />
-                </motion.div>
-              ))}
+      {/* Section Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {Icon && (
+            <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
+              <Icon className="w-5 h-5 text-violet-400" />
+            </div>
+          )}
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
         </div>
+
+        {/* Desktop Scroll Buttons */}
+        <div className="hidden md:flex gap-2">
+          <button
+            onClick={() => scroll("left")}
+            disabled={!canScrollLeft}
+            className="w-10 h-10 bg-zinc-800/50 hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center transition-all"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            disabled={!canScrollRight}
+            className="w-10 h-10 bg-zinc-800/50 hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center transition-all"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Scroll Container */}
+      <div className="relative">
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="shrink-0 w-[160px] sm:w-[180px] md:w-[200px] snap-start">
+                <div className="aspect-[2/3] bg-zinc-800 rounded-xl animate-pulse" />
+                <div className="mt-3 space-y-2">
+                  <div className="h-4 bg-zinc-800 rounded w-3/4 animate-pulse" />
+                  <div className="h-3 bg-zinc-800 rounded w-1/2 animate-pulse" />
+                </div>
+              </div>
+            ))
+          ) : (
+            shows.map((show, index) => (
+              <motion.div
+                key={show.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.03, duration: 0.3 }}
+                className="shrink-0 w-[160px] sm:w-[180px] md:w-[200px] snap-start"
+              >
+                <MovieCard movie={show} mediaType="tv" />
+              </motion.div>
+            ))
+          )}
+        </div>
+
+        {/* Gradient Fade Edges - Mobile */}
+        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black to-transparent" />
       </div>
     </div>
   )
@@ -124,7 +161,6 @@ export function TVBrowsePage() {
     runtime_max: null,
   })
 
-  // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -159,7 +195,6 @@ export function TVBrowsePage() {
     fetchInitialData()
   }, [])
 
-  // Fetch personalized TV shows if authenticated
   useEffect(() => {
     const fetchPersonalized = async () => {
       try {
@@ -186,7 +221,6 @@ export function TVBrowsePage() {
     fetchPersonalized()
   }, [])
 
-  // Fetch filtered data when filters change
   useEffect(() => {
     const fetchFilteredData = async () => {
       try {
@@ -242,40 +276,112 @@ export function TVBrowsePage() {
     currentFilters.vote_average_max !== null
 
   return (
-    <div className="space-y-8">
-      {/* Filter Bar */}
-      <FilterBar onFilterChange={handleFilterChange} mediaType="tv" genres={genres} providers={providers} />
+    <div className="min-h-screen bg-black pt-20">
+      {/* Hero Section */}
+      {!hasActiveFilters && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative px-4 sm:px-6 lg:px-8 py-12 sm:py-16 mb-8"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-2xl flex items-center justify-center">
+                <Tv className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl sm:text-5xl font-bold text-white">TV Shows</h1>
+                <p className="text-zinc-400 mt-2">Discover your next binge-worthy series</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
-      <div className="space-y-12 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Header */}
-        {!hasActiveFilters && (
-          <>
-            <div>
-              <h1 className="text-4xl font-bold text-foreground">TV Shows</h1>
-              <p className="text-muted-foreground mt-2">Explore trending and popular TV shows</p>
+      {/* Filter Bar */}
+      <div className="sticky top-20 z-40 bg-black/80 backdrop-blur-xl border-b border-zinc-800 mb-8">
+        <FilterBar 
+          onFilterChange={handleFilterChange} 
+          mediaType="tv" 
+          genres={genres} 
+          providers={providers} 
+        />
+      </div>
+
+      <div className="px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Carousel Sections */}
+          {!hasActiveFilters && (
+            <>
+              {isAuthenticated && personalizedShows.length > 0 && (
+                <ScrollContainer 
+                  title="For You" 
+                  shows={personalizedShows} 
+                  isLoading={isLoading}
+                  icon={Star}
+                />
+              )}
+
+              <ScrollContainer 
+                title="Trending Now" 
+                shows={trendingShows} 
+                isLoading={isLoading}
+                icon={TrendingUp}
+              />
+
+              <ScrollContainer 
+                title="Popular TV Shows" 
+                shows={popularShows} 
+                isLoading={isLoading}
+                icon={Tv}
+              />
+            </>
+          )}
+
+          {/* Filtered Results Grid */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">
+                {hasActiveFilters ? "Filtered Results" : "All TV Shows"}
+              </h2>
+              {isFiltering && (
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Loading...</span>
+                </div>
+              )}
             </div>
 
-            {/* Personalized Section */}
-            {isAuthenticated && personalizedShows.length > 0 && (
-              <ScrollContainer title="For You" shows={personalizedShows} isLoading={isLoading} />
+            {!isFiltering && filteredShows.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-20 h-20 bg-zinc-800/50 rounded-2xl flex items-center justify-center mb-6">
+                  <Tv className="w-10 h-10 text-zinc-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">No TV shows found</h3>
+                <p className="text-sm text-zinc-500">Try adjusting your filters</p>
+              </div>
+            ) : (
+              <MovieGrid 
+                movies={filteredShows} 
+                isLoading={isFiltering} 
+                mediaType="tv"
+                skeletonCount={12}
+              />
             )}
-
-            <ScrollContainer title="Trending TV Shows" shows={trendingShows} isLoading={isLoading} />
-            <ScrollContainer title="Popular TV Shows" shows={popularShows} isLoading={isLoading} />
-          </>
-        )}
-
-        {/* Filtered Results */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-foreground">
-              {hasActiveFilters ? "Filtered Results" : "All TV Shows"}
-            </h2>
-            {isFiltering && <Loader2 className="w-5 h-5 text-primary animate-spin" />}
           </div>
-          <MovieGrid movies={filteredShows} isLoading={isFiltering} />
         </div>
       </div>
+
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   )
 }
