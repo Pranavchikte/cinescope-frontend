@@ -5,7 +5,7 @@ import { Suspense } from "react"
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Loader2, ArrowLeft, Film, Tv, SlidersHorizontal, AlertCircle } from "lucide-react"
+import { Search, Loader2, Film, Tv, AlertCircle } from "lucide-react"
 import { MovieCard } from "@/components/movie-card"
 import { MovieCardSkeleton } from "@/components/movie-card-skeleton"
 
@@ -27,7 +27,6 @@ function SearchResults() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mediaFilter, setMediaFilter] = useState<"all" | "movie" | "tv">("all")
-  const [sortBy, setSortBy] = useState<"rating" | "year">("rating")
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -42,13 +41,11 @@ function SearchResults() {
         setIsLoading(true)
         setError(null)
 
-        // Search both movies and TV shows
         const [moviesData, tvData] = await Promise.all([
           moviesAPI.search(query),
           tvAPI.search(query),
         ])
 
-        // Transform movies
         const transformMovie = (m: any) => ({
           id: m.id,
           title: m.title,
@@ -58,7 +55,6 @@ function SearchResults() {
           mediaType: "movie" as const,
         })
 
-        // Transform TV shows
         const transformTV = (s: any) => ({
           id: s.id,
           title: s.name,
@@ -68,11 +64,10 @@ function SearchResults() {
           mediaType: "tv" as const,
         })
 
-        // Combine results
         const allResults = [
           ...moviesData.results.map(transformMovie),
           ...tvData.results.map(transformTV),
-        ]
+        ].sort((a, b) => b.rating - a.rating)
 
         setResults(allResults)
         setFilteredResults(allResults)
@@ -87,39 +82,27 @@ function SearchResults() {
     fetchSearchResults()
   }, [query])
 
-  // Apply filters and sorting
   useEffect(() => {
     let filtered = [...results]
 
-    // Media type filter
     if (mediaFilter !== "all") {
       filtered = filtered.filter((item) => item.mediaType === mediaFilter)
     }
 
-    // Sort
-    if (sortBy === "rating") {
-      filtered.sort((a, b) => b.rating - a.rating)
-    } else if (sortBy === "year") {
-      filtered.sort((a, b) => b.year - a.year)
-    }
-
     setFilteredResults(filtered)
-  }, [results, mediaFilter, sortBy])
+  }, [results, mediaFilter])
 
   const movieCount = results.filter((r) => r.mediaType === "movie").length
   const tvCount = results.filter((r) => r.mediaType === "tv").length
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-950">
-        <div className="fixed inset-0 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black pointer-events-none opacity-50" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-          <div className="mb-8">
-            <div className="h-10 bg-neutral-800 rounded-lg w-48 mb-3 animate-pulse" />
-            <div className="h-5 bg-neutral-800 rounded w-64 animate-pulse" />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
+      <div className="min-h-screen bg-[#141414] pt-24">
+        <div className="px-4 sm:px-6 lg:px-12">
+          <div className="h-8 bg-[#2a2a2a] rounded w-48 mb-3 animate-pulse" />
+          <div className="h-5 bg-[#2a2a2a] rounded w-64 mb-8 animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+            {Array.from({ length: 12 }).map((_, i) => (
               <MovieCardSkeleton key={i} />
             ))}
           </div>
@@ -130,23 +113,22 @@ function SearchResults() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
-        <div className="fixed inset-0 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black pointer-events-none opacity-50" />
+      <div className="min-h-screen bg-[#141414] flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative text-center max-w-md"
+          className="text-center max-w-md"
         >
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl mb-6 inline-flex">
-            <AlertCircle className="w-12 h-12 text-red-500" />
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#2a2a2a] rounded-full">
+            <AlertCircle className="w-8 h-8 text-[#b3b3b3]" />
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-neutral-50 mb-3">
-            Oops! Something went wrong
+          <h2 className="text-2xl font-semibold text-[#e5e5e5] mb-3">
+            Something went wrong
           </h2>
-          <p className="text-neutral-400 mb-8">{error}</p>
+          <p className="text-[#b3b3b3] mb-8">{error}</p>
           <button
             onClick={() => router.push("/")}
-            className="inline-flex items-center justify-center px-6 py-3 bg-neutral-100 hover:bg-white text-neutral-900 rounded-xl font-semibold transition-all"
+            className="px-6 py-2.5 bg-white text-black rounded font-medium hover:bg-[#e5e5e5] transition-colors"
           >
             Go Home
           </button>
@@ -158,181 +140,113 @@ function SearchResults() {
   const isEmpty = filteredResults.length === 0
 
   return (
-    <div className="min-h-screen bg-neutral-950">
-      <div className="fixed inset-0 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black pointer-events-none opacity-50" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-        {/* Back Button */}
-        <motion.button
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2 text-neutral-400 hover:text-neutral-200 transition-colors mb-6 md:mb-8 group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Back to home</span>
-        </motion.button>
-
+    <div className="min-h-screen bg-[#141414] pt-24 pb-12">
+      <div className="px-4 sm:px-6 lg:px-12">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <h1 className="text-3xl md:text-5xl font-bold text-neutral-50 mb-3 tracking-tight">
-            Search Results
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#e5e5e5] mb-2">
+            {query ? `Search results for "${query}"` : "Search Results"}
           </h1>
-          {query && (
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm md:text-base text-neutral-400">
-                {isEmpty ? "No results found for" : `Found ${filteredResults.length} results for`}
-              </p>
-              <span className="px-3 py-1 bg-neutral-800/50 border border-neutral-700/50 rounded-lg text-neutral-200 font-medium">
-                "{query}"
-              </span>
-            </div>
+          {!isEmpty && (
+            <p className="text-base text-[#b3b3b3]">
+              {filteredResults.length} {filteredResults.length === 1 ? "result" : "results"}
+            </p>
           )}
         </motion.div>
 
+        {/* Filter Tabs */}
         {!isEmpty && (
-          /* Filter Bar */
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="mb-8 space-y-4"
+            className="flex gap-4 mb-8 border-b border-[#2a2a2a]"
           >
-            {/* Media Type Filter */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-2">
-                Filter by Type
-              </label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setMediaFilter("all")}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    mediaFilter === "all"
-                      ? "bg-neutral-800 text-neutral-100 border border-neutral-700"
-                      : "bg-neutral-900/30 text-neutral-400 border border-neutral-800/50 hover:border-neutral-700/50 hover:text-neutral-300"
-                  }`}
-                >
-                  <span>All</span>
-                  <span className={`px-1.5 py-0.5 text-xs rounded-full ${
-                    mediaFilter === "all" ? "bg-neutral-700" : "bg-neutral-800"
-                  }`}>
-                    {results.length}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setMediaFilter("movie")}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    mediaFilter === "movie"
-                      ? "bg-neutral-800 text-neutral-100 border border-neutral-700"
-                      : "bg-neutral-900/30 text-neutral-400 border border-neutral-800/50 hover:border-neutral-700/50 hover:text-neutral-300"
-                  }`}
-                >
-                  <Film className="w-4 h-4" />
-                  <span>Movies</span>
-                  <span className={`px-1.5 py-0.5 text-xs rounded-full ${
-                    mediaFilter === "movie" ? "bg-neutral-700" : "bg-neutral-800"
-                  }`}>
-                    {movieCount}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setMediaFilter("tv")}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    mediaFilter === "tv"
-                      ? "bg-neutral-800 text-neutral-100 border border-neutral-700"
-                      : "bg-neutral-900/30 text-neutral-400 border border-neutral-800/50 hover:border-neutral-700/50 hover:text-neutral-300"
-                  }`}
-                >
-                  <Tv className="w-4 h-4" />
-                  <span>TV Shows</span>
-                  <span className={`px-1.5 py-0.5 text-xs rounded-full ${
-                    mediaFilter === "tv" ? "bg-neutral-700" : "bg-neutral-800"
-                  }`}>
-                    {tvCount}
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Sort Options */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-2">Sort By</label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setSortBy("rating")}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    sortBy === "rating"
-                      ? "bg-neutral-800 text-neutral-100 border border-neutral-700"
-                      : "bg-neutral-900/30 text-neutral-400 border border-neutral-800/50 hover:border-neutral-700/50 hover:text-neutral-300"
-                  }`}
-                >
-                  Highest Rated
-                </button>
-                <button
-                  onClick={() => setSortBy("year")}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    sortBy === "year"
-                      ? "bg-neutral-800 text-neutral-100 border border-neutral-700"
-                      : "bg-neutral-900/30 text-neutral-400 border border-neutral-800/50 hover:border-neutral-700/50 hover:text-neutral-300"
-                  }`}
-                >
-                  Most Recent
-                </button>
-              </div>
-            </div>
+            <button
+              onClick={() => setMediaFilter("all")}
+              className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+                mediaFilter === "all"
+                  ? "border-[#e5e5e5] text-[#e5e5e5]"
+                  : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+              }`}
+            >
+              All ({results.length})
+            </button>
+            <button
+              onClick={() => setMediaFilter("movie")}
+              className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                mediaFilter === "movie"
+                  ? "border-[#e5e5e5] text-[#e5e5e5]"
+                  : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+              }`}
+            >
+              <Film className="w-4 h-4" />
+              Movies ({movieCount})
+            </button>
+            <button
+              onClick={() => setMediaFilter("tv")}
+              className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                mediaFilter === "tv"
+                  ? "border-[#e5e5e5] text-[#e5e5e5]"
+                  : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+              }`}
+            >
+              <Tv className="w-4 h-4" />
+              TV Shows ({tvCount})
+            </button>
           </motion.div>
         )}
 
         {/* Content */}
         <AnimatePresence mode="wait">
           {isEmpty ? (
-            /* Empty State */
             <motion.div
               key="empty"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center py-16 md:py-24"
+              className="flex flex-col items-center justify-center py-24"
             >
-              <div className="p-4 bg-neutral-900/30 border border-neutral-800/50 rounded-2xl mb-6">
-                <Search className="w-12 h-12 md:w-16 md:h-16 text-neutral-600" />
+              <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#2a2a2a] rounded-full">
+                <Search className="w-8 h-8 text-[#808080]" />
               </div>
-              <h2 className="text-xl md:text-2xl font-semibold text-neutral-300 mb-2">
+              <h2 className="text-xl font-medium text-[#e5e5e5] mb-2">
                 No results found
               </h2>
-              <p className="text-sm md:text-base text-neutral-500 text-center max-w-md mb-8">
-                Try searching with different keywords, check your spelling, or adjust your filters
+              <p className="text-[#b3b3b3] text-center max-w-md mb-8">
+                {query 
+                  ? `We couldn't find any titles matching "${query}". Try different keywords.`
+                  : "Try searching for movies or TV shows"
+                }
               </p>
               <button
                 onClick={() => router.push("/")}
-                className="inline-flex items-center justify-center px-6 py-3 bg-neutral-100 hover:bg-white text-neutral-900 rounded-xl font-semibold transition-all"
+                className="px-6 py-2.5 bg-white text-black rounded font-medium hover:bg-[#e5e5e5] transition-colors"
               >
-                Browse Movies
+                Browse Titles
               </button>
             </motion.div>
           ) : (
-            /* Results Grid */
             <motion.div
               key="results"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2"
             >
               {filteredResults.map((movie, index) => (
                 <motion.div
                   key={`${movie.mediaType}-${movie.id}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.02 }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
                 >
                   <MovieCard movie={movie} mediaType={movie.mediaType} />
                 </motion.div>
@@ -349,10 +263,10 @@ export default function SearchPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="min-h-screen bg-[#141414] flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="w-10 h-10 text-neutral-400 animate-spin" />
-            <p className="text-sm text-neutral-500">Searching...</p>
+            <Loader2 className="w-10 h-10 text-[#808080] animate-spin" />
+            <p className="text-sm text-[#b3b3b3]">Searching...</p>
           </div>
         </div>
       }

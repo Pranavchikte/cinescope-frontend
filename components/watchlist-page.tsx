@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, Bookmark, ArrowLeft, X, Film, Tv } from "lucide-react"
+import { Loader2, X, Film, Tv, Star, Trash2, Check } from "lucide-react"
 import { watchlistAPI, moviesAPI, tvAPI } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -49,20 +49,19 @@ export function WatchlistPage() {
         const enrichedItems = await Promise.all(
           watchlistData.map(async (item) => {
             try {
-              // Use correct API based on media type
               const api = item.media_type === "tv" ? tvAPI : moviesAPI
               const tmdbData = await api.getDetails(item.tmdb_id)
-              
+
               return {
                 id: item.id,
                 tmdb_id: item.tmdb_id,
                 title: tmdbData.title || tmdbData.name,
                 rating: tmdbData.vote_average || 0,
-                poster: tmdbData.poster_path 
-                  ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` 
+                poster: tmdbData.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}`
                   : "",
                 year: (tmdbData.release_date || tmdbData.first_air_date)
-                  ? new Date(tmdbData.release_date || tmdbData.first_air_date).getFullYear() 
+                  ? new Date(tmdbData.release_date || tmdbData.first_air_date).getFullYear()
                   : 2024,
                 mediaType: item.media_type as "movie" | "tv",
               }
@@ -75,7 +74,6 @@ export function WatchlistPage() {
 
         const validItems = enrichedItems.filter((item): item is EnrichedWatchlistItem => item !== null)
         setWatchlist(validItems)
-
       } catch (err) {
         console.error("Failed to fetch watchlist:", err)
         setError("Failed to load watchlist. Please login or try again.")
@@ -91,58 +89,34 @@ export function WatchlistPage() {
     setRemovingId(watchlistId)
     try {
       await watchlistAPI.remove(watchlistId)
-      setWatchlist(watchlist.filter((item) => item.id !== watchlistId))
+      setTimeout(() => {
+        setWatchlist(watchlist.filter((item) => item.id !== watchlistId))
+        setRemovingId(null)
+      }, 300)
     } catch (err) {
       console.error("Failed to remove from watchlist:", err)
-    } finally {
       setRemovingId(null)
     }
   }
 
-  const filteredWatchlist = filter === "all" 
-    ? watchlist 
-    : watchlist.filter(item => item.mediaType === filter)
+  const filteredWatchlist = filter === "all"
+    ? watchlist
+    : watchlist.filter((item) => item.mediaType === filter)
 
   const stats = {
     all: watchlist.length,
-    movies: watchlist.filter(item => item.mediaType === "movie").length,
-    tvShows: watchlist.filter(item => item.mediaType === "tv").length,
+    movies: watchlist.filter((item) => item.mediaType === "movie").length,
+    tvShows: watchlist.filter((item) => item.mediaType === "tv").length,
   }
 
-  // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header Skeleton */}
-          <div className="mb-8">
-            <div className="h-10 bg-zinc-800 rounded-lg w-48 mb-6 animate-pulse" />
-            
-            {/* Stats Skeleton */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-20 bg-zinc-800 rounded-xl animate-pulse" />
-              ))}
-            </div>
-
-            {/* Filter Skeleton */}
-            <div className="flex gap-2 mb-8">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-10 w-24 bg-zinc-800 rounded-full animate-pulse" />
-              ))}
-            </div>
-          </div>
-
-          {/* Grid Skeleton */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className="min-h-screen bg-[#141414] pt-24">
+        <div className="px-4 sm:px-6 lg:px-12">
+          <div className="h-8 bg-[#2a2a2a] rounded w-48 mb-8 animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="relative">
-                <div className="aspect-[2/3] bg-zinc-800 rounded-xl animate-pulse" />
-                <div className="mt-3 space-y-2">
-                  <div className="h-4 bg-zinc-800 rounded w-3/4 animate-pulse" />
-                  <div className="h-3 bg-zinc-800 rounded w-1/2 animate-pulse" />
-                </div>
-              </div>
+              <div key={i} className="aspect-[2/3] bg-[#2a2a2a] rounded animate-pulse" />
             ))}
           </div>
         </div>
@@ -150,25 +124,25 @@ export function WatchlistPage() {
     )
   }
 
-  // Error State
   if (error) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#141414] flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md"
         >
-          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <div className="text-4xl">😕</div>
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#2a2a2a] rounded-full">
+            <X className="w-8 h-8 text-[#b3b3b3]" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Oops! Something went wrong</h2>
-          <p className="text-zinc-400 mb-8">{error}</p>
+          <h2 className="text-2xl font-semibold text-[#e5e5e5] mb-3">
+            Something went wrong
+          </h2>
+          <p className="text-[#b3b3b3] mb-8">{error}</p>
           <button
             onClick={() => router.push("/")}
-            className="h-12 px-6 bg-white hover:bg-zinc-200 text-black rounded-xl font-semibold transition-all inline-flex items-center gap-2"
+            className="px-6 py-2.5 bg-white text-black rounded font-medium hover:bg-[#e5e5e5] transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
             Go Home
           </button>
         </motion.div>
@@ -177,140 +151,108 @@ export function WatchlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#141414] pt-24 pb-12">
+      <div className="px-4 sm:px-6 lg:px-12">
         {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">My Watchlist</h1>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors"
-            >
-              <div className="text-2xl font-bold text-white mb-1">{stats.all}</div>
-              <div className="text-xs text-zinc-500">Total Items</div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors"
-            >
-              <div className="text-2xl font-bold text-white mb-1">{stats.movies}</div>
-              <div className="text-xs text-zinc-500">Movies</div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors"
-            >
-              <div className="text-2xl font-bold text-white mb-1">{stats.tvShows}</div>
-              <div className="text-xs text-zinc-500">TV Shows</div>
-            </motion.div>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setFilter("all")}
-              className={`h-10 px-4 rounded-full text-sm font-medium transition-all ${
-                filter === "all"
-                  ? "bg-violet-500 text-white"
-                  : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white border border-zinc-700"
-              }`}
-            >
-              All ({stats.all})
-            </button>
-            
-            <button
-              onClick={() => setFilter("movie")}
-              className={`h-10 px-4 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                filter === "movie"
-                  ? "bg-violet-500 text-white"
-                  : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white border border-zinc-700"
-              }`}
-            >
-              <Film className="w-4 h-4" />
-              Movies ({stats.movies})
-            </button>
-            
-            <button
-              onClick={() => setFilter("tv")}
-              className={`h-10 px-4 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                filter === "tv"
-                  ? "bg-violet-500 text-white"
-                  : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white border border-zinc-700"
-              }`}
-            >
-              <Tv className="w-4 h-4" />
-              TV Shows ({stats.tvShows})
-            </button>
-          </div>
+          <h1 className="text-3xl sm:text-4xl font-semibold text-[#e5e5e5] mb-2">
+            My List
+          </h1>
+          <p className="text-base text-[#b3b3b3]">
+            {stats.all} {stats.all === 1 ? "title" : "titles"}
+          </p>
         </motion.div>
 
-        {/* Empty State */}
+        {/* Filter Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex gap-4 mb-8 border-b border-[#2a2a2a]"
+        >
+          <button
+            onClick={() => setFilter("all")}
+            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+              filter === "all"
+                ? "border-[#e5e5e5] text-[#e5e5e5]"
+                : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter("movie")}
+            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+              filter === "movie"
+                ? "border-[#e5e5e5] text-[#e5e5e5]"
+                : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+            }`}
+          >
+            Movies
+          </button>
+          <button
+            onClick={() => setFilter("tv")}
+            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+              filter === "tv"
+                ? "border-[#e5e5e5] text-[#e5e5e5]"
+                : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+            }`}
+          >
+            TV Shows
+          </button>
+        </motion.div>
+
+        {/* Content Grid */}
         {filteredWatchlist.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="flex flex-col items-center justify-center py-20"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center justify-center py-24"
           >
-            <div className="relative mb-6">
-              <div className="absolute inset-0 bg-violet-500/20 blur-2xl rounded-full" />
-              <div className="relative w-20 h-20 bg-zinc-800/50 backdrop-blur-sm rounded-2xl border border-zinc-700 flex items-center justify-center">
-                <Bookmark className="w-10 h-10 text-zinc-600" />
-              </div>
+            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#2a2a2a] rounded-full">
+              <Film className="w-8 h-8 text-[#808080]" />
             </div>
-            
-            <h2 className="text-xl font-semibold text-white mb-2">
-              {filter === "all" 
-                ? "Your watchlist is empty" 
-                : `No ${filter === "movie" ? "movies" : "TV shows"} in watchlist`}
-            </h2>
-            
-            <p className="text-sm text-zinc-500 mb-6 text-center max-w-sm">
+            <h2 className="text-xl font-medium text-[#e5e5e5] mb-2">
               {filter === "all"
-                ? "Start adding movies and TV shows to keep track of what you want to watch"
-                : `Add some ${filter === "movie" ? "movies" : "TV shows"} to your watchlist`}
+                ? "Your list is empty"
+                : `No ${filter === "movie" ? "movies" : "TV shows"} in your list`}
+            </h2>
+            <p className="text-[#b3b3b3] text-center max-w-md mb-8">
+              {filter === "all"
+                ? "Titles you add to your list will appear here"
+                : `Add some ${filter === "movie" ? "movies" : "TV shows"} to your list`}
             </p>
-            
             <button
-              onClick={() => router.push(filter === "tv" ? "/tv" : "/")}
-              className="h-12 px-6 bg-violet-500 hover:bg-violet-600 text-white rounded-xl font-semibold transition-all"
+              onClick={() => router.push("/")}
+              className="px-6 py-2.5 bg-white text-black rounded font-medium hover:bg-[#e5e5e5] transition-colors"
             >
-              Browse {filter === "tv" ? "TV Shows" : filter === "movie" ? "Movies" : "Content"}
+              Find Something to Watch
             </button>
           </motion.div>
         ) : (
-          /* Watchlist Grid */
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2"
           >
-            {filteredWatchlist.map((item, index) => (
-              <WatchlistCard
-                key={item.id}
-                item={item}
-                onRemove={() => removeFromWatchlist(item.id)}
-                isRemoving={removingId === item.id}
-                delay={index * 0.03}
-              />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {filteredWatchlist.map((item, index) => (
+                <WatchlistCard
+                  key={item.id}
+                  item={item}
+                  onRemove={() => removeFromWatchlist(item.id)}
+                  isRemoving={removingId === item.id}
+                  delay={index * 0.03}
+                />
+              ))}
+            </AnimatePresence>
           </motion.div>
         )}
       </div>
@@ -329,107 +271,150 @@ function WatchlistCard({
   isRemoving: boolean
   delay: number
 }) {
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowConfirm(true)
+  }
+
+  const confirmRemove = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onRemove()
+    setShowConfirm(false)
+  }
+
+  const cancelRemove = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowConfirm(false)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{ delay, duration: 0.3 }}
       className="relative group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        setShowConfirm(false)
+      }}
     >
-      {/* Card */}
       <Link href={`/${item.mediaType}/${item.tmdb_id}`}>
-        <div className="relative aspect-[2/3] rounded-xl overflow-hidden border border-zinc-800 group-hover:border-zinc-700 transition-all bg-zinc-900">
-          <img
-            src={item.poster || "/placeholder.svg"}
-            alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+          className="relative aspect-[2/3] rounded overflow-hidden bg-[#2a2a2a] cursor-pointer"
+        >
+          {item.poster ? (
+            <img
+              src={item.poster}
+              alt={item.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Film className="w-12 h-12 text-[#404040]" />
+            </div>
+          )}
+
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+          {/* Rating Badge */}
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/80 backdrop-blur-sm rounded">
+            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            <span className="text-xs font-medium text-white">{item.rating.toFixed(1)}</span>
+          </div>
 
           {/* Media Type Badge */}
-          <div className="absolute top-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg border border-white/10 flex items-center gap-1">
+          <div className="absolute top-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-sm rounded">
             {item.mediaType === "movie" ? (
-              <Film className="w-3 h-3 text-zinc-400" />
+              <Film className="w-3 h-3 text-[#e5e5e5]" />
             ) : (
-              <Tv className="w-3 h-3 text-zinc-400" />
+              <Tv className="w-3 h-3 text-[#e5e5e5]" />
             )}
-            <span className="text-xs font-medium text-zinc-400 capitalize">
-              {item.mediaType}
-            </span>
           </div>
 
-          {/* Rating Badge - Top Left */}
-          <div className="absolute top-2 left-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg border border-white/10 flex items-center gap-1">
-            <span className="text-xs font-semibold text-yellow-400">
-              ⭐ {item.rating.toFixed(1)}
-            </span>
-          </div>
-
-          {/* Title Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-3">
-            <h3 className="text-sm font-semibold text-white line-clamp-2 mb-1 leading-tight">
+          {/* Title Info */}
+          <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <h3 className="text-sm font-medium text-white line-clamp-2 mb-1">
               {item.title}
             </h3>
-            <p className="text-xs text-zinc-400">{item.year}</p>
+            <p className="text-xs text-[#b3b3b3]">{item.year}</p>
           </div>
-        </div>
+        </motion.div>
       </Link>
 
-      {/* Remove Button - Hover Overlay on Desktop */}
-      <div className="hidden md:flex absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-xl items-center justify-center">
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            onRemove()
-          }}
-          disabled={isRemoving}
-          className="h-12 px-6 bg-red-500 hover:bg-red-600 disabled:bg-red-500/50 text-white rounded-xl font-semibold transition-all flex items-center gap-2 disabled:cursor-not-allowed"
-        >
-          {isRemoving ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Removing...
-            </>
-          ) : (
-            <>
-              <X className="w-4 h-4" />
-              Remove
-            </>
-          )}
-        </button>
-      </div>
+      {/* Remove Button - Desktop */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="hidden md:flex absolute -bottom-12 left-0 right-0 justify-center gap-2 z-20"
+          >
+            {!showConfirm ? (
+              <button
+                onClick={handleRemove}
+                disabled={isRemoving}
+                className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#333333] text-white rounded text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {isRemoving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Removing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>Remove</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={confirmRemove}
+                  className="px-3 py-2 bg-white hover:bg-[#e5e5e5] text-black rounded text-sm font-medium transition-colors flex items-center gap-2"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Yes</span>
+                </button>
+                <button
+                  onClick={cancelRemove}
+                  className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#333333] text-white rounded text-sm font-medium transition-colors flex items-center gap-2"
+                >
+                  <X className="w-4 h-4" />
+                  <span>No</span>
+                </button>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Remove Button - Always Visible on Mobile */}
+      {/* Remove Button - Mobile */}
       <button
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          if (window.confirm(`Remove "${item.title}" from your watchlist?`)) {
+          if (window.confirm(`Remove "${item.title}" from your list?`)) {
             onRemove()
           }
         }}
         disabled={isRemoving}
-        className="md:hidden absolute bottom-16 right-2 z-20 w-10 h-10 bg-red-500/90 hover:bg-red-500 disabled:bg-red-500/50 text-white rounded-lg flex items-center justify-center transition-all disabled:cursor-not-allowed shadow-lg"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-black/80 hover:bg-black text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
       >
-        {isRemoving ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <X className="w-4 h-4" />
-        )}
+        {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
       </button>
-
-      {/* Card Info - Below Image */}
-      <div className="mt-3 px-1">
-        <h4 className="text-sm font-medium text-white line-clamp-1 mb-1">
-          {item.title}
-        </h4>
-        <div className="flex items-center justify-between text-xs text-zinc-500">
-          <span>{item.year}</span>
-          <span className="flex items-center gap-1">
-            ⭐ {item.rating.toFixed(1)}
-          </span>
-        </div>
-      </div>
     </motion.div>
   )
 }

@@ -8,6 +8,7 @@ import { tvAPI, watchlistAPI, ratingsAPI } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 interface Cast {
   id: number
@@ -46,6 +47,12 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   const [trailer, setTrailer] = useState<Video | null>(null)
   const [recommendations, setRecommendations] = useState<any[]>([])
   const [similarShows, setSimilarShows] = useState<any[]>([])
+  const [providers, setProviders] = useState<any[]>([])
+  const [images, setImages] = useState<{ backdrops: any[]; posters: any[] }>({ backdrops: [], posters: [] })
+  const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'backdrops' | 'posters'>('videos')
+  const [seasons, setSeasons] = useState<any[]>([])
+  const [expandedSeason, setExpandedSeason] = useState<number | null>(null)
+  const [seasonData, setSeasonData] = useState<{ [key: number]: any }>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showRatingSheet, setShowRatingSheet] = useState(false)
@@ -67,16 +74,18 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
     setTimeout(() => setShowToast(null), 3000)
   }
 
-  useEffect(() => {
+ useEffect(() => {
     const fetchShowData = async () => {
       try {
         setIsLoading(true)
         setError(null)
 
-        const [showData, creditsData, videosData] = await Promise.all([
+        const [showData, creditsData, videosData, providersData, imagesData] = await Promise.all([
           tvAPI.getDetails(parseInt(tvId)),
           tvAPI.getCredits(parseInt(tvId)),
           tvAPI.getVideos(parseInt(tvId)),
+          tvAPI.getTVProviders(parseInt(tvId)),
+          tvAPI.getImages(parseInt(tvId)),
         ])
 
         setShow(showData)
@@ -86,6 +95,14 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           (v: Video) => v.type === "Trailer" && v.site === "YouTube"
         ) || videosData.results?.[0]
         setTrailer(trailerVideo || null)
+
+        const inProviders = providersData.results?.IN?.flatrate || []
+        setProviders(inProviders)
+
+        setImages({
+          backdrops: imagesData.backdrops?.slice(0, 12) || [],
+          posters: imagesData.posters?.slice(0, 12) || [],
+        })
 
         const [recommendationsData, similarData] = await Promise.all([
           tvAPI.getRecommendations(parseInt(tvId)),
@@ -102,6 +119,13 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
 
         setRecommendations(recommendationsData.results?.slice(0, 12).map(transformShow) || [])
         setSimilarShows(similarData.results?.slice(0, 12).map(transformShow) || [])
+
+        // Create seasons array
+        const seasonsArr = Array.from({ length: showData.number_of_seasons }, (_, i) => ({
+          season_number: i + 1,
+          name: `Season ${i + 1}`
+        }))
+        setSeasons(seasonsArr)
 
       } catch (err) {
         console.error("Failed to fetch TV show data:", err)
@@ -155,6 +179,26 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
       })
     }
   }
+
+  const handleSeasonToggle = async (seasonNumber: number) => {
+    if (expandedSeason === seasonNumber) {
+      setExpandedSeason(null)
+      return
+    }
+
+    setExpandedSeason(seasonNumber)
+
+    // Fetch season data if not already loaded
+    if (!seasonData[seasonNumber]) {
+      try {
+        const data = await tvAPI.getSeason(parseInt(tvId), seasonNumber)
+        setSeasonData(prev => ({ ...prev, [seasonNumber]: data }))
+      } catch (err) {
+        console.error("Failed to fetch season data:", err)
+      }
+    }
+  }
+
 
   // Loading Skeleton
   if (isLoading) {
@@ -416,6 +460,35 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           </motion.div>
         </div>
 
+        {/* Watch Providers */}
+        {providers.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-16"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Available On</h2>
+            <div className="flex flex-wrap gap-4">
+              {providers.map((provider) => (
+                <div
+                  key={provider.provider_id}
+                  className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
+                >
+                  <img
+                    src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                    alt={provider.provider_name}
+                    className="w-10 h-10 rounded-lg"
+                  />
+                  <span className="text-white font-medium text-sm">
+                    {provider.provider_name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
         {/* Trailer Section */}
         {trailerUrl && (
           <motion.section
@@ -437,6 +510,97 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 className="w-full h-full"
               />
             </div>
+          </motion.section>
+        )}
+
+        {(trailer || images.backdrops.length > 0 || images.posters.length > 0) && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mb-16"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Media</h2>
+            
+            <div className="flex gap-2 mb-6 border-b border-white/10">
+              {trailer && (
+                <button
+                  onClick={() => setActiveMediaTab('videos')}
+                  className={`px-4 py-2 font-medium transition-all ${
+                    activeMediaTab === 'videos'
+                      ? 'text-white border-b-2 border-white'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Videos
+                </button>
+              )}
+              {images.backdrops.length > 0 && (
+                <button
+                  onClick={() => setActiveMediaTab('backdrops')}
+                  className={`px-4 py-2 font-medium transition-all ${
+                    activeMediaTab === 'backdrops'
+                      ? 'text-white border-b-2 border-white'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Backdrops {images.backdrops.length}
+                </button>
+              )}
+              {images.posters.length > 0 && (
+                <button
+                  onClick={() => setActiveMediaTab('posters')}
+                  className={`px-4 py-2 font-medium transition-all ${
+                    activeMediaTab === 'posters'
+                      ? 'text-white border-b-2 border-white'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Posters {images.posters.length}
+                </button>
+              )}
+            </div>
+
+            {activeMediaTab === 'videos' && trailer && (
+              <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${trailer.key}`}
+                  title="Video"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            )}
+
+            {activeMediaTab === 'backdrops' && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {images.backdrops.map((image, index) => (
+                  <div key={index} className="aspect-video rounded-lg overflow-hidden border border-white/10">
+                    <img
+                      src={`https://image.tmdb.org/t/p/w780${image.file_path}`}
+                      alt="Backdrop"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeMediaTab === 'posters' && (
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {images.posters.map((image, index) => (
+                  <div key={index} className="aspect-[2/3] rounded-lg overflow-hidden border border-white/10">
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
+                      alt="Poster"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.section>
         )}
 
@@ -472,8 +636,9 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {cast.slice(0, showAllCast ? cast.length : 8).map((member) => (
-                <div 
-                  key={member.id} 
+                <Link
+                  key={member.id}
+                  href={`/people/${member.id}`}
                   className="shrink-0 w-28 snap-start group cursor-pointer"
                 >
                   <div className="relative w-28 h-28 rounded-full overflow-hidden bg-zinc-800 mb-3 border-2 border-white/10 group-hover:border-white/30 transition-all">
@@ -493,7 +658,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                   <p className="text-xs text-zinc-500 text-center line-clamp-1">
                     {member.character}
                   </p>
-                </div>
+                </Link>
               ))}
             </div>
 
@@ -507,6 +672,89 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             )}
           </motion.section>
         )}
+
+        {/* Seasons & Episodes */}
+        {seasons.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mb-16"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Seasons</h2>
+            <div className="space-y-3">
+              {seasons.map((season) => (
+                <div key={season.season_number} className="border border-white/10 rounded-xl overflow-hidden bg-white/5">
+                  <button
+                    onClick={() => handleSeasonToggle(season.season_number)}
+                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-all"
+                  >
+                    <span className="text-white font-semibold">{season.name}</span>
+                    <ChevronRight
+                      className={`w-5 h-5 text-white transition-transform ${
+                        expandedSeason === season.season_number ? 'rotate-90' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {expandedSeason === season.season_number && seasonData[season.season_number] && (
+                    <div className="border-t border-white/10 p-4 space-y-4">
+                      {seasonData[season.season_number].episodes?.map((episode: any) => (
+                        <div
+                          key={episode.episode_number}
+                          className="flex gap-4 p-3 rounded-lg hover:bg-white/5 transition-all"
+                        >
+                          <div className="flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden bg-zinc-800">
+                            {episode.still_path ? (
+                              <img
+                                src={`https://image.tmdb.org/t/p/w300${episode.still_path}`}
+                                alt={episode.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Play className="w-8 h-8 text-zinc-600" />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="text-white font-semibold">
+                                {episode.episode_number}. {episode.name}
+                              </h4>
+                              {episode.vote_average > 0 && (
+                                <div className="flex items-center gap-1 ml-4">
+                                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                  <span className="text-sm text-zinc-400">{episode.vote_average.toFixed(1)}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {episode.air_date && (
+                              <p className="text-sm text-zinc-500 mb-2">
+                                {new Date(episode.air_date).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}
+                              </p>
+                            )}
+
+                            {episode.overview && (
+                              <p className="text-sm text-zinc-300 line-clamp-2">{episode.overview}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
 
         {/* Recommendations Grid */}
         {recommendations.length > 0 && (
