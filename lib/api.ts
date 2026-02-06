@@ -1,15 +1,107 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
 
 // Token management
-export const getAccessToken = () => localStorage.getItem('access_token')
-export const getRefreshToken = () => localStorage.getItem('refresh_token')
+// Token management (localStorage + cookies for middleware)
+export const getAccessToken = () => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('access_token');
+};
+
+export const getRefreshToken = () => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('refresh_token');
+};
+
 export const setTokens = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('access_token', accessToken)
-    localStorage.setItem('refresh_token', refreshToken)
-}
+    if (typeof window === 'undefined') return;
+
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+
+    // Also set as cookie for middleware
+    document.cookie = `access_token=${accessToken}; path=/; max-age=${60 * 60}`; // 1 hour
+    document.cookie = `refresh_token=${refreshToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+};
+
 export const clearTokens = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    if (typeof window === 'undefined') return;
+
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+
+    // Clear cookies
+    document.cookie = 'access_token=; path=/; max-age=0';
+    document.cookie = 'refresh_token=; path=/; max-age=0';
+};
+// Refresh token logic
+let isRefreshing = false
+let refreshPromise: Promise<boolean> | null = null
+
+const refreshAccessToken = async (): Promise<boolean> => {
+    if (isRefreshing && refreshPromise) {
+        return refreshPromise
+    }
+
+    isRefreshing = true
+    refreshPromise = (async () => {
+        try {
+            const refreshToken = getRefreshToken()
+            if (!refreshToken) return false
+
+            const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            })
+
+            if (!res.ok) {
+                clearTokens()
+                return false
+            }
+
+            const tokens = await res.json()
+            setTokens(tokens.access_token, tokens.refresh_token)
+            return true
+        } catch {
+            clearTokens()
+            return false
+        } finally {
+            isRefreshing = false
+            refreshPromise = null
+        }
+    })()
+
+    return refreshPromise
+}
+
+// Authenticated fetch wrapper
+const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const token = getAccessToken()
+
+    const res = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${token}`,
+        },
+    })
+
+    // If 401, try refresh and retry once
+    if (res.status === 401) {
+        const refreshed = await refreshAccessToken()
+        if (refreshed) {
+            const newToken = getAccessToken()
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    Authorization: `Bearer ${newToken}`,
+                },
+            })
+        }
+    }
+
+    return res
 }
 
 // Auth API
@@ -59,6 +151,28 @@ export const authAPI = {
         if (!res.ok) throw new Error(await res.text())
         return res.json()
     },
+
+    verifyEmail: async (token: string) => {
+        const res = await fetch(`${API_BASE_URL}/auth/verify-email?token=${token}`, {
+            method: 'POST',
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    resendVerification: async () => {
+        const res = await authFetch(`${API_BASE_URL}/auth/resend-verification`, {
+            method: 'POST',
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    getCurrentUser: async () => {
+        const res = await authFetch(`${API_BASE_URL}/auth/me`)
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
 }
 
 // Movies API
@@ -90,6 +204,75 @@ export const moviesAPI = {
 
     getVideos: async (id: number) => {
         const res = await fetch(`${API_BASE_URL}/movies/${id}/videos`)
+        return res.json()
+    },
+
+    getImages: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/images`)
+        return res.json()
+    },
+
+    getGenres: async () => {
+        const res = await fetch(`${API_BASE_URL}/movies/genres`)
+        return res.json()
+    },
+
+    getRecommendations: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/recommendations?page=${page}`)
+        return res.json()
+    },
+
+    getSimilar: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/similar?page=${page}`)
+        return res.json()
+    },
+
+    getPersonalized: async (page: number = 1, vote_count_min: number = 500, vote_average_min: number = 6.5) => {
+        const res = await authFetch(
+            `${API_BASE_URL}/movies/personalized?page=${page}&vote_count_min=${vote_count_min}&vote_average_min=${vote_average_min}`
+        )
+        return res.json()
+    },
+
+    discover: async (params: {
+        genre?: string
+        year?: number
+        language?: string
+        country?: string
+        provider?: string
+        sort_by?: string
+        page?: number
+        vote_count_min?: number
+        vote_average_min?: number
+        vote_average_max?: number
+        runtime_min?: number
+        runtime_max?: number
+    }) => {
+        const queryParams = new URLSearchParams()
+        if (params.genre) queryParams.append('genre', params.genre)
+        if (params.year) queryParams.append('year', params.year.toString())
+        if (params.language) queryParams.append('language', params.language)
+        if (params.country) queryParams.append('country', params.country)
+        if (params.provider) queryParams.append('provider', params.provider)
+        if (params.sort_by) queryParams.append('sort_by', params.sort_by)
+        if (params.page) queryParams.append('page', params.page.toString())
+        if (params.vote_count_min !== undefined) queryParams.append('vote_count_min', params.vote_count_min.toString())
+        if (params.vote_average_min !== undefined) queryParams.append('vote_average_min', params.vote_average_min.toString())
+        if (params.vote_average_max !== undefined) queryParams.append('vote_average_max', params.vote_average_max.toString())
+        if (params.runtime_min !== undefined) queryParams.append('runtime_min', params.runtime_min.toString())
+        if (params.runtime_max !== undefined) queryParams.append('runtime_max', params.runtime_max.toString())
+
+        const res = await fetch(`${API_BASE_URL}/movies/discover?${queryParams}`)
+        return res.json()
+    },
+
+    getProviders: async (region: string = "IN") => {
+        const res = await fetch(`${API_BASE_URL}/movies/providers?region=${region}`)
+        return res.json()
+    },
+
+    getMovieProviders: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/movies/${id}/providers`)
         return res.json()
     },
 }
@@ -125,26 +308,89 @@ export const tvAPI = {
         const res = await fetch(`${API_BASE_URL}/tv/${id}/videos`)
         return res.json()
     },
+
+    getImages: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/images`)
+        return res.json()
+    },
+
+    getGenres: async () => {
+        const res = await fetch(`${API_BASE_URL}/tv/genres`)
+        return res.json()
+    },
+
+    getRecommendations: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/recommendations?page=${page}`)
+        return res.json()
+    },
+
+    getSimilar: async (id: number, page: number = 1) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/similar?page=${page}`)
+        return res.json()
+    },
+
+    getPersonalized: async (page: number = 1, vote_count_min: number = 500, vote_average_min: number = 6.5) => {
+        const res = await authFetch(
+            `${API_BASE_URL}/tv/personalized?page=${page}&vote_count_min=${vote_count_min}&vote_average_min=${vote_average_min}`
+        )
+        return res.json()
+    },
+
+    discover: async (params: {
+        genre?: string
+        year?: number
+        language?: string
+        country?: string
+        provider?: string
+        sort_by?: string
+        page?: number
+        vote_count_min?: number
+        vote_average_min?: number
+        vote_average_max?: number
+    }) => {
+        const queryParams = new URLSearchParams()
+        if (params.genre) queryParams.append('genre', params.genre)
+        if (params.year) queryParams.append('year', params.year.toString())
+        if (params.language) queryParams.append('language', params.language)
+        if (params.country) queryParams.append('country', params.country)
+        if (params.provider) queryParams.append('provider', params.provider)
+        if (params.sort_by) queryParams.append('sort_by', params.sort_by)
+        if (params.page) queryParams.append('page', params.page.toString())
+        if (params.vote_count_min !== undefined) queryParams.append('vote_count_min', params.vote_count_min.toString())
+        if (params.vote_average_min !== undefined) queryParams.append('vote_average_min', params.vote_average_min.toString())
+        if (params.vote_average_max !== undefined) queryParams.append('vote_average_max', params.vote_average_max.toString())
+
+        const res = await fetch(`${API_BASE_URL}/tv/discover?${queryParams}`)
+        return res.json()
+    },
+
+    getProviders: async (region: string = "IN") => {
+        const res = await fetch(`${API_BASE_URL}/tv/providers?region=${region}`)
+        return res.json()
+    },
+
+    getTVProviders: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/providers`)
+        return res.json()
+    },
+
+    getSeason: async (id: number, seasonNumber: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/${id}/season/${seasonNumber}`)
+        return res.json()
+    },
 }
 
 // Watchlist API (protected)
 export const watchlistAPI = {
     get: async () => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/watchlist`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
+        const res = await authFetch(`${API_BASE_URL}/watchlist`)
         return res.json()
     },
 
     add: async (data: { tmdb_id: number; media_type: 'movie' | 'tv' }) => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/watchlist`, {
+        const res = await authFetch(`${API_BASE_URL}/watchlist`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
         if (!res.ok) throw new Error(await res.text())
@@ -152,10 +398,8 @@ export const watchlistAPI = {
     },
 
     remove: async (id: string) => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/watchlist/${id}`, {
+        const res = await authFetch(`${API_BASE_URL}/watchlist/${id}`, {
             method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
         })
         return res.json()
     },
@@ -164,21 +408,14 @@ export const watchlistAPI = {
 // Ratings API (protected)
 export const ratingsAPI = {
     get: async () => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/ratings`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
+        const res = await authFetch(`${API_BASE_URL}/ratings`)
         return res.json()
     },
 
     create: async (data: { tmdb_id: number; media_type: 'movie' | 'tv'; rating: string }) => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/ratings`, {
+        const res = await authFetch(`${API_BASE_URL}/ratings`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
         if (!res.ok) throw new Error(await res.text())
@@ -186,24 +423,115 @@ export const ratingsAPI = {
     },
 
     update: async (id: string, rating: string) => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/ratings/${id}`, {
+        const res = await authFetch(`${API_BASE_URL}/ratings/${id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ rating }),
         })
         return res.json()
     },
 
     delete: async (id: string) => {
-        const token = getAccessToken()
-        const res = await fetch(`${API_BASE_URL}/ratings/${id}`, {
+        const res = await authFetch(`${API_BASE_URL}/ratings/${id}`, {
             method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
         })
+        return res.json()
+    },
+}
+
+// Creator Requests API
+export const creatorRequestsAPI = {
+    create: async (message?: string) => {
+        const res = await authFetch(`${API_BASE_URL}/creator-requests`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    getMyRequest: async () => {
+        const res = await authFetch(`${API_BASE_URL}/creator-requests/my-request`)
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    getAll: async (statusFilter?: string) => {
+        const url = statusFilter
+            ? `${API_BASE_URL}/creator-requests?status_filter=${statusFilter}`
+            : `${API_BASE_URL}/creator-requests`
+        const res = await authFetch(url)
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    approve: async (requestId: string) => {
+        const res = await authFetch(`${API_BASE_URL}/creator-requests/${requestId}/approve`, {
+            method: 'PATCH',
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    reject: async (requestId: string) => {
+        const res = await authFetch(`${API_BASE_URL}/creator-requests/${requestId}/reject`, {
+            method: 'PATCH',
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+}
+
+// Creators API
+export const creatorsAPI = {
+    getAll: async () => {
+        const res = await fetch(`${API_BASE_URL}/creators`)
+        return res.json()
+    },
+
+    getRatings: async (username: string, ratingFilter?: string, mediaType?: string) => {
+        const params = new URLSearchParams()
+        if (ratingFilter) params.append('rating_filter', ratingFilter)
+        if (mediaType) params.append('media_type', mediaType)
+
+        const url = params.toString()
+            ? `${API_BASE_URL}/creators/${username}/ratings?${params}`
+            : `${API_BASE_URL}/creators/${username}/ratings`
+
+        const res = await fetch(url)
+        return res.json()
+    },
+}
+
+// People API
+export const peopleAPI = {
+    getDetails: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/people/${id}`)
+        return res.json()
+    },
+
+    getMovieCredits: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/people/${id}/movie-credits`)
+        return res.json()
+    },
+
+    getTVCredits: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/people/${id}/tv-credits`)
+        return res.json()
+    },
+}
+
+
+// Update profile API
+export const profileAPI = {
+    update: async (data: { is_public_profile?: boolean }) => {
+        const res = await authFetch(`${API_BASE_URL}/auth/me`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
         return res.json()
     },
 }

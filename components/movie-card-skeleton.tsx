@@ -1,15 +1,31 @@
-"use client"
+"use client";
+
+import { motion } from "framer-motion";
 
 export function MovieCardSkeleton() {
   return (
-    <div className="w-full h-72 rounded-lg bg-secondary/50 animate-pulse overflow-hidden">
-      <div className="w-full h-full flex flex-col">
-        <div className="flex-1 bg-gradient-to-br from-secondary to-secondary/50" />
-        <div className="p-3 space-y-2 bg-secondary/30">
-          <div className="h-4 bg-secondary rounded w-3/4" />
-          <div className="h-3 bg-secondary rounded w-1/2" />
-        </div>
+    <div className="relative">
+      {/* Poster Skeleton */}
+      <div className="relative aspect-[2/3] bg-[#2a2a2a] overflow-hidden rounded-sm">
+        {/* Shimmer Effect */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-[#3a3a3a]/60 to-transparent"
+          animate={{
+            x: ["-100%", "100%"],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      </div>
+
+      {/* Title Below Card - Mobile Only */}
+      <div className="mt-2 md:hidden space-y-1.5">
+        <div className="h-3 bg-[#2a2a2a] rounded w-3/4 animate-pulse" />
+        <div className="h-3 bg-[#2a2a2a] rounded w-1/2 animate-pulse" />
       </div>
     </div>
-  )
+  );
 }
