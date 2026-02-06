@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react"
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Plus, Check, Loader2 } from "lucide-react";
@@ -45,10 +47,10 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
   const router = useRouter();
 
   const ratingOptions = [
-    { value: "skip", label: "Skip", color: "text-[#808080]" },
-    { value: "timepass", label: "Timepass", color: "text-white" },
-    { value: "go_for_it", label: "Go for it", color: "text-white" },
-    { value: "perfection", label: "Perfection", color: "text-[#46d369]" },
+    { value: "skip", label: "Skip", color: "text-[#A0A0A0]" },
+    { value: "timepass", label: "Timepass", color: "text-[#F5F5F5]" },
+    { value: "go_for_it", label: "Go for it", color: "text-[#F5F5F5]" },
+    { value: "perfection", label: "Perfection", color: "text-[#14B8A6]" },
   ];
 
   useEffect(() => {
@@ -136,7 +138,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
           className="relative group cursor-pointer"
         >
           {/* Poster Container */}
-          <div className="relative aspect-[2/3] bg-[#2a2a2a] overflow-hidden rounded-sm">
+          <div className="relative aspect-[2/3] bg-[#1A1A1A] overflow-hidden rounded-lg border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors duration-300">
             <img
               src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
@@ -151,10 +153,10 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-3"
+                  className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/70 to-transparent flex flex-col justify-end p-3"
                 >
                   {/* Title on Hover */}
-                  <h3 className="text-sm md:text-base font-medium text-white mb-3 line-clamp-2 leading-tight">
+                  <h3 className="text-sm md:text-base font-medium text-[#F5F5F5] mb-3 line-clamp-2 leading-tight">
                     {movie.title}
                   </h3>
 
@@ -166,14 +168,14 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                       whileTap={{ scale: 0.95 }}
                       onClick={handleWatchlistToggle}
                       disabled={isLoading}
-                      className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-[#2a2a2a]/90 hover:bg-[#3a3a3a] border border-[#808080]/30 hover:border-white/50 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (
-                        <Loader2 className="w-4 h-4 text-white animate-spin" />
+                        <Loader2 className="w-4 h-4 text-[#14B8A6] animate-spin" />
                       ) : isInWatchlist ? (
-                        <Check className="w-4 h-4 text-white" />
+                        <Check className="w-4 h-4 text-[#14B8A6]" />
                       ) : (
-                        <Plus className="w-4 h-4 text-white" />
+                        <Plus className="w-4 h-4 text-[#F5F5F5]" />
                       )}
                     </motion.button>
 
@@ -183,9 +185,9 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                       whileTap={{ scale: 0.95 }}
                       onClick={openRatingMenu}
                       disabled={isLoading}
-                      className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-[#2a2a2a]/90 hover:bg-[#3a3a3a] border border-[#808080]/30 hover:border-white/50 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Star className="w-4 h-4 text-white" />
+                      <Star className="w-4 h-4 text-[#F5F5F5]" />
                     </motion.button>
                   </div>
                 </motion.div>
@@ -195,7 +197,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
 
           {/* Title Below Card - Always Visible on Mobile/Small Cards */}
           <div className="mt-2 md:hidden">
-            <h3 className="text-xs font-medium text-white line-clamp-2 leading-tight">
+            <h3 className="text-xs font-medium text-[#F5F5F5] line-clamp-2 leading-tight">
               {movie.title}
             </h3>
           </div>
@@ -205,7 +207,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute -inset-2 bg-black/40 rounded-sm -z-10 blur-xl pointer-events-none"
+            className="absolute -inset-2 bg-[#14B8A6]/20 rounded-lg -z-10 blur-xl pointer-events-none"
           />
         </motion.div>
       </Link>
@@ -220,7 +222,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowRatingMenu(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-[#0F0F0F]/80 backdrop-blur-sm z-[100]"
             />
 
             {/* Modal */}
@@ -230,16 +232,16 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative w-full max-w-md bg-[#181818] rounded p-8"
+                className="relative w-full max-w-md bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Close Button */}
                 <button
                   onClick={() => setShowRatingMenu(false)}
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-[#14B8A6]/10 rounded-full transition-colors duration-200"
                 >
                   <svg
-                    className="w-5 h-5 text-white"
+                    className="w-5 h-5 text-[#F5F5F5]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -254,7 +256,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                 </button>
 
                 {/* Title */}
-                <h3 className="text-xl font-medium text-white mb-6 pr-8">
+                <h3 className="text-xl font-semibold text-[#F5F5F5] mb-6 pr-8">
                   Rate: {movie.title}
                 </h3>
 
@@ -267,9 +269,9 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleRating(option.value)}
                       disabled={isLoading}
-                      className={`w-full px-5 py-4 text-left rounded bg-[#2a2a2a] hover:bg-[#333333] border border-[#404040] hover:border-[#808080] transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`w-full px-5 py-4 text-left rounded-lg bg-[#2A2A2A] hover:bg-[#14B8A6]/10 border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                         option.value === "perfection"
-                          ? "border-[#46d369]/30 hover:border-[#46d369]/50"
+                          ? "border-[#14B8A6]/30 hover:border-[#14B8A6]/50"
                           : ""
                       }`}
                     >
@@ -293,10 +295,10 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ type: "spring", duration: 0.3 }}
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded shadow-2xl backdrop-blur-md border min-w-[200px] max-w-[90vw] md:max-w-md ${
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-lg shadow-lg backdrop-blur-md border min-w-[200px] max-w-[90vw] md:max-w-md ${
               showToast.type === "success"
-                ? "bg-[#46d369]/20 border-[#46d369]/30 text-white"
-                : "bg-[#E50914]/20 border-[#E50914]/30 text-white"
+                ? "bg-[#14B8A6]/10 border-[#14B8A6]/30 text-[#14B8A6]"
+                : "bg-red-500/10 border-red-500/30 text-red-300"
             }`}
           >
             <p className="text-sm font-normal text-center">

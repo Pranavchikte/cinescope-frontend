@@ -42,10 +42,10 @@ export function MovieGrid({
   if (!movies || movies.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 px-4">
-        <h3 className="text-2xl font-medium text-white mb-3">
+        <h3 className="text-2xl font-semibold text-[#F5F5F5] mb-3">
           {emptyMessage}
         </h3>
-        <p className="text-base text-[#808080] text-center max-w-md">
+        <p className="text-base text-[#A0A0A0] text-center max-w-md">
           Try adjusting your search or filters
         </p>
       </div>

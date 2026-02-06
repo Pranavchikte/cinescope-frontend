@@ -231,9 +231,12 @@ export const moviesAPI = {
         const res = await authFetch(
             `${API_BASE_URL}/movies/personalized?page=${page}&vote_count_min=${vote_count_min}&vote_average_min=${vote_average_min}`
         )
+        if (!res.ok) {
+            console.error('Personalized API failed:', res.status, await res.text())
+            return { results: [] } // Return empty array instead of nothing
+        }
         return res.json()
     },
-
     discover: async (params: {
         genre?: string
         year?: number

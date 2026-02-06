@@ -249,20 +249,20 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   // Loading Skeleton
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black">
-        <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] bg-zinc-900 animate-pulse">
+      <div className="min-h-screen bg-[#0F0F0F]">
+        <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] bg-[#1A1A1A] animate-pulse">
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="aspect-[2/3] bg-zinc-800 rounded-xl animate-pulse" />
+            <div className="aspect-[2/3] bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse" />
             <div className="md:col-span-2 space-y-6">
-              <div className="h-12 bg-zinc-800 rounded w-3/4 animate-pulse" />
-              <div className="h-6 bg-zinc-800 rounded w-1/2 animate-pulse" />
+              <div className="h-12 bg-[#1A1A1A] rounded-lg w-3/4 animate-pulse" />
+              <div className="h-6 bg-[#1A1A1A] rounded-lg w-1/2 animate-pulse" />
               <div className="space-y-2">
-                <div className="h-4 bg-zinc-800 rounded animate-pulse" />
-                <div className="h-4 bg-zinc-800 rounded w-5/6 animate-pulse" />
+                <div className="h-4 bg-[#1A1A1A] rounded animate-pulse" />
+                <div className="h-4 bg-[#1A1A1A] rounded w-5/6 animate-pulse" />
               </div>
             </div>
           </div>
@@ -274,22 +274,22 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   // Error State
   if (error || !show) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
             <div className="text-4xl">😕</div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">
+          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">
             Oops! Something went wrong
           </h2>
-          <p className="text-zinc-400 mb-8">{error || "TV show not found"}</p>
+          <p className="text-[#A0A0A0] mb-8">{error || "TV show not found"}</p>
           <Button
             onClick={() => router.push("/tv")}
-            className="bg-white hover:bg-zinc-200 text-black"
+            className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go to TV Shows
@@ -311,15 +311,15 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   const avgRuntime = show.episode_run_time?.[0] || 45;
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#0F0F0F]">
       {/* Back Button */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         onClick={() => router.back()}
-        className="fixed top-20 left-4 z-50 w-10 h-10 bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 hover:bg-black/90 hover:border-white/20 transition-all"
+        className="fixed top-20 left-4 z-50 w-10 h-10 bg-[#1A1A1A]/80 backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
       >
-        <ArrowLeft className="w-5 h-5 text-white" />
+        <ArrowLeft className="w-5 h-5 text-[#F5F5F5]" />
       </motion.button>
 
       {/* Hero Section */}
@@ -329,12 +329,12 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
         className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] overflow-hidden"
       >
         <img
-          src={backdropUrl}
+          src={backdropUrl || "/placeholder.svg"}
           alt={show.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/90 via-transparent to-transparent" />
 
         {trailerUrl && (
           <motion.a
@@ -342,9 +342,9 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute bottom-8 right-8 w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 hover:bg-white/30 transition-all group"
+            className="absolute bottom-8 right-8 w-16 h-16 bg-[#14B8A6]/20 backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/50 hover:bg-[#14B8A6]/30 transition-all duration-200 group"
           >
-            <Play className="w-6 h-6 text-white ml-1 group-hover:scale-110 transition-transform" />
+            <Play className="w-6 h-6 text-[#14B8A6] ml-1 group-hover:scale-110 transition-transform" />
           </motion.a>
         )}
       </motion.div>
@@ -362,7 +362,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             <div className="w-full max-w-[280px] md:max-w-none">
               <div className="relative aspect-[2/3] rounded-xl overflow-hidden border-2 border-white/10 shadow-2xl">
                 <img
-                  src={posterUrl}
+                  src={posterUrl || "/placeholder.svg"}
                   alt={show.name}
                   className="w-full h-full object-cover"
                 />
@@ -379,19 +379,19 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           >
             {/* Title & Tagline */}
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-violet-500/10 rounded-lg flex items-center justify-center">
-                  <Tv className="w-5 h-5 text-violet-400" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-[#14B8A6]/10 rounded-lg flex items-center justify-center border border-[#14B8A6]/30">
+                  <Tv className="w-5 h-5 text-[#14B8A6]" />
                 </div>
-                <span className="text-sm font-medium text-violet-400 uppercase tracking-wide">
+                <span className="text-sm font-semibold text-[#14B8A6] uppercase tracking-wide">
                   TV Series
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#F5F5F5] mb-2 leading-tight">
                 {show.name}
               </h1>
               {show.tagline && (
-                <p className="text-base md:text-lg text-zinc-400 italic">
+                <p className="text-base md:text-lg text-[#A0A0A0] italic">
                   {show.tagline}
                 </p>
               )}
@@ -405,15 +405,15 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                     key={i}
                     className={`w-5 h-5 ${
                       i < Math.floor(show.vote_average / 2)
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-zinc-700"
+                        ? "fill-[#14B8A6] text-[#14B8A6]"
+                        : "text-[#2A2A2A]"
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-lg font-semibold text-white">
+              <span className="text-lg font-semibold text-[#F5F5F5]">
                 {show.vote_average.toFixed(1)}
-                <span className="text-zinc-500">/10</span>
+                <span className="text-[#A0A0A0]">/10</span>
               </span>
             </div>
 
@@ -422,7 +422,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               {show.genres.slice(0, 4).map((genre) => (
                 <span
                   key={genre.id}
-                  className="px-3 py-1.5 rounded-full bg-white/5 backdrop-blur-sm text-sm text-white border border-white/10"
+                  className="px-3 py-1.5 rounded-full bg-[#1A1A1A] backdrop-blur-sm text-sm text-[#F5F5F5] border border-[#2A2A2A]"
                 >
                   {genre.name}
                 </span>
@@ -430,10 +430,10 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             </div>
 
             {/* Details Grid - TV Specific */}
-            <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-2 gap-4 pt-4">
               <div>
-                <p className="text-sm text-zinc-500 mb-1">First Air Date</p>
-                <p className="text-base font-medium text-white">
+                <p className="text-sm text-[#A0A0A0] mb-1">First Air Date</p>
+                <p className="text-base font-medium text-[#F5F5F5]">
                   {new Date(show.first_air_date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -442,38 +442,38 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-zinc-500 mb-1">Status</p>
-                <p className="text-base font-medium text-white capitalize">
+                <p className="text-sm text-[#A0A0A0] mb-1">Status</p>
+                <p className="text-base font-medium text-[#F5F5F5] capitalize">
                   {show.status || "Unknown"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-zinc-500 mb-1">Seasons</p>
-                <p className="text-base font-medium text-white">
+                <p className="text-sm text-[#A0A0A0] mb-1">Seasons</p>
+                <p className="text-base font-medium text-[#F5F5F5]">
                   {show.number_of_seasons} Season
                   {show.number_of_seasons !== 1 ? "s" : ""}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-zinc-500 mb-1">Episodes</p>
-                <p className="text-base font-medium text-white">
+                <p className="text-sm text-[#A0A0A0] mb-1">Episodes</p>
+                <p className="text-base font-medium text-[#F5F5F5]">
                   {show.number_of_episodes} Episodes
                 </p>
               </div>
               <div>
-                <p className="text-sm text-zinc-500 mb-1">Episode Runtime</p>
-                <p className="text-base font-medium text-white">
+                <p className="text-sm text-[#A0A0A0] mb-1">Episode Runtime</p>
+                <p className="text-base font-medium text-[#F5F5F5]">
                   {avgRuntime} min
                 </p>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-6">
               <Button
                 onClick={handleAddToWatchlist}
                 disabled={isAddingToWatchlist}
-                className="flex-1 sm:flex-none h-12 px-6 bg-white hover:bg-zinc-200 text-black font-semibold rounded-xl transition-all disabled:opacity-50"
+                className="flex-1 sm:flex-none h-12 px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold rounded-lg transition-all disabled:opacity-50"
               >
                 {isAddingToWatchlist ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -487,7 +487,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
 
               <Button
                 onClick={() => setShowRatingSheet(true)}
-                className="flex-1 sm:flex-none h-12 px-6 bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold rounded-xl transition-all"
+                className="flex-1 sm:flex-none h-12 px-6 bg-[#1A1A1A] hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 font-semibold rounded-lg transition-all duration-200"
               >
                 <Star className="w-5 h-5 mr-2" />
                 Rate
@@ -506,18 +506,18 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                       showNotification("Link copied!", "success");
                     });
                 }}
-                className="h-12 w-12 sm:w-auto sm:px-4 bg-white/10 hover:bg-white/15 text-white border border-white/20 rounded-xl transition-all"
+                className="h-12 w-12 sm:w-auto sm:px-4 bg-[#1A1A1A] hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg transition-all duration-200"
               >
                 <Share2 className="w-5 h-5" />
               </Button>
             </div>
 
             {/* Overview */}
-            <div className="pt-6 border-t border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-3">
+            <div className="pt-8 border-t border-[#2A2A2A]">
+              <h3 className="text-lg font-semibold text-[#F5F5F5] mb-3">
                 Overview
               </h3>
-              <p className="text-zinc-300 leading-relaxed text-sm md:text-base">
+              <p className="text-[#A0A0A0] leading-relaxed text-sm md:text-base">
                 {show.overview}
               </p>
             </div>
@@ -532,19 +532,19 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Available On</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-6">Available On</h2>
             <div className="flex flex-wrap gap-4">
               {providers.map((provider) => (
                 <div
                   key={provider.provider_id}
-                  className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
+                  className="flex items-center gap-3 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg hover:border-[#14B8A6]/50 hover:bg-[#14B8A6]/5 transition-all duration-200"
                 >
                   <img
                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-10 h-10 rounded-lg"
                   />
-                  <span className="text-white font-medium text-sm">
+                  <span className="text-[#F5F5F5] font-medium text-sm">
                     {provider.provider_name}
                   </span>
                 </div>
@@ -562,8 +562,8 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Trailer</h2>
-            <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-6">Trailer</h2>
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[#2A2A2A] bg-[#1A1A1A]">
               <iframe
                 width="100%"
                 height="100%"

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* @tailwind base; */
+/* @tailwind components; */
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -141,4 +144,80 @@
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* Light mode (not used, but kept for compatibility) */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
+  }
+  
+  /* Dark mode (default, always active) */
+  html, .dark {
+    --background: #0F0F0F;
+    --foreground: #F5F5F5;
+    --card: #1A1A1A;
+    --card-foreground: #F5F5F5;
+    --popover: #1A1A1A;
+    --popover-foreground: #F5F5F5;
+    --primary: #14B8A6;
+    --primary-foreground: #0F0F0F;
+    --secondary: #2A2A2A;
+    --secondary-foreground: #F5F5F5;
+    --muted: #A0A0A0;
+    --muted-foreground: #F5F5F5;
+    --accent: #14B8A6;
+    --accent-foreground: #0F0F0F;
+    --destructive: #EF4444;
+    --destructive-foreground: #F5F5F5;
+    --border: #2A2A2A;
+    --input: #2A2A2A;
+    --ring: #14B8A6;
+    --chart-1: #14B8A6;
+    --chart-2: #06B6D4;
+    --chart-3: #3B82F6;
+    --chart-4: #8B5CF6;
+    --chart-5: #EC4899;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

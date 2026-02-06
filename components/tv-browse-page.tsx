@@ -68,18 +68,18 @@ function ScrollContainer({
 
   return (
     <div
-      className="space-y-3 group"
+      className="space-y-4 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Section Header - Netflix Style */}
-      <h2 className="text-xl md:text-2xl font-medium text-white px-4 sm:px-6 lg:px-12">
+      {/* Section Header - Minimalist Style */}
+      <h2 className="text-xl md:text-2xl font-semibold text-[#F5F5F5] px-6 sm:px-8 lg:px-16">
         {title}
       </h2>
 
       {/* Scroll Container */}
       <div className="relative">
-        {/* Left Scroll Button - Hover Only */}
+        {/* Left Scroll Button - Subtle Hover */}
         <AnimatePresence>
           {isHovered && canScrollLeft && (
             <motion.button
@@ -88,16 +88,16 @@ function ScrollContainer({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => scroll("left")}
-              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-r from-[#141414] via-[#141414]/90 to-transparent items-center justify-start pl-2 hover:from-[#141414] transition-all"
+              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-background via-background/40 to-transparent items-center justify-start pl-3 hover:from-background transition-all"
             >
-              <div className="w-10 h-10 bg-[#181818]/90 hover:bg-[#333333] rounded-full flex items-center justify-center transition-colors">
-                <ChevronLeft className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
+                <ChevronLeft className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
           )}
         </AnimatePresence>
 
-        {/* Right Scroll Button - Hover Only */}
+        {/* Right Scroll Button - Subtle Hover */}
         <AnimatePresence>
           {isHovered && canScrollRight && (
             <motion.button
@@ -106,10 +106,10 @@ function ScrollContainer({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => scroll("right")}
-              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-l from-[#141414] via-[#141414]/90 to-transparent items-center justify-end pr-2 hover:from-[#141414] transition-all"
+              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-background via-background/40 to-transparent items-center justify-end pr-3 hover:from-background transition-all"
             >
-              <div className="w-10 h-10 bg-[#181818]/90 hover:bg-[#333333] rounded-full flex items-center justify-center transition-colors">
-                <ChevronRight className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
+                <ChevronRight className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
           )}
@@ -118,7 +118,7 @@ function ScrollContainer({
         {/* Cards Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-1 md:gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 sm:px-6 lg:px-12 pb-10"
+          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-6 sm:px-8 lg:px-16 pb-6"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {isLoading
@@ -127,7 +127,7 @@ function ScrollContainer({
                   key={i}
                   className="shrink-0 w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] snap-start"
                 >
-                  <div className="aspect-[2/3] bg-[#2a2a2a] rounded animate-pulse" />
+                  <div className="aspect-[2/3] bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse" />
                 </div>
               ))
             : shows.map((show) => (
@@ -144,8 +144,8 @@ function ScrollContainer({
         </div>
 
         {/* Gradient Fade Edges - Mobile */}
-        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#141414] to-transparent" />
-        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#141414] to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent" />
       </div>
     </div>
   );
@@ -305,9 +305,9 @@ export function TVBrowsePage() {
     currentFilters.vote_average_max !== null;
 
   return (
-    <div className="min-h-screen bg-[#141414]">
+    <div className="min-h-screen bg-[#0F0F0F]">
       {/* Filter Bar - Sticky */}
-      <div className="sticky top-0 z-40 bg-[#141414]/98 backdrop-blur-sm border-b border-[#2a2a2a]">
+      <div className="sticky top-0 z-40 bg-[#0F0F0F]/95 backdrop-blur-md border-b border-[#2A2A2A]/50">
         <FilterBar
           onFilterChange={handleFilterChange}
           mediaType="tv"
@@ -317,10 +317,10 @@ export function TVBrowsePage() {
       </div>
 
       {/* Main Content */}
-      <div className="pt-6 pb-20">
+      <div className="pt-8 pb-24">
         {/* Carousel Sections */}
         {!hasActiveFilters && (
-          <div className="space-y-10">
+          <div className="space-y-16">
             {isAuthenticated && personalizedShows.length > 0 && (
               <ScrollContainer
                 title="Recommended For You"
@@ -344,14 +344,14 @@ export function TVBrowsePage() {
         )}
 
         {/* Filtered Results Grid */}
-        <div className="mt-10 px-4 sm:px-6 lg:px-12">
+        <div className="px-6 sm:px-8 lg:px-16">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl md:text-2xl font-medium text-white">
-                {hasActiveFilters ? "Search Results" : "Explore"}
+              <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5]">
+                {hasActiveFilters ? "Search Results" : "Explore All"}
               </h2>
               {isFiltering && (
-                <div className="flex items-center gap-2 text-sm text-[#808080]">
+                <div className="flex items-center gap-2 text-sm text-[#A0A0A0]">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Loading...</span>
                 </div>
@@ -360,12 +360,12 @@ export function TVBrowsePage() {
 
             {!isFiltering && filteredShows.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32">
-                <div className="text-center">
-                  <h3 className="text-2xl font-medium text-white mb-3">
+                <div className="text-center space-y-2">
+                  <h3 className="text-2xl font-semibold text-[#F5F5F5]">
                     No titles found
                   </h3>
-                  <p className="text-base text-[#808080]">
-                    Try adjusting your search or filters
+                  <p className="text-base text-[#A0A0A0]">
+                    Try adjusting your filters or search criteria
                   </p>
                 </div>
               </div>

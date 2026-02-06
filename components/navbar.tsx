@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react"
+
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { authAPI, getAccessToken, moviesAPI, tvAPI } from "@/lib/api";
@@ -208,48 +210,48 @@ export function Navbar() {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
-          isScrolled ? "bg-[#141414]" : "bg-transparent"
+          isScrolled ? "bg-[#0F0F0F]/95 backdrop-blur-md border-b border-[#2A2A2A]/50" : "bg-transparent"
         }`}
       >
         <div className="px-4 sm:px-6 lg:px-12 h-[68px] flex items-center justify-between gap-4">
           {/* Logo */}
           <button
             onClick={() => router.push("/")}
-            className="shrink-0 group flex items-center"
+            className="shrink-0 group flex items-center hover:opacity-90 transition-opacity"
           >
-            <span className="text-[#E50914] text-2xl md:text-3xl font-black tracking-tighter">
+            <span className="text-[#14B8A6] text-2xl md:text-3xl font-semibold tracking-tight">
               CINESCOPE
             </span>
           </button>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-5 ml-8">
+          <div className="hidden lg:flex items-center gap-6 ml-8">
             <button
               onClick={() => router.push("/")}
-              className={`text-sm font-normal transition-colors ${
+              className={`text-sm font-medium transition-colors duration-200 ${
                 isActive("/")
-                  ? "text-white font-medium"
-                  : "text-[#e5e5e5] hover:text-[#b3b3b3]"
+                  ? "text-[#14B8A6]"
+                  : "text-[#A0A0A0] hover:text-[#F5F5F5]"
               }`}
             >
               Home
             </button>
             <button
               onClick={() => router.push("/tv")}
-              className={`text-sm font-normal transition-colors ${
+              className={`text-sm font-medium transition-colors duration-200 ${
                 isActive("/tv")
-                  ? "text-white font-medium"
-                  : "text-[#e5e5e5] hover:text-[#b3b3b3]"
+                  ? "text-[#14B8A6]"
+                  : "text-[#A0A0A0] hover:text-[#F5F5F5]"
               }`}
             >
               TV Shows
             </button>
             <button
               onClick={() => router.push("/movies")}
-              className={`text-sm font-normal transition-colors ${
+              className={`text-sm font-medium transition-colors duration-200 ${
                 isActive("/movies")
-                  ? "text-white font-medium"
-                  : "text-[#e5e5e5] hover:text-[#b3b3b3]"
+                  ? "text-[#14B8A6]"
+                  : "text-[#A0A0A0] hover:text-[#F5F5F5]"
               }`}
             >
               Movies
@@ -258,10 +260,10 @@ export function Navbar() {
               <>
                 <button
                   onClick={() => router.push("/watchlist")}
-                  className={`text-sm font-normal transition-colors ${
+                  className={`text-sm font-medium transition-colors duration-200 ${
                     isActive("/watchlist")
-                      ? "text-white font-medium"
-                      : "text-[#e5e5e5] hover:text-[#b3b3b3]"
+                      ? "text-[#14B8A6]"
+                      : "text-[#A0A0A0] hover:text-[#F5F5F5]"
                   }`}
                 >
                   My List
@@ -284,23 +286,23 @@ export function Navbar() {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="relative"
                   >
-                    <button
-                      type="submit"
-                      onClick={() => {
-                        if (!searchQuery && !showResults) {
-                          const input =
-                            desktopSearchInputRef.current?.focus();
+                      <button
+                        type="submit"
+                        onClick={() => {
+                          if (!searchQuery && !showResults) {
+                            const input =
+                              desktopSearchInputRef.current?.focus();
 
-                        }
-                      }}
-                      className={`absolute left-0 top-1/2 -translate-y-1/2 w-[34px] h-[34px] flex items-center justify-center transition-colors ${
-                        showResults || searchQuery
-                          ? "pointer-events-none"
-                          : "hover:text-white"
-                      }`}
-                    >
-                      <Search className="w-5 h-5 text-white" />
-                    </button>
+                          }
+                        }}
+                        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[34px] h-[34px] flex items-center justify-center transition-colors duration-200 ${
+                          showResults || searchQuery
+                            ? "pointer-events-none"
+                            : "hover:text-[#14B8A6]"
+                        }`}
+                      >
+                        <Search className="w-5 h-5 text-[#A0A0A0]" />
+                      </button>
                     {(showResults || searchQuery) && (
                       <input
                         type="search"
@@ -313,13 +315,13 @@ export function Navbar() {
                           }
                         }}
                         placeholder="Titles, people, genres"
-                        className="w-full h-[34px] pl-10 pr-10 bg-[#000000] border border-white text-sm text-white placeholder:text-[#808080] focus:outline-none"
+                        className="w-full h-[34px] pl-10 pr-10 bg-[#1A1A1A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 text-sm text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-colors duration-200"
                         autoComplete="off"
                         autoFocus
                       />
                     )}
                     {isSearching && (
-                      <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white animate-spin" />
+                      <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[#14B8A6] animate-spin" />
                     )}
                   </motion.div>
                 </div>
@@ -333,18 +335,18 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 right-0 w-[300px] bg-[#141414]/98 border border-[#333333] shadow-2xl max-h-[500px] overflow-y-auto"
+                    className="absolute top-full mt-2 right-0 w-[300px] bg-[#1A1A1A]/95 border border-[#2A2A2A] shadow-2xl rounded-lg max-h-[500px] overflow-y-auto backdrop-blur-md"
                   >
                     {searchResults.map((result) => (
                       <button
                         key={`${result.mediaType}-${result.id}`}
                         onClick={() => handleResultClick(result)}
-                        className="w-full flex items-start gap-3 p-3 hover:bg-[#2a2a2a] transition-colors border-b border-[#2a2a2a] last:border-0"
+                        className="w-full flex items-start gap-3 p-3 hover:bg-[#14B8A6]/5 transition-colors duration-200 border-b border-[#2A2A2A] last:border-0"
                       >
-                        <div className="w-16 h-24 bg-[#2a2a2a] shrink-0 overflow-hidden">
+                        <div className="w-16 h-24 bg-[#2A2A2A] shrink-0 overflow-hidden rounded-lg">
                           {result.poster ? (
                             <img
-                              src={result.poster}
+                              src={result.poster || "/placeholder.svg"}
                               alt={result.title}
                               className="w-full h-full object-cover"
                             />
@@ -355,12 +357,12 @@ export function Navbar() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0 text-left pt-1">
-                          <p className="text-sm font-normal text-white line-clamp-2 leading-tight">
+                          <p className="text-sm font-medium text-[#F5F5F5] line-clamp-2 leading-tight">
                             {result.title}
                           </p>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-[#808080]">
+                          <div className="flex items-center gap-2 mt-1 text-xs text-[#A0A0A0]">
                             <span>{result.year}</span>
-                            <span>•</span>
+                            <span className="text-[#2A2A2A]">•</span>
                             <span className="capitalize">
                               {result.mediaType === "tv" ? "Series" : "Movie"}
                             </span>
@@ -376,14 +378,14 @@ export function Navbar() {
             {/* Mobile Search Button */}
             <button
               onClick={() => setIsMobileSearchOpen(true)}
-              className="md:hidden w-[34px] h-[34px] flex items-center justify-center text-white"
+              className="md:hidden w-[34px] h-[34px] flex items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200"
             >
               <Search className="w-5 h-5" />
             </button>
 
             {/* Notifications - Authenticated Only */}
             {isAuthenticated && (
-              <button className="hidden md:flex w-[34px] h-[34px] items-center justify-center text-white hover:text-[#b3b3b3] transition-colors">
+              <button className="hidden md:flex w-[34px] h-[34px] items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200">
                 <Bell className="w-5 h-5" />
               </button>
             )}
@@ -395,17 +397,17 @@ export function Navbar() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 group"
                 >
-                  <Avatar className="w-8 h-8">
+                  <Avatar className="w-8 h-8 border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors">
                     <AvatarImage
                       src={`https://avatar.vercel.sh/${user?.username || "user"}`}
                     />
-                    <AvatarFallback className="bg-[#E50914] text-white text-xs font-semibold">
+                    <AvatarFallback className="bg-[#14B8A6] text-[#0F0F0F] text-xs font-semibold">
                       {user?.username?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <ChevronDown
-                    className={`hidden md:block w-4 h-4 text-white transition-transform ${
-                      showUserMenu ? "rotate-180" : ""
+                    className={`hidden md:block w-4 h-4 text-[#A0A0A0] transition-all duration-200 ${
+                      showUserMenu ? "rotate-180 text-[#14B8A6]" : ""
                     }`}
                   />
                 </button>
@@ -418,7 +420,7 @@ export function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute top-full right-0 mt-2 w-[220px] bg-[#141414]/98 border border-[#333333] shadow-2xl overflow-hidden"
+                      className="absolute top-full right-0 mt-2 w-[220px] bg-[#1A1A1A]/95 border border-[#2A2A2A] shadow-2xl overflow-hidden rounded-lg backdrop-blur-md"
                     >
                       {/* Menu Items */}
                       <div className="py-1">
@@ -427,7 +429,7 @@ export function Navbar() {
                             setShowUserMenu(false);
                             router.push("/watchlist");
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:underline transition-all"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
                         >
                           <List className="w-4 h-4" />
                           <span>My List</span>
@@ -437,7 +439,7 @@ export function Navbar() {
                             setShowUserMenu(false);
                             router.push("/ratings");
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:underline transition-all"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
                         >
                           <Star className="w-4 h-4" />
                           <span>Ratings</span>
@@ -447,20 +449,20 @@ export function Navbar() {
                             setShowUserMenu(false);
                             router.push("/creator-picks");
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:underline transition-all"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
                         >
                           <Crown className="w-4 h-4" />
                           <span>Creator Picks</span>
                         </button>
                         {user?.role === "admin" && (
                           <>
-                            <div className="h-px bg-[#333333] my-1" />
+                            <div className="h-px bg-[#2A2A2A] my-1" />
                             <button
                               onClick={() => {
                                 setShowUserMenu(false);
                                 router.push("/admin");
                               }}
-                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:underline transition-all"
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
                             >
                               <Shield className="w-4 h-4" />
                               <span>Admin Panel</span>
@@ -470,15 +472,15 @@ export function Navbar() {
                       </div>
 
                       {/* Account Section */}
-                      <div className="border-t border-[#333333] py-1">
+                      <div className="border-t border-[#2A2A2A] py-1">
                         <div className="px-4 py-3">
-                          <p className="text-xs text-[#808080] text-center">
+                          <p className="text-xs text-[#A0A0A0] text-center">
                             {user?.email}
                           </p>
                         </div>
                         <button
                           onClick={handleLogout}
-                          className="w-full px-4 py-3 text-sm text-white hover:underline text-center transition-all"
+                          className="w-full px-4 py-3 text-sm text-[#F5F5F5] hover:bg-red-500/5 hover:text-red-400 text-center transition-colors duration-200"
                         >
                           Sign out of CineScope
                         </button>
@@ -489,7 +491,7 @@ export function Navbar() {
               </div>
             ) : (
               <Link href="/login">
-                <button className="h-8 px-4 bg-[#E50914] text-white text-sm font-medium hover:bg-[#C11119] transition-colors">
+                <button className="h-8 px-5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] text-sm font-semibold rounded-lg transition-all duration-200 hover:shadow-md">
                   Sign In
                 </button>
               </Link>
@@ -505,18 +507,18 @@ export function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#141414]"
+            className="fixed inset-0 z-50 bg-[#0F0F0F]"
           >
             <div className="h-full flex flex-col">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a]">
-                <h2 className="text-lg font-medium text-white">Search</h2>
+              <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
+                <h2 className="text-lg font-semibold text-[#F5F5F5]">Search</h2>
                 <button
                   onClick={() => {
                     setIsMobileSearchOpen(false);
                     setSearchQuery("");
                   }}
-                  className="w-10 h-10 flex items-center justify-center text-white"
+                  className="w-10 h-10 flex items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -526,17 +528,17 @@ export function Navbar() {
               <div className="p-4">
                 <form onSubmit={handleSearch}>
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#808080]" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#A0A0A0]" />
                     <input
                       type="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Titles, people, genres"
                       autoFocus
-                      className="w-full h-12 pl-12 pr-12 bg-[#2a2a2a] text-base text-white placeholder:text-[#808080] focus:outline-none focus:bg-[#333333]"
+                      className="w-full h-12 pl-12 pr-12 bg-[#1A1A1A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 text-base text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-colors duration-200 rounded-lg"
                     />
                     {isSearching && (
-                      <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white animate-spin" />
+                      <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#14B8A6] animate-spin" />
                     )}
                   </div>
                 </form>
@@ -550,12 +552,12 @@ export function Navbar() {
                       <button
                         key={`${result.mediaType}-${result.id}`}
                         onClick={() => handleResultClick(result)}
-                        className="w-full flex items-start gap-4 p-4 hover:bg-[#2a2a2a] transition-colors border-b border-[#2a2a2a]"
+                        className="w-full flex items-start gap-4 p-4 hover:bg-[#14B8A6]/5 transition-colors duration-200 border-b border-[#2A2A2A]"
                       >
-                        <div className="w-16 h-24 bg-[#2a2a2a] shrink-0 overflow-hidden">
+                        <div className="w-16 h-24 bg-[#2A2A2A] shrink-0 overflow-hidden rounded-lg">
                           {result.poster ? (
                             <img
-                              src={result.poster}
+                              src={result.poster || "/placeholder.svg"}
                               alt={result.title}
                               className="w-full h-full object-cover"
                             />
@@ -566,10 +568,10 @@ export function Navbar() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0 text-left pt-1">
-                          <p className="text-base font-normal text-white line-clamp-2">
+                          <p className="text-base font-medium text-[#F5F5F5] line-clamp-2">
                             {result.title}
                           </p>
-                          <div className="flex items-center gap-2 mt-1.5 text-sm text-[#808080]">
+                          <div className="flex items-center gap-2 mt-1.5 text-sm text-[#A0A0A0]">
                             <span>{result.year}</span>
                             <span>•</span>
                             <span className="capitalize">
@@ -582,7 +584,7 @@ export function Navbar() {
                   </div>
                 ) : searchQuery && !isSearching ? (
                   <div className="text-center py-20">
-                    <p className="text-base text-[#808080]">
+                    <p className="text-base text-[#A0A0A0]">
                       No results found for "{searchQuery}"
                     </p>
                   </div>
@@ -602,13 +604,14 @@ export function Navbar() {
           width: 10px;
         }
         .overflow-y-auto::-webkit-scrollbar-track {
-          background: #141414;
+          background: #0F0F0F;
         }
         .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #404040;
+          background: #2A2A2A;
+          border-radius: 5px;
         }
         .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-          background: #606060;
+          background: #14B8A6;
         }
       `}</style>
     </>

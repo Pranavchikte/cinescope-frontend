@@ -145,12 +145,12 @@ export function RatingsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#141414] pt-24">
+      <div className="min-h-screen bg-[#0F0F0F] pt-24">
         <div className="px-4 sm:px-6 lg:px-12">
-          <div className="h-8 bg-[#2a2a2a] rounded w-48 mb-8 animate-pulse" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+          <div className="h-8 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg w-48 mb-8 animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] bg-[#2a2a2a] rounded animate-pulse" />
+              <div key={i} className="aspect-[2/3] bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse" />
             ))}
           </div>
         </div>
@@ -160,22 +160,22 @@ export function RatingsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#141414] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md"
         >
-          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#2a2a2a] rounded-full">
-            <XCircle className="w-8 h-8 text-[#b3b3b3]" />
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#1A1A1A] border border-[#2A2A2A] rounded-full">
+            <XCircle className="w-8 h-8 text-[#A0A0A0]" />
           </div>
-          <h2 className="text-2xl font-semibold text-[#e5e5e5] mb-3">
+          <h2 className="text-2xl font-semibold text-[#F5F5F5] mb-3">
             Something went wrong
           </h2>
-          <p className="text-[#b3b3b3] mb-8">{error}</p>
+          <p className="text-[#A0A0A0] mb-8">{error}</p>
           <button
             onClick={() => router.push("/")}
-            className="px-6 py-2.5 bg-white text-black rounded font-medium hover:bg-[#e5e5e5] transition-colors"
+            className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-colors"
           >
             Go Home
           </button>
@@ -185,7 +185,7 @@ export function RatingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#141414] pt-24 pb-12">
+    <div className="min-h-screen bg-[#0F0F0F] pt-24 pb-12">
       <div className="px-4 sm:px-6 lg:px-12">
         {/* Header */}
         <motion.div
@@ -194,10 +194,10 @@ export function RatingsPage() {
           transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <h1 className="text-3xl sm:text-4xl font-semibold text-[#e5e5e5] mb-2">
+          <h1 className="text-3xl sm:text-4xl font-semibold text-[#F5F5F5] mb-2">
             My Ratings
           </h1>
-          <p className="text-base text-[#b3b3b3]">
+          <p className="text-base text-[#A0A0A0]">
             {ratings.length} {ratings.length === 1 ? "rating" : "ratings"}
           </p>
         </motion.div>
@@ -207,14 +207,14 @@ export function RatingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex gap-4 mb-8 border-b border-[#2a2a2a] overflow-x-auto hide-scrollbar"
+          className="flex gap-4 mb-8 border-b border-[#2A2A2A] overflow-x-auto hide-scrollbar"
         >
           <button
             onClick={() => setFilter("all")}
-            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
               filter === "all"
-                ? "border-[#e5e5e5] text-[#e5e5e5]"
-                : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+                ? "border-[#14B8A6] text-[#14B8A6]"
+                : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
             }`}
           >
             All ({ratings.length})
@@ -226,13 +226,13 @@ export function RatingsPage() {
               <button
                 key={key}
                 onClick={() => setFilter(key)}
-                className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
+                className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap flex items-center gap-2 ${
                   filter === key
-                    ? "border-[#e5e5e5] text-[#e5e5e5]"
-                    : "border-transparent text-[#808080] hover:text-[#b3b3b3]"
+                    ? "border-[#14B8A6] text-[#14B8A6]"
+                    : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
                 }`}
               >
-                <Icon className="w-4 h-4" style={{ color: filter === key ? config.color : undefined }} />
+                <Icon className="w-4 h-4" style={{ color: filter === key ? "#14B8A6" : undefined }} />
                 <span>{config.label} ({count})</span>
               </button>
             )
@@ -247,22 +247,22 @@ export function RatingsPage() {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center justify-center py-24"
           >
-            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#2a2a2a] rounded-full">
-              <Star className="w-8 h-8 text-[#808080]" />
+            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#1A1A1A] border border-[#2A2A2A] rounded-full">
+              <Star className="w-8 h-8 text-[#A0A0A0]" />
             </div>
-            <h2 className="text-xl font-medium text-[#e5e5e5] mb-2">
+            <h2 className="text-xl font-semibold text-[#F5F5F5] mb-2">
               {filter === "all"
                 ? "No ratings yet"
                 : `No ${RATING_CONFIG[filter as keyof typeof RATING_CONFIG].label} ratings`}
             </h2>
-            <p className="text-[#b3b3b3] text-center max-w-md mb-8">
+            <p className="text-[#A0A0A0] text-center max-w-md mb-8">
               {filter === "all"
                 ? "Start rating titles to see them here"
                 : "Try selecting a different rating filter"}
             </p>
             <button
               onClick={() => router.push("/")}
-              className="px-6 py-2.5 bg-white text-black rounded font-medium hover:bg-[#e5e5e5] transition-colors"
+              className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-colors"
             >
               Browse Titles
             </button>
@@ -341,11 +341,11 @@ function RatedMovieCard({
         <motion.div
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.2 }}
-          className="relative aspect-[2/3] rounded overflow-hidden bg-[#2a2a2a] cursor-pointer"
+          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors cursor-pointer"
         >
           {movie.poster ? (
             <img
-              src={movie.poster}
+              src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
               className="w-full h-full object-cover"
             />
@@ -356,20 +356,20 @@ function RatedMovieCard({
           )}
 
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
           {/* Rating Badge */}
-          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/80 backdrop-blur-sm rounded">
-            <Icon className="w-3 h-3" style={{ color: config.color }} />
-            <span className="text-xs font-medium text-white">{config.label}</span>
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-[#0F0F0F]/80 backdrop-blur-sm rounded-lg border border-[#2A2A2A]">
+            <Icon className="w-3 h-3" style={{ color: "#14B8A6" }} />
+            <span className="text-xs font-medium text-[#F5F5F5]">{config.label}</span>
           </div>
 
           {/* Title Info */}
           <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-            <h3 className="text-sm font-medium text-white line-clamp-2 mb-1">
+            <h3 className="text-sm font-medium text-[#F5F5F5] line-clamp-2 mb-1">
               {movie.title}
             </h3>
-            <p className="text-xs text-[#b3b3b3]">{movie.year}</p>
+            <p className="text-xs text-[#A0A0A0]">{movie.year}</p>
           </div>
         </motion.div>
       </Link>
@@ -388,7 +388,7 @@ function RatedMovieCard({
                 e.preventDefault()
                 onEditToggle()
               }}
-              className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#333333] text-white rounded text-sm font-medium transition-colors flex items-center gap-2"
+              className="px-3 py-2 bg-[#1A1A1A] hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Edit</span>
@@ -400,7 +400,7 @@ function RatedMovieCard({
                   onRemove()
                 }
               }}
-              className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#333333] text-white rounded text-sm font-medium transition-colors flex items-center gap-2"
+              className="px-3 py-2 bg-[#1A1A1A] hover:bg-red-500/10 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Remove</span>
@@ -417,7 +417,7 @@ function RatedMovieCard({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="hidden md:block absolute top-0 left-0 right-0 bg-[#181818] border border-[#2a2a2a] rounded overflow-hidden z-30 shadow-2xl"
+            className="hidden md:block absolute top-0 left-0 right-0 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg overflow-hidden z-30 shadow-2xl"
           >
             {ratingOptions.map((option) => {
               const optionConfig = RATING_CONFIG[option]
@@ -430,9 +430,9 @@ function RatedMovieCard({
                     e.preventDefault()
                     onUpdate(option)
                   }}
-                  className="w-full px-3 py-2.5 text-sm text-[#e5e5e5] hover:bg-[#2a2a2a] transition-colors text-left flex items-center gap-2"
+                  className="w-full px-3 py-2.5 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200 text-left flex items-center gap-2"
                 >
-                  <OptionIcon className="w-4 h-4" style={{ color: optionConfig.color }} />
+                  <OptionIcon className="w-4 h-4" style={{ color: "#14B8A6" }} />
                   <span>{optionConfig.label}</span>
                 </button>
               )
@@ -462,7 +462,7 @@ function RatedMovieCard({
             onUpdate("perfection")
           }
         }}
-        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-black/80 hover:bg-black text-white rounded-full flex items-center justify-center transition-colors"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#14B8A6]/20 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full flex items-center justify-center transition-colors duration-200"
       >
         <Edit3 className="w-3.5 h-3.5" />
       </button>
