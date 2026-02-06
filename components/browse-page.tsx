@@ -32,85 +32,85 @@ interface FeaturedMovie {
 function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
   if (!movie) {
     return (
-      <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] bg-[#141414] animate-pulse">
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#141414] to-transparent" />
+      <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] bg-card animate-pulse">
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh]">
+    <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] overflow-hidden">
       {/* Backdrop Image */}
       <div className="absolute inset-0">
         <img
-          src={movie.backdrop}
+          src={movie.backdrop || "/placeholder.svg"}
           alt={movie.title}
           className="w-full h-full object-cover object-center"
         />
-        {/* Gradient Overlays - Netflix Style */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#141414]/90 via-[#141414]/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#141414] to-transparent" />
+        {/* Elegant Gradient Overlays - Minimalist Style */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-end pb-16 sm:pb-20 lg:pb-28 px-4 sm:px-6 lg:px-12">
-        <div className="max-w-2xl space-y-3 sm:space-y-4">
+      <div className="relative h-full flex items-end pb-12 sm:pb-16 lg:pb-24 px-6 sm:px-8 lg:px-16">
+        <div className="max-w-2xl space-y-4 sm:space-y-5">
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight"
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-tight text-balance"
           >
             {movie.title}
           </motion.h1>
 
-          {/* Meta Info */}
+          {/* Meta Info - Refined */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base flex-wrap"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center gap-4 text-sm sm:text-base flex-wrap"
           >
-            <span className="text-[#46d369] font-semibold">
-              {Math.round(movie.rating * 10)}% Match
+            <span className="text-primary font-medium text-lg">
+              {Math.round(movie.rating * 10)}%
             </span>
-            <span className="text-white">{movie.year}</span>
+            <span className="text-muted text-sm">{movie.year}</span>
             {movie.genres && movie.genres.length > 0 && (
               <>
-                <span className="w-1 h-1 rounded-full bg-[#808080]" />
-                <span className="text-[#b3b3b3]">
-                  {movie.genres.slice(0, 3).join(" • ")}
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <span className="text-muted text-sm">
+                  {movie.genres.slice(0, 2).join(" · ")}
                 </span>
               </>
             )}
           </motion.div>
 
-          {/* Description */}
+          {/* Description - Elegant & Concise */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm sm:text-base lg:text-lg text-white line-clamp-2 sm:line-clamp-3 max-w-xl leading-relaxed"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-sm sm:text-base lg:text-base text-muted line-clamp-2 sm:line-clamp-3 max-w-lg leading-relaxed"
           >
             {movie.overview}
           </motion.p>
 
-          {/* Buttons */}
+          {/* Buttons - Minimalist Style */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex items-center gap-3 pt-2"
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex items-center gap-3 pt-3"
           >
-            <button className="flex items-center gap-2 px-5 sm:px-7 py-2 sm:py-2.5 bg-white hover:bg-white/90 text-black rounded text-sm sm:text-base font-semibold transition-all">
-              <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-black" />
-              <span>Play</span>
+            <button className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm sm:text-base font-medium transition-all duration-200 hover:shadow-lg hover:scale-105">
+              <Play className="w-5 h-5 sm:w-5 sm:h-5 fill-current" />
+              <span>Watch Now</span>
             </button>
-            <button className="flex items-center gap-2 px-5 sm:px-7 py-2 sm:py-2.5 bg-[#6d6d6e]/70 hover:bg-[#6d6d6e]/50 text-white rounded text-sm sm:text-base font-semibold transition-all">
-              <Info className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span>More Info</span>
+            <button className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-transparent border border-border hover:border-primary hover:text-primary text-muted rounded-lg text-sm sm:text-base font-medium transition-all duration-200 hover:bg-primary/5">
+              <Info className="w-5 h-5 sm:w-5 sm:h-5" />
+              <span>Details</span>
             </button>
           </motion.div>
         </div>
@@ -138,7 +138,7 @@ function ScrollContainer({
     if (element) {
       setCanScrollLeft(element.scrollLeft > 0);
       setCanScrollRight(
-        element.scrollLeft < element.scrollWidth - element.clientWidth - 10
+        element.scrollLeft < element.scrollWidth - element.clientWidth - 10,
       );
     }
   };
@@ -171,18 +171,18 @@ function ScrollContainer({
 
   return (
     <div
-      className="space-y-3 group"
+      className="space-y-4 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Section Header - Netflix Style */}
-      <h2 className="text-xl md:text-2xl font-medium text-white px-4 sm:px-6 lg:px-12">
+      {/* Section Header - Minimalist Style */}
+      <h2 className="text-xl md:text-2xl font-semibold text-foreground px-6 sm:px-8 lg:px-16">
         {title}
       </h2>
 
       {/* Scroll Container */}
       <div className="relative">
-        {/* Left Scroll Button - Hover Only */}
+        {/* Left Scroll Button - Subtle Hover */}
         <AnimatePresence>
           {isHovered && canScrollLeft && (
             <motion.button
@@ -191,16 +191,16 @@ function ScrollContainer({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => scroll("left")}
-              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-r from-[#141414] via-[#141414]/90 to-transparent items-center justify-start pl-2 hover:from-[#141414] transition-all"
+              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-background via-background/40 to-transparent items-center justify-start pl-3 hover:from-background transition-all"
             >
-              <div className="w-10 h-10 bg-[#181818]/90 hover:bg-[#333333] rounded-full flex items-center justify-center transition-colors">
-                <ChevronLeft className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
+                <ChevronLeft className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
           )}
         </AnimatePresence>
 
-        {/* Right Scroll Button - Hover Only */}
+        {/* Right Scroll Button - Subtle Hover */}
         <AnimatePresence>
           {isHovered && canScrollRight && (
             <motion.button
@@ -209,10 +209,10 @@ function ScrollContainer({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => scroll("right")}
-              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-l from-[#141414] via-[#141414]/90 to-transparent items-center justify-end pr-2 hover:from-[#141414] transition-all"
+              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-background via-background/40 to-transparent items-center justify-end pr-3 hover:from-background transition-all"
             >
-              <div className="w-10 h-10 bg-[#181818]/90 hover:bg-[#333333] rounded-full flex items-center justify-center transition-colors">
-                <ChevronRight className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
+                <ChevronRight className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
           )}
@@ -221,7 +221,7 @@ function ScrollContainer({
         {/* Cards Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-1 md:gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 sm:px-6 lg:px-12 pb-10"
+          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-6 sm:px-8 lg:px-16 pb-6"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {isLoading
@@ -247,22 +247,24 @@ function ScrollContainer({
         </div>
 
         {/* Gradient Fade Edges - Mobile */}
-        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#141414] to-transparent" />
-        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#141414] to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent" />
       </div>
     </div>
   );
 }
 
 export function BrowsePage() {
-  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(null);
+  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(
+    null,
+  );
   const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
   const [personalizedMovies, setPersonalizedMovies] = useState<any[]>([]);
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
-  const [providers, setProviders] = useState
-    <{ provider_id: number; provider_name: string; logo_path: string }[]
+  const [providers, setProviders] = useState<
+    { provider_id: number; provider_name: string; logo_path: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
@@ -282,68 +284,83 @@ export function BrowsePage() {
   });
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setIsLoading(true);
-        const [trending, popular, genresData, providersData] = await Promise.all([
-          moviesAPI.getTrending(),
+  const fetchInitialData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch only essential data first - trending and genres
+      const [trending, genresData] = await Promise.all([
+        moviesAPI.getTrending(),
+        moviesAPI.getGenres(),
+      ]);
+
+      const transformMovie = (m: TMDBMovie) => ({
+        id: m.id,
+        title: m.title,
+        rating: m.vote_average,
+        poster: m.poster_path
+          ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+          : "",
+        year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+      });
+
+      const trendingTransformed = trending.results.map(transformMovie);
+      setTrendingMovies(trendingTransformed);
+      setGenres(genresData.genres || []);
+
+      // Set featured movie
+      if (trending.results.length > 0) {
+        const featured = trending.results[0];
+        setFeaturedMovie({
+          id: featured.id,
+          title: featured.title,
+          overview: featured.overview || "",
+          backdrop: featured.backdrop_path
+            ? `https://image.tmdb.org/t/p/original${featured.backdrop_path}`
+            : "",
+          rating: featured.vote_average,
+          year: featured.release_date
+            ? new Date(featured.release_date).getFullYear()
+            : 2024,
+        });
+      }
+
+      // Fetch non-critical data after initial render (lazy load)
+      setTimeout(async () => {
+        const [popular, providersData] = await Promise.all([
           moviesAPI.getPopular(),
-          moviesAPI.getGenres(),
           moviesAPI.getProviders("IN"),
         ]);
-
-        const transformMovie = (m: TMDBMovie) => ({
-          id: m.id,
-          title: m.title,
-          rating: m.vote_average,
-          poster: m.poster_path
-            ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-            : "",
-          year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
-        });
-
-        const trendingTransformed = trending.results.map(transformMovie);
-        const popularTransformed = popular.results.map(transformMovie);
-
-        setTrendingMovies(trendingTransformed);
-        setPopularMovies(popularTransformed);
-        setFilteredMovies(popularTransformed);
-        setGenres(genresData.genres || []);
+        setPopularMovies(popular.results.map(transformMovie));
+        setFilteredMovies(popular.results.map(transformMovie));
         setProviders(providersData.results || []);
+      }, 100); // Load after 100ms
 
-        // Set featured movie (first from trending)
-        if (trending.results.length > 0) {
-          const featured = trending.results[0];
-          setFeaturedMovie({
-            id: featured.id,
-            title: featured.title,
-            overview: featured.overview || "",
-            backdrop: featured.backdrop_path
-              ? `https://image.tmdb.org/t/p/original${featured.backdrop_path}`
-              : "",
-            rating: featured.vote_average,
-            year: featured.release_date
-              ? new Date(featured.release_date).getFullYear()
-              : 2024,
-          });
-        }
-      } catch (error) {
-        console.error("Failed to fetch movies:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    } catch (error) {
+      console.error("Failed to fetch movies:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchInitialData();
-  }, []);
+  fetchInitialData();
+}, []);
 
   useEffect(() => {
-    const fetchPersonalized = async () => {
-      try {
-        const token = getAccessToken();
-        if (token) {
-          setIsAuthenticated(true);
+  const fetchPersonalized = async () => {
+    try {
+      const token = getAccessToken();
+      if (token) {
+        setIsAuthenticated(true);
+        
+        // Delay personalized fetch - it's not critical for initial render
+        setTimeout(async () => {
           const data = await moviesAPI.getPersonalized(1, 500, 6.5);
+
+          if (!data || !data.results) {
+            console.error("Invalid response from personalized API:", data);
+            return;
+          }
 
           const transformMovie = (m: TMDBMovie) => ({
             id: m.id,
@@ -358,14 +375,15 @@ export function BrowsePage() {
           });
 
           setPersonalizedMovies(data.results.map(transformMovie));
-        }
-      } catch (error) {
-        console.error("Failed to fetch personalized movies:", error);
+        }, 500); // Load after page is visible
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch personalized movies:", error);
+    }
+  };
 
-    fetchPersonalized();
-  }, []);
+  fetchPersonalized();
+}, []);
 
   useEffect(() => {
     const fetchFilteredData = async () => {
@@ -432,12 +450,12 @@ export function BrowsePage() {
     currentFilters.runtime_max !== null;
 
   return (
-    <div className="min-h-screen bg-[#141414]">
+    <div className="min-h-screen bg-background">
       {/* Hero Banner - Only show when no filters active */}
       {!hasActiveFilters && <HeroBanner movie={featuredMovie} />}
 
       {/* Filter Bar - Sticky */}
-      <div className="sticky top-0 z-40 bg-[#141414]/98 backdrop-blur-sm border-b border-[#2a2a2a]">
+      <div className="sticky top-0 z-40 bg-background/98 backdrop-blur-md border-b border-border">
         <FilterBar
           onFilterChange={handleFilterChange}
           mediaType="movie"
@@ -447,10 +465,10 @@ export function BrowsePage() {
       </div>
 
       {/* Main Content */}
-      <div className="pt-6 pb-20">
+      <div className="pt-8 pb-24">
         {/* Carousel Sections */}
         {!hasActiveFilters && (
-          <div className="space-y-10">
+          <div className="space-y-16">
             {isAuthenticated && personalizedMovies.length > 0 && (
               <ScrollContainer
                 title="Recommended For You"
@@ -474,14 +492,14 @@ export function BrowsePage() {
         )}
 
         {/* Filtered Results Grid */}
-        <div className="mt-10 px-4 sm:px-6 lg:px-12">
+        <div className="px-6 sm:px-8 lg:px-16">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl md:text-2xl font-medium text-white">
-                {hasActiveFilters ? "Search Results" : "Explore"}
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+                {hasActiveFilters ? "Search Results" : "Explore All"}
               </h2>
               {isFiltering && (
-                <div className="flex items-center gap-2 text-sm text-[#808080]">
+                <div className="flex items-center gap-2 text-sm text-muted">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Loading...</span>
                 </div>
@@ -490,12 +508,12 @@ export function BrowsePage() {
 
             {!isFiltering && filteredMovies.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32">
-                <div className="text-center">
-                  <h3 className="text-2xl font-medium text-white mb-3">
+                <div className="text-center space-y-2">
+                  <h3 className="text-2xl font-semibold text-foreground">
                     No titles found
                   </h3>
-                  <p className="text-base text-[#808080]">
-                    Try adjusting your search or filters
+                  <p className="text-base text-muted">
+                    Try adjusting your filters or search criteria
                   </p>
                 </div>
               </div>

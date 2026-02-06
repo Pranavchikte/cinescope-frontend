@@ -3,7 +3,7 @@
 import { authAPI } from "@/lib/api";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -43,165 +43,168 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://assets.nflxext.com/ffe/siteui/vlv3/4690cab8-243a-4552-baef-1fb415632f74/web/IN-en-20241118-TRIFECTA-perspective_0b813abc-8365-4a43-a9d8-14c06e84c9f3_large.jpg')",
-          }}
-        />
-        <div className="absolute inset-0 bg-black/60" />
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       {/* Header */}
-      <div className="relative z-10 px-4 sm:px-8 lg:px-16 py-5">
+      <div className="px-4 sm:px-8 lg:px-16 py-6">
         <Link href="/">
-          <span className="text-[#E50914] text-2xl sm:text-3xl font-black tracking-tighter">
-            CINESCOPE
+          <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            CineScope
           </span>
         </Link>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-[450px] bg-black/75 rounded px-8 sm:px-16 py-12 sm:py-16"
+          className="w-full max-w-md"
         >
-          <h1 className="text-3xl font-bold text-white mb-7">Sign In</h1>
+          {/* Decorative Background Element */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-3xl -z-10" />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Error Message */}
-            {errors.root && (
-              <div className="px-4 py-3 bg-[#E87C03] rounded text-white text-sm">
-                {errors.root.message}
-              </div>
-            )}
-
-            {/* Email Input */}
-            <div>
-              <input
-                {...register("email", {
-                  required: "Please enter a valid email or phone number.",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Please enter a valid email address.",
-                  },
-                })}
-                type="text"
-                placeholder="Email or phone number"
-                className={`w-full h-[50px] px-5 bg-[#333333] border rounded text-white placeholder:text-[#8c8c8c] focus:outline-none transition-colors ${
-                  errors.email
-                    ? "border-[#E87C03] focus:border-[#E87C03]"
-                    : "border-[#333333] focus:border-white"
-                }`}
-              />
-              {errors.email && (
-                <p className="mt-1 text-xs text-[#E87C03]">
-                  {errors.email.message}
-                </p>
-              )}
+          <div className="bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-2xl p-8 sm:p-10 shadow-2xl">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
+              <p className="text-slate-400">Sign in to your account to continue</p>
             </div>
 
-            {/* Password Input */}
-            <div>
-              <div className="relative">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* Error Message */}
+              {errors.root && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium"
+                >
+                  {errors.root.message}
+                </motion.div>
+              )}
+
+              {/* Email Input */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Email Address
+                </label>
                 <input
-                  {...register("password", {
-                    required:
-                      "Your password must contain between 4 and 60 characters.",
-                    minLength: {
-                      value: 4,
-                      message: "Password must be at least 4 characters.",
-                    },
-                    maxLength: {
-                      value: 60,
-                      message: "Password must not exceed 60 characters.",
+                  {...register("email", {
+                    required: "Please enter a valid email or phone number.",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Please enter a valid email address.",
                     },
                   })}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  className={`w-full h-[50px] px-5 bg-[#333333] border rounded text-white placeholder:text-[#8c8c8c] focus:outline-none transition-colors ${
-                    errors.password
-                      ? "border-[#E87C03] focus:border-[#E87C03]"
-                      : "border-[#333333] focus:border-white"
+                  type="text"
+                  placeholder="you@example.com"
+                  className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white placeholder:text-slate-500 focus:outline-none transition-all ${
+                    errors.email
+                      ? "border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-600/50 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
                   }`}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c] hover:text-white transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
+                {errors.email && (
+                  <p className="mt-1.5 text-xs text-red-400 font-medium">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-[#E87C03]">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full h-[50px] bg-[#E50914] hover:bg-[#C11119] disabled:bg-[#E50914]/60 text-white rounded font-medium transition-colors flex items-center justify-center"
-            >
-              {isSubmitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                "Sign In"
-              )}
-            </button>
+              {/* Password Input */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-slate-300">
+                    Password
+                  </label>
+                  <a href="#" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                    Forgot password?
+                  </a>
+                </div>
+                <div className="relative">
+                  <input
+                    {...register("password", {
+                      required:
+                        "Your password must contain between 4 and 60 characters.",
+                      minLength: {
+                        value: 4,
+                        message: "Password must be at least 4 characters.",
+                      },
+                      maxLength: {
+                        value: 60,
+                        message: "Password must not exceed 60 characters.",
+                      },
+                    })}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white placeholder:text-slate-500 focus:outline-none transition-all ${
+                      errors.password
+                        ? "border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                        : "border-slate-600/50 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="mt-1.5 text-xs text-red-400 font-medium">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
 
-            {/* Remember Me & Help */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-1 text-[#b3b3b3] cursor-pointer">
+              {/* Remember Me */}
+              <label className="flex items-center gap-3 text-sm cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 accent-[#b3b3b3] bg-[#333333] border-[#333333]"
+                  className="w-4 h-4 rounded accent-blue-400 bg-slate-700 border-slate-600"
                 />
-                <span>Remember me</span>
+                <span className="text-slate-300">Keep me signed in</span>
               </label>
-              <a href="#" className="text-[#b3b3b3] hover:underline">
-                Need help?
-              </a>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-slate-600 disabled:to-slate-600 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Sign Up Link */}
+            <div className="mt-8 text-center text-slate-400">
+              Don't have an account?{" "}
+              <Link href="/signup" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                Sign up
+              </Link>
             </div>
-          </form>
 
-          {/* Sign Up Link */}
-          <div className="mt-16 text-base text-[#737373]">
-            New to CineScope?{" "}
-            <Link href="/signup" className="text-white hover:underline">
-              Sign up now
-            </Link>
-            .
+            {/* Security Notice */}
+            <p className="mt-6 text-xs text-slate-500 text-center">
+              This page is protected by Google reCAPTCHA to ensure your security.{" "}
+              <a href="#" className="text-blue-400 hover:text-blue-300">
+                Learn more
+              </a>
+            </p>
           </div>
-
-          {/* reCAPTCHA Notice */}
-          <p className="mt-3 text-xs text-[#8c8c8c]">
-            This page is protected by Google reCAPTCHA to ensure you're not a
-            bot.{" "}
-            <a href="#" className="text-[#0071eb] hover:underline">
-              Learn more
-            </a>
-            .
-          </p>
         </motion.div>
       </div>
-
-      {/* Footer Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
     </div>
   );
 }

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { style } from "next/css";
 
 interface Cast {
   id: number;
@@ -212,9 +213,9 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black">
-        <div className="relative h-[50vh] bg-zinc-900 animate-pulse">
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+      <div className="min-h-screen bg-[#0F0F0F]">
+        <div className="relative h-[50vh] bg-[#1A1A1A] animate-pulse">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent" />
         </div>
       </div>
     );
@@ -222,22 +223,22 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
   if (error || !movie) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <div className="text-4xl">😕</div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">
+          <h2 className="text-2xl font-semibold text-[#F5F5F5] mb-3">
             Oops! Something went wrong
           </h2>
-          <p className="text-zinc-400 mb-8">{error || "Movie not found"}</p>
+          <p className="text-[#A0A0A0] mb-8">{error || "Movie not found"}</p>
           <Button
             onClick={() => router.push("/")}
-            className="bg-white hover:bg-zinc-200 text-black"
+            className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-medium"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go Home
@@ -259,15 +260,15 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   const rating = Math.round((movie.vote_average / 10) * 100);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#0F0F0F]">
       {/* Back Button */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         onClick={() => router.back()}
-        className="fixed top-20 left-4 z-50 w-11 h-11 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 hover:bg-black/80 hover:border-white/20 transition-all"
+        className="fixed top-20 left-4 z-50 w-11 h-11 bg-[#1A1A1A]/70 backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
       >
-        <ArrowLeft className="w-5 h-5 text-white" />
+        <ArrowLeft className="w-5 h-5 text-[#F5F5F5]" />
       </motion.button>
 
       {/* Hero Section - Responsive Height */}
@@ -275,13 +276,13 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         {/* Backdrop Image with Blur */}
         <div className="absolute inset-0">
           <img
-            src={backdropUrl}
+            src={backdropUrl || "/placeholder.svg"}
             alt={movie.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 backdrop-blur-sm bg-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent" />
+          <div className="absolute inset-0 backdrop-blur-sm bg-[#0F0F0F]/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/95 via-[#0F0F0F]/40 to-transparent" />
         </div>
 
         {/* Content Overlay */}
@@ -292,9 +293,9 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               {/* Mobile Poster */}
               <div className="lg:hidden mb-6">
                 <div className="relative w-48 mx-auto">
-                  <div className="aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 relative">
+                  <div className="aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-[#2A2A2A] relative">
                     <img
-                      src={posterUrl}
+                      src={posterUrl || "/placeholder.svg"}
                       alt={movie.title}
                       className="w-full h-full object-cover"
                     />
@@ -305,7 +306,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                             cx="24"
                             cy="24"
                             r="20"
-                            stroke="rgba(255,255,255,0.1)"
+                            stroke="rgba(20,184,166,0.2)"
                             strokeWidth="3"
                             fill="none"
                           />
@@ -313,7 +314,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                             cx="24"
                             cy="24"
                             r="20"
-                            stroke="#10b981"
+                            stroke="#14b8a6"
                             strokeWidth="3"
                             fill="none"
                             strokeDasharray={`${2 * Math.PI * 20}`}
@@ -321,7 +322,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
+                          <span className="text-[#F5F5F5] font-bold text-sm">
                             {rating}
                           </span>
                         </div>
@@ -331,67 +332,86 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 </div>
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              />
-              {/* Rest of the content - title, genres, overview, buttons - stays the same */}
+              {/* Title */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-3 leading-tight drop-shadow-2xl">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-[#F5F5F5] mb-2 md:mb-3 leading-tight drop-shadow-2xl text-balance">
                   {movie.title}
                 </h1>
                 {movie.tagline && (
-                  <p className="text-sm md:text-base lg:text-lg text-zinc-300 italic mb-3 md:mb-4">
+                  <p className="text-sm md:text-base lg:text-lg text-[#A0A0A0] italic mb-3 md:mb-4">
                     {movie.tagline}
                   </p>
                 )}
+              </motion.div>
 
-                {/* Meta Info */}
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm text-zinc-300 mb-3 md:mb-4">
-                  <span className="font-medium">
+              {/* Meta Info */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm text-[#A0A0A0] mb-3 md:mb-4">
+                  <span className="font-medium text-[#F5F5F5]">
                     {new Date(movie.release_date).getFullYear()}
                   </span>
-                  <span>•</span>
+                  <span className="text-[#2A2A2A]">•</span>
                   <span>
                     {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
                   </span>
-                  <span>•</span>
+                  <span className="text-[#2A2A2A]">•</span>
                   <div className="flex items-center gap-1.5">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">
+                    <Star className="w-4 h-4 fill-[#14B8A6] text-[#14B8A6]" />
+                    <span className="font-semibold text-[#F5F5F5]">
                       {movie.vote_average.toFixed(1)}/10
                     </span>
                   </div>
                 </div>
+              </motion.div>
 
-                {/* Genres */}
+              {/* Genres */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="flex flex-wrap gap-2 mb-4 md:mb-5">
                   {movie.genres.slice(0, 3).map((genre) => (
                     <span
                       key={genre.id}
-                      className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-xs md:text-sm text-white border border-white/20"
+                      className="px-3 py-1.5 rounded-lg bg-[#14B8A6]/10 backdrop-blur-md text-xs md:text-sm text-[#14B8A6] border border-[#14B8A6]/30 font-medium"
                     >
                       {genre.name}
                     </span>
                   ))}
                 </div>
+              </motion.div>
 
-                {/* Overview */}
-                <p className="text-zinc-200 leading-relaxed text-sm md:text-base max-w-2xl line-clamp-3 md:line-clamp-4 mb-4 md:mb-6">
+              {/* Overview */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <p className="text-[#D0D0D0] leading-relaxed text-sm md:text-base max-w-2xl line-clamp-3 md:line-clamp-4 mb-4 md:mb-6">
                   {movie.overview}
                 </p>
+              </motion.div>
 
-                {/* Action Buttons */}
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="flex flex-wrap gap-2 md:gap-3">
                   <Button
                     onClick={handleAddToWatchlist}
                     disabled={isAddingToWatchlist}
-                    className="h-10 md:h-12 px-4 md:px-6 bg-white hover:bg-zinc-200 text-black font-semibold rounded-xl transition-all shadow-lg text-sm md:text-base"
+                    className="h-10 md:h-12 px-4 md:px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl text-sm md:text-base duration-200"
                   >
                     {isAddingToWatchlist ? (
                       <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
@@ -405,7 +425,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
                   <Button
                     onClick={() => setShowRatingSheet(true)}
-                    className="h-10 md:h-12 px-4 md:px-6 bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-md font-semibold rounded-xl transition-all text-sm md:text-base"
+                    className="h-10 md:h-12 px-4 md:px-6 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 backdrop-blur-md font-semibold rounded-lg transition-all text-sm md:text-base duration-200"
                   >
                     <Star className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                     Rate
@@ -423,7 +443,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                           showNotification("Link copied!", "success");
                         });
                     }}
-                    className="h-10 md:h-12 w-10 md:w-12 bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-md rounded-xl transition-all"
+                    className="h-10 md:h-12 w-10 md:w-12 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 backdrop-blur-md rounded-lg transition-all duration-200"
                   >
                     <Share2 className="w-4 h-4 md:w-5 md:h-5" />
                   </Button>
@@ -439,9 +459,9 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               className="hidden lg:flex justify-end"
             >
               <div className="relative w-full max-w-[280px]">
-                <div className="aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 relative">
+                <div className="aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#2A2A2A] relative hover:shadow-xl hover:border-[#14B8A6]/50 transition-all duration-300">
                   <img
-                    src={posterUrl}
+                    src={posterUrl || "/placeholder.svg"}
                     alt={movie.title}
                     className="w-full h-full object-cover"
                   />
@@ -453,7 +473,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                           cx="28"
                           cy="28"
                           r="24"
-                          stroke="rgba(255,255,255,0.1)"
+                          stroke="rgba(20,184,166,0.2)"
                           strokeWidth="4"
                           fill="none"
                         />
@@ -461,7 +481,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                           cx="28"
                           cy="28"
                           r="24"
-                          stroke="#10b981"
+                          stroke="#14b8a6"
                           strokeWidth="4"
                           fill="none"
                           strokeDasharray={`${2 * Math.PI * 24}`}
@@ -470,7 +490,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                         />
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-white font-bold text-base">
+                        <span className="text-[#F5F5F5] font-bold text-base">
                           {rating}
                         </span>
                       </div>
@@ -489,11 +509,11 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
-            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 hover:bg-white/30 hover:scale-110 transition-all group shadow-2xl"
+            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 md:w-16 md:h-16 bg-[#14B8A6] backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/60 hover:bg-[#14B8A6]/90 hover:scale-110 hover:shadow-lg transition-all group shadow-lg text-[#0F0F0F]"
           >
             <Play
-              className="w-5 h-5 md:w-6 md:h-6 text-white ml-0.5"
-              fill="white"
+              className="w-5 h-5 md:w-6 md:h-6 ml-0.5"
+              fill="currentColor"
             />
           </motion.a>
         )}
@@ -508,21 +528,21 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5] mb-4 md:mb-6">
               Available On
             </h2>
             <div className="flex flex-wrap gap-4">
               {providers.map((provider) => (
                 <div
                   key={provider.provider_id}
-                  className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
+                  className="flex items-center gap-3 px-4 py-3 bg-[#1A1A1A]/50 border border-[#2A2A2A] rounded-lg hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
                 >
                   <img
                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-10 h-10 rounded-lg"
                   />
-                  <span className="text-white font-medium text-sm">
+                  <span className="text-[#F5F5F5] font-medium text-sm">
                     {provider.provider_name}
                   </span>
                 </div>
@@ -539,10 +559,10 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5] mb-4 md:mb-6">
               Trailer
             </h2>
-            <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 shadow-2xl">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-[#2A2A2A] bg-[#1A1A1A] shadow-2xl hover:border-[#14B8A6]/50 transition-all duration-200">
               <iframe
                 width="100%"
                 height="100%"
@@ -565,18 +585,18 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5] mb-4 md:mb-6">
               Media
             </h2>
 
-            <div className="flex gap-2 mb-6 border-b border-white/10">
+            <div className="flex gap-2 mb-6 border-b border-[#2A2A2A]">
               {trailer && (
                 <button
                   onClick={() => setActiveMediaTab("videos")}
                   className={`px-4 py-2 font-medium transition-all ${
                     activeMediaTab === "videos"
-                      ? "text-white border-b-2 border-white"
-                      : "text-zinc-400 hover:text-white"
+                      ? "text-[#14B8A6] border-b-2 border-[#14B8A6]"
+                      : "text-[#A0A0A0] hover:text-[#F5F5F5]"
                   }`}
                 >
                   Videos
@@ -587,8 +607,8 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                   onClick={() => setActiveMediaTab("backdrops")}
                   className={`px-4 py-2 font-medium transition-all ${
                     activeMediaTab === "backdrops"
-                      ? "text-white border-b-2 border-white"
-                      : "text-zinc-400 hover:text-white"
+                      ? "text-[#14B8A6] border-b-2 border-[#14B8A6]"
+                      : "text-[#A0A0A0] hover:text-[#F5F5F5]"
                   }`}
                 >
                   Backdrops {images.backdrops.length}
@@ -599,8 +619,8 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                   onClick={() => setActiveMediaTab("posters")}
                   className={`px-4 py-2 font-medium transition-all ${
                     activeMediaTab === "posters"
-                      ? "text-white border-b-2 border-white"
-                      : "text-zinc-400 hover:text-white"
+                      ? "text-[#14B8A6] border-b-2 border-[#14B8A6]"
+                      : "text-[#A0A0A0] hover:text-[#F5F5F5]"
                   }`}
                 >
                   Posters {images.posters.length}
@@ -609,7 +629,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             </div>
 
             {activeMediaTab === "videos" && trailer && (
-              <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+              <div className="aspect-video rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#1A1A1A]">
                 <iframe
                   width="100%"
                   height="100%"
@@ -626,7 +646,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 {images.backdrops.map((image, index) => (
                   <div
                     key={index}
-                    className="aspect-video rounded-lg overflow-hidden border border-white/10"
+                    className="aspect-video rounded-lg overflow-hidden border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200"
                   >
                     <img
                       src={`https://image.tmdb.org/t/p/w780${image.file_path}`}
@@ -643,7 +663,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 {images.posters.map((image, index) => (
                   <div
                     key={index}
-                    className="aspect-[2/3] rounded-lg overflow-hidden border border-white/10"
+                    className="aspect-[2/3] rounded-lg overflow-hidden border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200"
                   >
                     <img
                       src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
@@ -665,21 +685,21 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             viewport={{ once: true }}
           >
             <div className="flex items-center justify-between mb-6 md:mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">
+              <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5]">
                 Top Billed Cast
               </h2>
               <div className="hidden md:flex gap-2">
                 <button
                   onClick={() => scrollCast("left")}
-                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center border border-white/20 transition-all"
+                  className="w-10 h-10 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 rounded-full flex items-center justify-center border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200"
                 >
-                  <ChevronLeft className="w-5 h-5 text-white" />
+                  <ChevronLeft className="w-5 h-5 text-[#F5F5F5]" />
                 </button>
                 <button
                   onClick={() => scrollCast("right")}
-                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center border border-white/20 transition-all"
+                  className="w-10 h-10 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 rounded-full flex items-center justify-center border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200"
                 >
-                  <ChevronRight className="w-5 h-5 text-white" />
+                  <ChevronRight className="w-5 h-5 text-[#F5F5F5]" />
                 </button>
               </div>
             </div>
@@ -694,7 +714,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                   href={`/people/${member.id}`}
                   className="shrink-0 w-28 md:w-36 snap-start group cursor-pointer"
                 >
-                  <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden bg-zinc-900 mb-3 md:mb-4 border-2 border-white/10 group-hover:border-white/30 transition-all shadow-lg">
+                  <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden bg-[#1A1A1A] mb-3 md:mb-4 border-2 border-[#2A2A2A] group-hover:border-[#14B8A6]/50 transition-all shadow-lg">
                     <img
                       src={
                         member.profile_path
@@ -705,10 +725,10 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <h4 className="text-xs md:text-sm font-semibold text-white text-center mb-1 line-clamp-1">
+                  <h4 className="text-xs md:text-sm font-semibold text-[#F5F5F5] text-center mb-1 line-clamp-1">
                     {member.name}
                   </h4>
-                  <p className="text-xs text-zinc-400 text-center line-clamp-2">
+                  <p className="text-xs text-[#A0A0A0] text-center line-clamp-2">
                     {member.character}
                   </p>
                 </Link>
@@ -724,7 +744,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5] mb-6 md:mb-8">
               Recommendations
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
@@ -742,7 +762,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5] mb-6 md:mb-8">
               More Like This
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
@@ -764,7 +784,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowRatingSheet(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-[#0F0F0F]/80 backdrop-blur-sm z-[100]"
             />
 
             {/* Modal */}
@@ -774,16 +794,16 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative w-full max-w-md bg-[#181818] rounded p-8"
+                className="relative w-full max-w-md bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-8 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Close Button */}
                 <button
                   onClick={() => setShowRatingSheet(false)}
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-[#14B8A6]/10 rounded-full transition-colors duration-200"
                 >
                   <svg
-                    className="w-5 h-5 text-white"
+                    className="w-5 h-5 text-[#F5F5F5]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -798,7 +818,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 </button>
 
                 {/* Title */}
-                <h3 className="text-xl font-medium text-white mb-6 pr-8">
+                <h3 className="text-xl font-semibold text-[#F5F5F5] mb-6 pr-8">
                   Rate: {movie.title}
                 </h3>
 
@@ -810,9 +830,9 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleRating(option.value)}
-                      className={`w-full px-5 py-4 text-left rounded bg-[#2a2a2a] hover:bg-[#333333] border border-[#404040] hover:border-[#808080] transition-all ${
+                      className={`w-full px-5 py-4 text-left rounded-lg bg-[#2A2A2A] hover:bg-[#14B8A6]/10 border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200 ${
                         option.value === "perfection"
-                          ? "border-[#46d369]/30 hover:border-[#46d369]/50"
+                          ? "border-[#14B8A6]/30 hover:border-[#14B8A6]/50"
                           : ""
                       }`}
                     >
@@ -835,9 +855,9 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-xl shadow-2xl backdrop-blur-md border ${
+            className={`fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg shadow-lg backdrop-blur-md border ${
               showToast.type === "success"
-                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                ? "bg-[#14B8A6]/10 border-[#14B8A6]/30 text-[#14B8A6]"
                 : "bg-red-500/10 border-red-500/30 text-red-300"
             }`}
           >
@@ -846,7 +866,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         )}
       </AnimatePresence>
 
-      <style jsx global>{`
+      <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

@@ -66,19 +66,19 @@ export function VerificationBanner() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50"
         >
-          <div className="bg-[#181818] border border-[#2a2a2a] rounded shadow-2xl">
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg shadow-2xl">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#ec4899] rounded flex items-center justify-center shrink-0">
-                    <Mail className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 bg-[#14B8A6]/10 rounded-lg flex items-center justify-center shrink-0 border border-[#14B8A6]/30">
+                    <Mail className="w-5 h-5 text-[#14B8A6]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-[#e5e5e5]">
+                    <h3 className="text-sm font-semibold text-[#F5F5F5]">
                       Verify your email
                     </h3>
-                    <p className="text-xs text-[#b3b3b3] mt-0.5">
+                    <p className="text-xs text-[#A0A0A0] mt-0.5">
                       Get full access to all features
                     </p>
                   </div>
@@ -86,14 +86,14 @@ export function VerificationBanner() {
 
                 <button
                   onClick={handleDismiss}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-[#2a2a2a] rounded transition-colors shrink-0"
+                  className="w-7 h-7 flex items-center justify-center hover:bg-[#14B8A6]/10 rounded-lg transition-colors duration-200 shrink-0"
                 >
-                  <X className="w-4 h-4 text-[#b3b3b3]" />
+                  <X className="w-4 h-4 text-[#A0A0A0] hover:text-[#14B8A6]" />
                 </button>
               </div>
 
               {/* Body */}
-              <p className="text-xs text-[#b3b3b3] mb-4">
+              <p className="text-xs text-[#A0A0A0] mb-4">
                 Check your inbox for the verification link. Didn't receive it?
               </p>
 
@@ -103,7 +103,7 @@ export function VerificationBanner() {
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="flex items-center gap-2 text-sm text-[#46d369] font-medium"
+                    className="flex items-center gap-2 text-sm text-[#14B8A6] font-medium"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     Email sent successfully
@@ -112,7 +112,7 @@ export function VerificationBanner() {
                   <button
                     onClick={handleResend}
                     disabled={isResending}
-                    className="h-9 px-4 bg-white hover:bg-[#e5e5e5] disabled:bg-[#333333] disabled:cursor-not-allowed text-black disabled:text-[#808080] rounded text-sm font-medium transition-colors flex items-center gap-2"
+                    className="h-9 px-4 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#1A1A1A] disabled:border disabled:border-[#2A2A2A] disabled:cursor-not-allowed text-[#0F0F0F] disabled:text-[#A0A0A0] rounded-lg text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
                   >
                     <RefreshCw className={`w-4 h-4 ${isResending ? 'animate-spin' : ''}`} />
                     {isResending ? 'Sending...' : 'Resend Email'}
