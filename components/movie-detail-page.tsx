@@ -22,7 +22,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import Link from "next/link"
+import Link from "next/link";
 
 interface Cast {
   id: number;
@@ -59,8 +59,13 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [similarMovies, setSimilarMovies] = useState<any[]>([]);
   const [providers, setProviders] = useState<any[]>([]);
-  const [images, setImages] = useState<{ backdrops: any[]; posters: any[] }>({ backdrops: [], posters: [] })
-  const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'backdrops' | 'posters'>('videos')
+  const [images, setImages] = useState<{ backdrops: any[]; posters: any[] }>({
+    backdrops: [],
+    posters: [],
+  });
+  const [activeMediaTab, setActiveMediaTab] = useState<
+    "videos" | "backdrops" | "posters"
+  >("videos");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRatingSheet, setShowRatingSheet] = useState(false);
@@ -95,13 +100,14 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         setIsLoading(true);
         setError(null);
 
-        const [movieData, creditsData, videosData, providersData, imagesData] = await Promise.all([
-          moviesAPI.getDetails(parseInt(movieId)),
-          moviesAPI.getCredits(parseInt(movieId)),
-          moviesAPI.getVideos(parseInt(movieId)),
-          moviesAPI.getMovieProviders(parseInt(movieId)),
-          moviesAPI.getImages(parseInt(movieId)),
-        ]);
+        const [movieData, creditsData, videosData, providersData, imagesData] =
+          await Promise.all([
+            moviesAPI.getDetails(parseInt(movieId)),
+            moviesAPI.getCredits(parseInt(movieId)),
+            moviesAPI.getVideos(parseInt(movieId)),
+            moviesAPI.getMovieProviders(parseInt(movieId)),
+            moviesAPI.getImages(parseInt(movieId)),
+          ]);
 
         setMovie(movieData);
         setCast(creditsData.cast?.slice(0, 15) || []);
@@ -281,34 +287,56 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         {/* Content Overlay */}
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 md:pt-32 pb-8 md:pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-end">
-  {/* Left: Title + Info */}
-  <div className="lg:col-span-2 space-y-4 md:space-y-5">
-    {/* Mobile Poster */}
-    <div className="lg:hidden mb-6">
-      <div className="relative w-48 mx-auto">
-        <div className="aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 relative">
-          <img
-            src={posterUrl}
-            alt={movie.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute bottom-3 right-3">
-            <div className="relative w-12 h-12">
-              <svg className="w-12 h-12 transform -rotate-90">
-                <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.1)" strokeWidth="3" fill="none" />
-                <circle cx="24" cy="24" r="20" stroke="#10b981" strokeWidth="3" fill="none" strokeDasharray={`${2 * Math.PI * 20}`} strokeDashoffset={`${2 * Math.PI * 20 * (1 - rating / 100)}`} />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">{rating}</span>
+            {/* Left: Title + Info */}
+            <div className="lg:col-span-2 space-y-4 md:space-y-5">
+              {/* Mobile Poster */}
+              <div className="lg:hidden mb-6">
+                <div className="relative w-48 mx-auto">
+                  <div className="aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 relative">
+                    <img
+                      src={posterUrl}
+                      alt={movie.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-3 right-3">
+                      <div className="relative w-12 h-12">
+                        <svg className="w-12 h-12 transform -rotate-90">
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r="20"
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeWidth="3"
+                            fill="none"
+                          />
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r="20"
+                            stroke="#10b981"
+                            strokeWidth="3"
+                            fill="none"
+                            strokeDasharray={`${2 * Math.PI * 20}`}
+                            strokeDashoffset={`${2 * Math.PI * 20 * (1 - rating / 100)}`}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            {rating}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}/>
-      {/* Rest of the content - title, genres, overview, buttons - stays the same */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              />
+              {/* Rest of the content - title, genres, overview, buttons - stays the same */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -471,8 +499,6 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         )}
       </div>
 
-      
-
       {/* Content Sections */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-12 md:space-y-16">
         {/* Watch Providers */}
@@ -531,22 +557,26 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         )}
 
         {/* Media Section */}
-        {(trailer || images.backdrops.length > 0 || images.posters.length > 0) && (
+        {(trailer ||
+          images.backdrops.length > 0 ||
+          images.posters.length > 0) && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">Media</h2>
-            
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
+              Media
+            </h2>
+
             <div className="flex gap-2 mb-6 border-b border-white/10">
               {trailer && (
                 <button
-                  onClick={() => setActiveMediaTab('videos')}
+                  onClick={() => setActiveMediaTab("videos")}
                   className={`px-4 py-2 font-medium transition-all ${
-                    activeMediaTab === 'videos'
-                      ? 'text-white border-b-2 border-white'
-                      : 'text-zinc-400 hover:text-white'
+                    activeMediaTab === "videos"
+                      ? "text-white border-b-2 border-white"
+                      : "text-zinc-400 hover:text-white"
                   }`}
                 >
                   Videos
@@ -554,11 +584,11 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               )}
               {images.backdrops.length > 0 && (
                 <button
-                  onClick={() => setActiveMediaTab('backdrops')}
+                  onClick={() => setActiveMediaTab("backdrops")}
                   className={`px-4 py-2 font-medium transition-all ${
-                    activeMediaTab === 'backdrops'
-                      ? 'text-white border-b-2 border-white'
-                      : 'text-zinc-400 hover:text-white'
+                    activeMediaTab === "backdrops"
+                      ? "text-white border-b-2 border-white"
+                      : "text-zinc-400 hover:text-white"
                   }`}
                 >
                   Backdrops {images.backdrops.length}
@@ -566,11 +596,11 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               )}
               {images.posters.length > 0 && (
                 <button
-                  onClick={() => setActiveMediaTab('posters')}
+                  onClick={() => setActiveMediaTab("posters")}
                   className={`px-4 py-2 font-medium transition-all ${
-                    activeMediaTab === 'posters'
-                      ? 'text-white border-b-2 border-white'
-                      : 'text-zinc-400 hover:text-white'
+                    activeMediaTab === "posters"
+                      ? "text-white border-b-2 border-white"
+                      : "text-zinc-400 hover:text-white"
                   }`}
                 >
                   Posters {images.posters.length}
@@ -578,7 +608,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               )}
             </div>
 
-            {activeMediaTab === 'videos' && trailer && (
+            {activeMediaTab === "videos" && trailer && (
               <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
                 <iframe
                   width="100%"
@@ -591,10 +621,13 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               </div>
             )}
 
-            {activeMediaTab === 'backdrops' && (
+            {activeMediaTab === "backdrops" && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {images.backdrops.map((image, index) => (
-                  <div key={index} className="aspect-video rounded-lg overflow-hidden border border-white/10">
+                  <div
+                    key={index}
+                    className="aspect-video rounded-lg overflow-hidden border border-white/10"
+                  >
                     <img
                       src={`https://image.tmdb.org/t/p/w780${image.file_path}`}
                       alt="Backdrop"
@@ -605,10 +638,13 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               </div>
             )}
 
-            {activeMediaTab === 'posters' && (
+            {activeMediaTab === "posters" && (
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {images.posters.map((image, index) => (
-                  <div key={index} className="aspect-[2/3] rounded-lg overflow-hidden border border-white/10">
+                  <div
+                    key={index}
+                    className="aspect-[2/3] rounded-lg overflow-hidden border border-white/10"
+                  >
                     <img
                       src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
                       alt="Poster"
@@ -620,7 +656,6 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             )}
           </motion.section>
         )}
-
 
         {/* Top Billed Cast */}
         {cast.length > 0 && (
@@ -719,33 +754,79 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         )}
       </div>
 
-      {/* Rating Sheet */}
-      <Sheet open={showRatingSheet} onOpenChange={setShowRatingSheet}>
-        <SheetContent
-          side="bottom"
-          className="bg-zinc-900/95 backdrop-blur-xl border-zinc-800 rounded-t-3xl"
-        >
-          <SheetHeader className="mb-6">
-            <SheetTitle className="text-white text-lg">
-              Rate: {movie.title}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="space-y-3 pb-6">
-            {ratingOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleRating(option.value)}
-                className="w-full h-14 px-5 text-left rounded-xl bg-zinc-800/50 hover:bg-zinc-700/50 border border-zinc-700 hover:border-zinc-600 transition-all flex items-center gap-4"
+      {/* Netflix-Style Rating Modal */}
+      <AnimatePresence>
+        {showRatingSheet && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowRatingSheet(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+            />
+
+            {/* Modal */}
+            <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative w-full max-w-md bg-[#181818] rounded p-8"
+                onClick={(e) => e.stopPropagation()}
               >
-                <span className="text-2xl">{option.icon}</span>
-                <span className={`text-base font-medium ${option.color}`}>
-                  {option.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </SheetContent>
-      </Sheet>
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowRatingSheet(false)}
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                {/* Title */}
+                <h3 className="text-xl font-medium text-white mb-6 pr-8">
+                  Rate: {movie.title}
+                </h3>
+
+                {/* Rating Options */}
+                <div className="space-y-3">
+                  {ratingOptions.map((option) => (
+                    <motion.button
+                      key={option.value}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleRating(option.value)}
+                      className={`w-full px-5 py-4 text-left rounded bg-[#2a2a2a] hover:bg-[#333333] border border-[#404040] hover:border-[#808080] transition-all ${
+                        option.value === "perfection"
+                          ? "border-[#46d369]/30 hover:border-[#46d369]/50"
+                          : ""
+                      }`}
+                    >
+                      <span className={`text-base font-normal ${option.color}`}>
+                        {option.label}
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Toast */}
       <AnimatePresence>

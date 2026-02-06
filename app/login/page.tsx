@@ -32,8 +32,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await authAPI.login(data);
-      router.push("/");
-      router.refresh();
+      window.location.href = "/"; // Force full page reload to trigger middleware
     } catch (error: any) {
       setError("root", {
         message: error.message || "Incorrect email or password.",

@@ -1,17 +1,38 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
 
 // Token management
-export const getAccessToken = () => localStorage.getItem('access_token')
-export const getRefreshToken = () => localStorage.getItem('refresh_token')
-export const setTokens = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('access_token', accessToken)
-    localStorage.setItem('refresh_token', refreshToken)
-}
-export const clearTokens = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-}
+// Token management (localStorage + cookies for middleware)
+export const getAccessToken = () => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('access_token');
+};
 
+export const getRefreshToken = () => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('refresh_token');
+};
+
+export const setTokens = (accessToken: string, refreshToken: string) => {
+    if (typeof window === 'undefined') return;
+
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+
+    // Also set as cookie for middleware
+    document.cookie = `access_token=${accessToken}; path=/; max-age=${60 * 60}`; // 1 hour
+    document.cookie = `refresh_token=${refreshToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+};
+
+export const clearTokens = () => {
+    if (typeof window === 'undefined') return;
+
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+
+    // Clear cookies
+    document.cookie = 'access_token=; path=/; max-age=0';
+    document.cookie = 'refresh_token=; path=/; max-age=0';
+};
 // Refresh token logic
 let isRefreshing = false
 let refreshPromise: Promise<boolean> | null = null

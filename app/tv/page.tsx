@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { TVBrowsePage } from "@/components/tv-browse-page"
-import { AuthModal } from "@/components/auth-modal"
+// import { AuthModal } from "@/components/auth-modal"
 import { getAccessToken } from "@/lib/api"
 
 export default function TVPage() {
@@ -19,8 +19,8 @@ export default function TVPage() {
 
   return (
     <>
-      <TVBrowsePage />
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      {/* <TVBrowsePage />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} /> */}
     </>
   )
 }

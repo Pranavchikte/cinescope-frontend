@@ -1,27 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { BrowsePage } from "@/components/browse-page"
-import { AuthModal } from "@/components/auth-modal"
-import { getAccessToken } from "@/lib/api"
-import { useEffect } from "react"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getAccessToken } from "@/lib/api";
+import { BrowsePage } from "@/components/browse-page";
 
 export default function HomePage() {
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const router = useRouter();
 
   useEffect(() => {
-    const token = getAccessToken()
-    setIsAuthenticated(!!token)
+    const token = getAccessToken();
+    
+    // If no token, redirect to login
     if (!token) {
-      setShowAuthModal(true)
+      router.push("/login");
     }
-  }, [])
+  }, [router]);
 
-  return (
-    <>
-      <BrowsePage />
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-    </>
-  )
+  // Show browse page if authenticated
+  return <BrowsePage />;
 }

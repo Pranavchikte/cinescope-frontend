@@ -34,8 +34,7 @@ export default function SignupPage() {
     try {
       await authAPI.register(data);
       await authAPI.login({ email: data.email, password: data.password });
-      router.push("/");
-      router.refresh();
+      window.location.href = "/"; // Force full page reload to trigger middleware
     } catch (error: any) {
       setError("root", {
         message:

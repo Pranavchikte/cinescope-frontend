@@ -6,7 +6,12 @@ import { Star, Plus, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { watchlistAPI, ratingsAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -100,7 +105,7 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
       setShowRatingMenu(false);
       showNotification(
         `Rated as ${ratingOptions.find((r) => r.value === ratingValue)?.label}`,
-        "success"
+        "success",
       );
     } catch (error: any) {
       const errorText = error.message || "";
@@ -205,57 +210,80 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
         </motion.div>
       </Link>
 
-      {/* Desktop Rating Menu - Dropdown */}
-      {!isMobile && (
-        <DropdownMenu open={showRatingMenu && !isMobile} onOpenChange={setShowRatingMenu}>
-          <DropdownMenuTrigger asChild>
-            <div className="hidden" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="center"
-            className="w-40 bg-[#181818]/98 backdrop-blur-xl border-[#333333] rounded p-1"
-          >
-            {ratingOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={(e) => handleRating(option.value, e as any)}
-                disabled={isLoading}
-                className={`cursor-pointer rounded px-3 py-2.5 text-sm font-normal ${option.color} hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] focus:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+      {/* Netflix-Style Rating Modal */}
+      <AnimatePresence>
+        {showRatingMenu && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowRatingMenu(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+            />
 
-      {/* Mobile Rating Menu - Bottom Sheet */}
-      <Sheet open={showRatingMenu && isMobile} onOpenChange={setShowRatingMenu}>
-        <SheetContent
-          side="bottom"
-          className="bg-[#181818]/98 backdrop-blur-xl border-[#333333] rounded-t-xl"
-        >
-          <SheetHeader className="mb-4">
-            <SheetTitle className="text-white text-base font-medium">
-              Rate: {movie.title}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="space-y-2 pb-6">
-            {ratingOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleRating(option.value)}
-                disabled={isLoading}
-                className={`w-full px-4 py-4 text-left rounded bg-[#2a2a2a]/50 hover:bg-[#333333] border border-[#404040] hover:border-[#808080]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+            {/* Modal */}
+            <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative w-full max-w-md bg-[#181818] rounded p-8"
+                onClick={(e) => e.stopPropagation()}
               >
-                <span className={`text-base font-normal ${option.color}`}>
-                  {option.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </SheetContent>
-      </Sheet>
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowRatingMenu(false)}
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                {/* Title */}
+                <h3 className="text-xl font-medium text-white mb-6 pr-8">
+                  Rate: {movie.title}
+                </h3>
+
+                {/* Rating Options */}
+                <div className="space-y-3">
+                  {ratingOptions.map((option) => (
+                    <motion.button
+                      key={option.value}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleRating(option.value)}
+                      disabled={isLoading}
+                      className={`w-full px-5 py-4 text-left rounded bg-[#2a2a2a] hover:bg-[#333333] border border-[#404040] hover:border-[#808080] transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                        option.value === "perfection"
+                          ? "border-[#46d369]/30 hover:border-[#46d369]/50"
+                          : ""
+                      }`}
+                    >
+                      <span className={`text-base font-normal ${option.color}`}>
+                        {option.label}
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Toast Notification */}
       <AnimatePresence>
@@ -271,7 +299,9 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
                 : "bg-[#E50914]/20 border-[#E50914]/30 text-white"
             }`}
           >
-            <p className="text-sm font-normal text-center">{showToast.message}</p>
+            <p className="text-sm font-normal text-center">
+              {showToast.message}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
