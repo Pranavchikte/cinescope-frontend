@@ -255,9 +255,7 @@ function ScrollContainer({
 }
 
 export function BrowsePage() {
-  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(
-    null,
-  );
+  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(null);
   const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
@@ -283,30 +281,36 @@ export function BrowsePage() {
     runtime_max: null,
   });
 
+  const transformMovie = (m: TMDBMovie) => ({
+    id: m.id,
+    title: m.title,
+    rating: m.vote_average,
+    poster: m.poster_path
+      ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+      : "",
+    year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+  });
+
+  // CRITICAL: Load only essential data first
   useEffect(() => {
-  const fetchInitialData = async () => {
+  const fetchCriticalData = async () => {
     try {
       setIsLoading(true);
-      
-      // Fetch only essential data first - trending and genres
-      const [trending, genresData] = await Promise.all([
-        moviesAPI.getTrending(),
-        moviesAPI.getGenres(),
-      ]);
 
-      const transformMovie = (m: TMDBMovie) => ({
-        id: m.id,
-        title: m.title,
-        rating: m.vote_average,
-        poster: m.poster_path
-          ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-          : "",
-        year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+      // Fetch trending with error handling
+      const trending = await moviesAPI.getTrending().catch(err => {
+        console.error("Trending fetch error:", err);
+        return { results: [] }; // Fallback to empty results
       });
+
+      if (!trending || !trending.results) {
+        console.error("Invalid trending response:", trending);
+        setIsLoading(false);
+        return;
+      }
 
       const trendingTransformed = trending.results.map(transformMovie);
       setTrendingMovies(trendingTransformed);
-      setGenres(genresData.genres || []);
 
       // Set featured movie
       if (trending.results.length > 0) {
@@ -325,66 +329,56 @@ export function BrowsePage() {
         });
       }
 
-      // Fetch non-critical data after initial render (lazy load)
-      setTimeout(async () => {
-        const [popular, providersData] = await Promise.all([
-          moviesAPI.getPopular(),
-          moviesAPI.getProviders("IN"),
-        ]);
-        setPopularMovies(popular.results.map(transformMovie));
-        setFilteredMovies(popular.results.map(transformMovie));
-        setProviders(providersData.results || []);
-      }, 100); // Load after 100ms
+      setIsLoading(false);
 
+      // Lazy load secondary data
+      setTimeout(async () => {
+        try {
+          const [genresData, popular, providersData] = await Promise.all([
+            moviesAPI.getGenres().catch(() => ({ genres: [] })),
+            moviesAPI.getPopular().catch(() => ({ results: [] })),
+            moviesAPI.getProviders("IN").catch(() => ({ results: [] })),
+          ]);
+
+          setGenres(genresData.genres || []);
+          
+          if (popular.results) {
+            const popularTransformed = popular.results.map(transformMovie);
+            setPopularMovies(popularTransformed);
+            setFilteredMovies(popularTransformed);
+          }
+          
+          setProviders(providersData.results || []);
+        } catch (error) {
+          console.error("Failed to load secondary data:", error);
+        }
+      }, 200);
+
+      // Load personalized if authenticated
+      const token = getAccessToken();
+      if (token) {
+        setIsAuthenticated(true);
+        setTimeout(async () => {
+          try {
+            const data = await moviesAPI.getPersonalized(1, 500, 6.5);
+            if (data?.results) {
+              setPersonalizedMovies(data.results.map(transformMovie));
+            }
+          } catch (error) {
+            console.error("Failed to load personalized:", error);
+          }
+        }, 500);
+      }
     } catch (error) {
-      console.error("Failed to fetch movies:", error);
-    } finally {
+      console.error("Critical fetch error:", error);
       setIsLoading(false);
     }
   };
 
-  fetchInitialData();
+  fetchCriticalData();
 }, []);
 
-  useEffect(() => {
-  const fetchPersonalized = async () => {
-    try {
-      const token = getAccessToken();
-      if (token) {
-        setIsAuthenticated(true);
-        
-        // Delay personalized fetch - it's not critical for initial render
-        setTimeout(async () => {
-          const data = await moviesAPI.getPersonalized(1, 500, 6.5);
-
-          if (!data || !data.results) {
-            console.error("Invalid response from personalized API:", data);
-            return;
-          }
-
-          const transformMovie = (m: TMDBMovie) => ({
-            id: m.id,
-            title: m.title,
-            rating: m.vote_average,
-            poster: m.poster_path
-              ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-              : "",
-            year: m.release_date
-              ? new Date(m.release_date).getFullYear()
-              : 2024,
-          });
-
-          setPersonalizedMovies(data.results.map(transformMovie));
-        }, 500); // Load after page is visible
-      }
-    } catch (error) {
-      console.error("Failed to fetch personalized movies:", error);
-    }
-  };
-
-  fetchPersonalized();
-}, []);
-
+  // Handle filter changes separately
   useEffect(() => {
     const fetchFilteredData = async () => {
       try {
@@ -411,17 +405,6 @@ export function BrowsePage() {
           params.runtime_max = currentFilters.runtime_max;
 
         const data = await moviesAPI.discover(params);
-
-        const transformMovie = (m: TMDBMovie) => ({
-          id: m.id,
-          title: m.title,
-          rating: m.vote_average,
-          poster: m.poster_path
-            ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-            : "",
-          year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
-        });
-
         setFilteredMovies(data.results.map(transformMovie));
       } catch (error) {
         console.error("Failed to fetch filtered movies:", error);
@@ -451,10 +434,8 @@ export function BrowsePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Banner - Only show when no filters active */}
       {!hasActiveFilters && <HeroBanner movie={featuredMovie} />}
 
-      {/* Filter Bar - Sticky */}
       <div className="sticky top-0 z-40 bg-background/98 backdrop-blur-md border-b border-border">
         <FilterBar
           onFilterChange={handleFilterChange}
@@ -464,16 +445,14 @@ export function BrowsePage() {
         />
       </div>
 
-      {/* Main Content */}
       <div className="pt-8 pb-24">
-        {/* Carousel Sections */}
         {!hasActiveFilters && (
           <div className="space-y-16">
             {isAuthenticated && personalizedMovies.length > 0 && (
               <ScrollContainer
                 title="Recommended For You"
                 movies={personalizedMovies}
-                isLoading={isLoading}
+                isLoading={false}
               />
             )}
 
@@ -486,12 +465,11 @@ export function BrowsePage() {
             <ScrollContainer
               title="Popular on Netflix"
               movies={popularMovies}
-              isLoading={isLoading}
+              isLoading={false}
             />
           </div>
         )}
 
-        {/* Filtered Results Grid */}
         <div className="px-6 sm:px-8 lg:px-16">
           <div className="space-y-6">
             <div className="flex items-center justify-between">

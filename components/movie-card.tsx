@@ -1,25 +1,13 @@
 "use client";
 
-import React from "react"
-
+import React from "react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Plus, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { watchlistAPI, ratingsAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface Movie {
   id: number;
@@ -127,11 +115,17 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
     setShowRatingMenu(true);
   };
 
+  // 🔥 HOVER PREFETCH - Preloads detail page on hover
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    router.prefetch(`/${mediaType}/${movie.id}`);
+  };
+
   return (
     <>
       <Link href={`/${mediaType}/${movie.id}`}>
         <motion.div
-          onHoverStart={() => setIsHovered(true)}
+          onHoverStart={handleMouseEnter}
           onHoverEnd={() => setIsHovered(false)}
           whileHover={{ scale: 1.08 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
@@ -139,10 +133,15 @@ export function MovieCard({ movie, mediaType = "movie" }: MovieCardProps) {
         >
           {/* Poster Container */}
           <div className="relative aspect-[2/3] bg-[#1A1A1A] overflow-hidden rounded-lg border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors duration-300">
-            <img
+            {/* OPTIMIZED IMAGE - Lazy loading + optimization */}
+            <Image
               src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 640px) 140px, (max-width: 768px) 160px, (max-width: 1024px) 180px, 200px"
+              className="object-cover"
+              loading="lazy"
+              quality={75}
             />
 
             {/* Hover Overlay - Bottom Actions */}

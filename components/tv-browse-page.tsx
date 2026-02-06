@@ -157,7 +157,9 @@ export function TVBrowsePage() {
   const [filteredShows, setFilteredShows] = useState<any[]>([]);
   const [personalizedShows, setPersonalizedShows] = useState<any[]>([]);
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
-  const [providers, setProviders] = useState<{ provider_id: number; provider_name: string; logo_path: string }[]>([]);
+  const [providers, setProviders] = useState<
+    { provider_id: number; provider_name: string; logo_path: string }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -175,75 +177,87 @@ export function TVBrowsePage() {
     runtime_max: null,
   });
 
+  const transformShow = (s: TMDBShow) => ({
+    id: s.id,
+    title: s.name,
+    rating: s.vote_average,
+    poster: s.poster_path
+      ? `https://image.tmdb.org/t/p/w500${s.poster_path}`
+      : "",
+    year: s.first_air_date
+      ? new Date(s.first_air_date).getFullYear()
+      : 2024,
+  });
+
+  // Load critical data first
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchCriticalData = async () => {
       try {
         setIsLoading(true);
-        const [trending, popular, genresData, providersData] =
-          await Promise.all([
-            tvAPI.getTrending(),
-            tvAPI.getPopular(),
-            tvAPI.getGenres(),
-            tvAPI.getProviders("IN"),
-          ]);
 
-        const transformShow = (s: TMDBShow) => ({
-          id: s.id,
-          title: s.name,
-          rating: s.vote_average,
-          poster: s.poster_path
-            ? `https://image.tmdb.org/t/p/w500${s.poster_path}`
-            : "",
-          year: s.first_air_date
-            ? new Date(s.first_air_date).getFullYear()
-            : 2024,
+        // Only fetch trending first
+        const trending = await tvAPI.getTrending().catch((err) => {
+          console.error("Trending TV fetch error:", err);
+          return { results: [] };
         });
 
+        if (!trending || !trending.results) {
+          console.error("Invalid trending response:", trending);
+          setIsLoading(false);
+          return;
+        }
+
         setTrendingShows(trending.results.map(transformShow));
-        setPopularShows(popular.results.map(transformShow));
-        setFilteredShows(popular.results.map(transformShow));
-        setGenres(genresData.genres || []);
-        setProviders(providersData.results || []);
+        setIsLoading(false);
+
+        // Lazy load secondary data
+        setTimeout(async () => {
+          try {
+            const [genresData, popular, providersData] = await Promise.all([
+              tvAPI.getGenres().catch(() => ({ genres: [] })),
+              tvAPI.getPopular().catch(() => ({ results: [] })),
+              tvAPI.getProviders("IN").catch(() => ({ results: [] })),
+            ]);
+
+            setGenres(genresData.genres || []);
+
+            if (popular.results) {
+              const popularTransformed = popular.results.map(transformShow);
+              setPopularShows(popularTransformed);
+              setFilteredShows(popularTransformed);
+            }
+
+            setProviders(providersData.results || []);
+          } catch (error) {
+            console.error("Failed to load secondary data:", error);
+          }
+        }, 200);
+
+        // Load personalized if authenticated
+        const token = getAccessToken();
+        if (token) {
+          setIsAuthenticated(true);
+          setTimeout(async () => {
+            try {
+              const data = await tvAPI.getPersonalized(1, 500, 6.5);
+              if (data?.results) {
+                setPersonalizedShows(data.results.map(transformShow));
+              }
+            } catch (error) {
+              console.error("Failed to load personalized:", error);
+            }
+          }, 500);
+        }
       } catch (error) {
-        console.error("Failed to fetch TV shows:", error);
-      } finally {
+        console.error("Critical TV fetch error:", error);
         setIsLoading(false);
       }
     };
 
-    fetchInitialData();
+    fetchCriticalData();
   }, []);
 
-  useEffect(() => {
-    const fetchPersonalized = async () => {
-      try {
-        const token = getAccessToken();
-        if (token) {
-          setIsAuthenticated(true);
-          const data = await tvAPI.getPersonalized(1, 500, 6.5);
-
-          const transformShow = (s: TMDBShow) => ({
-            id: s.id,
-            title: s.name,
-            rating: s.vote_average,
-            poster: s.poster_path
-              ? `https://image.tmdb.org/t/p/w500${s.poster_path}`
-              : "",
-            year: s.first_air_date
-              ? new Date(s.first_air_date).getFullYear()
-              : 2024,
-          });
-
-          setPersonalizedShows(data.results.map(transformShow));
-        }
-      } catch (error) {
-        console.error("Failed to fetch personalized TV shows:", error);
-      }
-    };
-
-    fetchPersonalized();
-  }, []);
-
+  // Handle filter changes
   useEffect(() => {
     const fetchFilteredData = async () => {
       try {
@@ -267,19 +281,9 @@ export function TVBrowsePage() {
 
         const data = await tvAPI.discover(params);
 
-        const transformShow = (s: TMDBShow) => ({
-          id: s.id,
-          title: s.name,
-          rating: s.vote_average,
-          poster: s.poster_path
-            ? `https://image.tmdb.org/t/p/w500${s.poster_path}`
-            : "",
-          year: s.first_air_date
-            ? new Date(s.first_air_date).getFullYear()
-            : 2024,
-        });
-
-        setFilteredShows(data.results.map(transformShow));
+        if (data?.results) {
+          setFilteredShows(data.results.map(transformShow));
+        }
       } catch (error) {
         console.error("Failed to fetch filtered TV shows:", error);
       } finally {
@@ -306,7 +310,6 @@ export function TVBrowsePage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">
-      {/* Filter Bar - Sticky */}
       <div className="sticky top-0 z-40 bg-[#0F0F0F]/95 backdrop-blur-md border-b border-[#2A2A2A]/50">
         <FilterBar
           onFilterChange={handleFilterChange}
@@ -316,16 +319,14 @@ export function TVBrowsePage() {
         />
       </div>
 
-      {/* Main Content */}
       <div className="pt-8 pb-24">
-        {/* Carousel Sections */}
         {!hasActiveFilters && (
           <div className="space-y-16">
             {isAuthenticated && personalizedShows.length > 0 && (
               <ScrollContainer
                 title="Recommended For You"
                 shows={personalizedShows}
-                isLoading={isLoading}
+                isLoading={false}
               />
             )}
 
@@ -338,12 +339,11 @@ export function TVBrowsePage() {
             <ScrollContainer
               title="Popular on Netflix"
               shows={popularShows}
-              isLoading={isLoading}
+              isLoading={false}
             />
           </div>
         )}
 
-        {/* Filtered Results Grid */}
         <div className="px-6 sm:px-8 lg:px-16">
           <div className="space-y-6">
             <div className="flex items-center justify-between">

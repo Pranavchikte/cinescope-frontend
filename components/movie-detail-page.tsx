@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { style } from "next/css";
 
 interface Cast {
   id: number;
@@ -96,42 +95,35 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   };
 
   useEffect(() => {
-    const fetchMovieData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const fetchMovieData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const [movieData, creditsData, videosData, providersData, imagesData] =
-          await Promise.all([
-            moviesAPI.getDetails(parseInt(movieId)),
-            moviesAPI.getCredits(parseInt(movieId)),
-            moviesAPI.getVideos(parseInt(movieId)),
-            moviesAPI.getMovieProviders(parseInt(movieId)),
-            moviesAPI.getImages(parseInt(movieId)),
-          ]);
+      // 🔥 NEW: Single API call gets everything
+      const fullData = await moviesAPI.getFullDetails(parseInt(movieId));
 
-        setMovie(movieData);
-        setCast(creditsData.cast?.slice(0, 15) || []);
+      setMovie(fullData.details);
+      setCast(fullData.credits.cast?.slice(0, 15) || []);
 
-        const trailerVideo =
-          videosData.results?.find(
-            (v: Video) => v.type === "Trailer" && v.site === "YouTube",
-          ) || videosData.results?.[0];
-        setTrailer(trailerVideo || null);
+      const trailerVideo =
+        fullData.videos.results?.find(
+          (v: Video) => v.type === "Trailer" && v.site === "YouTube"
+        ) || fullData.videos.results?.[0];
+      setTrailer(trailerVideo || null);
 
-        const inProviders = providersData.results?.IN?.flatrate || [];
-        setProviders(inProviders);
+      const inProviders = fullData.providers.results?.IN?.flatrate || [];
+      setProviders(inProviders);
 
-        setImages({
-          backdrops: imagesData.backdrops?.slice(0, 12) || [],
-          posters: imagesData.posters?.slice(0, 12) || [],
-        });
+      setImages({
+        backdrops: fullData.images.backdrops?.slice(0, 12) || [],
+        posters: fullData.images.posters?.slice(0, 12) || [],
+      });
 
-        const [recommendationsData, similarData] = await Promise.all([
-          moviesAPI.getRecommendations(parseInt(movieId)),
-          moviesAPI.getSimilar(parseInt(movieId)),
-        ]);
+      setIsLoading(false);
 
+      // 🔥 LAZY LOAD: Recommendations after main content loads
+      setTimeout(() => {
         const transformMovie = (m: any) => ({
           id: m.id,
           title: m.title,
@@ -143,21 +135,22 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         });
 
         setRecommendations(
-          recommendationsData.results?.slice(0, 12).map(transformMovie) || [],
+          fullData.recommendations.results?.slice(0, 12).map(transformMovie) || []
         );
         setSimilarMovies(
-          similarData.results?.slice(0, 12).map(transformMovie) || [],
+          fullData.similar.results?.slice(0, 12).map(transformMovie) || []
         );
-      } catch (err) {
-        console.error("Failed to fetch movie data:", err);
-        setError("Failed to load movie details. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      }, 100);
 
-    fetchMovieData();
-  }, [movieId]);
+    } catch (err) {
+      console.error("Failed to fetch movie data:", err);
+      setError("Failed to load movie details. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  fetchMovieData();
+}, [movieId]);
 
   const handleAddToWatchlist = async () => {
     setIsAddingToWatchlist(true);

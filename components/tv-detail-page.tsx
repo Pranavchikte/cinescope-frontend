@@ -103,42 +103,45 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   };
 
   useEffect(() => {
-    const fetchShowData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const fetchShowData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const [showData, creditsData, videosData, providersData, imagesData] =
-          await Promise.all([
-            tvAPI.getDetails(parseInt(tvId)),
-            tvAPI.getCredits(parseInt(tvId)),
-            tvAPI.getVideos(parseInt(tvId)),
-            tvAPI.getTVProviders(parseInt(tvId)),
-            tvAPI.getImages(parseInt(tvId)),
-          ]);
+      // 🔥 NEW: Single API call gets everything
+      const fullData = await tvAPI.getFullDetails(parseInt(tvId));
 
-        setShow(showData);
-        setCast(creditsData.cast?.slice(0, 15) || []);
+      setShow(fullData.details);
+      setCast(fullData.credits.cast?.slice(0, 15) || []);
 
-        const trailerVideo =
-          videosData.results?.find(
-            (v: Video) => v.type === "Trailer" && v.site === "YouTube",
-          ) || videosData.results?.[0];
-        setTrailer(trailerVideo || null);
+      const trailerVideo =
+        fullData.videos.results?.find(
+          (v: Video) => v.type === "Trailer" && v.site === "YouTube"
+        ) || fullData.videos.results?.[0];
+      setTrailer(trailerVideo || null);
 
-        const inProviders = providersData.results?.IN?.flatrate || [];
-        setProviders(inProviders);
+      const inProviders = fullData.providers.results?.IN?.flatrate || [];
+      setProviders(inProviders);
 
-        setImages({
-          backdrops: imagesData.backdrops?.slice(0, 12) || [],
-          posters: imagesData.posters?.slice(0, 12) || [],
-        });
+      setImages({
+        backdrops: fullData.images.backdrops?.slice(0, 12) || [],
+        posters: fullData.images.posters?.slice(0, 12) || [],
+      });
 
-        const [recommendationsData, similarData] = await Promise.all([
-          tvAPI.getRecommendations(parseInt(tvId)),
-          tvAPI.getSimilar(parseInt(tvId)),
-        ]);
+      // Create seasons array
+      const seasonsArr = Array.from(
+        { length: fullData.details.number_of_seasons },
+        (_, i) => ({
+          season_number: i + 1,
+          name: `Season ${i + 1}`,
+        })
+      );
+      setSeasons(seasonsArr);
 
+      setIsLoading(false);
+
+      // 🔥 LAZY LOAD: Recommendations after main content loads
+      setTimeout(() => {
         const transformShow = (s: any) => ({
           id: s.id,
           title: s.name,
@@ -152,31 +155,22 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
         });
 
         setRecommendations(
-          recommendationsData.results?.slice(0, 12).map(transformShow) || [],
+          fullData.recommendations.results?.slice(0, 12).map(transformShow) || []
         );
         setSimilarShows(
-          similarData.results?.slice(0, 12).map(transformShow) || [],
+          fullData.similar.results?.slice(0, 12).map(transformShow) || []
         );
+      }, 100);
 
-        // Create seasons array
-        const seasonsArr = Array.from(
-          { length: showData.number_of_seasons },
-          (_, i) => ({
-            season_number: i + 1,
-            name: `Season ${i + 1}`,
-          }),
-        );
-        setSeasons(seasonsArr);
-      } catch (err) {
-        console.error("Failed to fetch TV show data:", err);
-        setError("Failed to load TV show details. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    } catch (err) {
+      console.error("Failed to fetch TV show data:", err);
+      setError("Failed to load TV show details. Please try again.");
+      setIsLoading(false);
+    }
+  };
 
-    fetchShowData();
-  }, [tvId]);
+  fetchShowData();
+}, [tvId]);
 
   const handleAddToWatchlist = async () => {
     setIsAddingToWatchlist(true);

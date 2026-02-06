@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { MovieCard } from "./movie-card";
 import { MovieCardSkeleton } from "./movie-card-skeleton";
@@ -27,6 +28,11 @@ export function MovieGrid({
   skeletonCount = 12,
   emptyMessage = "No titles found",
 }: MovieGridProps) {
+  const INITIAL_LOAD = 20; // Only load 20 cards initially
+  const LOAD_MORE_COUNT = 20; // Load 20 more when clicking "Load More"
+  
+  const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
+
   // Show skeleton loading state
   if (isLoading) {
     return (
@@ -52,17 +58,41 @@ export function MovieGrid({
     );
   }
 
+  const visibleMovies = movies.slice(0, visibleCount);
+  const hasMore = visibleCount < movies.length;
+
+  const loadMore = () => {
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_COUNT, movies.length));
+  };
+
   return (
-    <div
-      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-1 md:gap-2"
-      role="list"
-      aria-label={`${mediaType === "movie" ? "Movies" : "TV Shows"} grid`}
-    >
-      {movies.map((movie) => (
-        <div key={movie.id} role="listitem">
-          <MovieCard movie={movie} mediaType={mediaType} />
+    <div className="space-y-8">
+      {/* Movie Grid - Only render visible cards */}
+      <div
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-1 md:gap-2"
+        role="list"
+        aria-label={`${mediaType === "movie" ? "Movies" : "TV Shows"} grid`}
+      >
+        {visibleMovies.map((movie) => (
+          <div key={movie.id} role="listitem">
+            <MovieCard movie={movie} mediaType={mediaType} />
+          </div>
+        ))}
+      </div>
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={loadMore}
+            className="px-8 py-3 bg-[#1A1A1A] hover:bg-[#14B8A6]/20 border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg text-[#F5F5F5] font-medium transition-all duration-200"
+          >
+            Load More ({movies.length - visibleCount} remaining)
+          </motion.button>
         </div>
-      ))}
+      )}
     </div>
   );
 }
