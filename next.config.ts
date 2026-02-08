@@ -1,11 +1,16 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
+// frontend/next.config.ts
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        pathname: "/t/p/**",
+      },
+    ],
+    unoptimized: true,  // ADD THIS - stops timeouts
   },
 };
 

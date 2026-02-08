@@ -30,10 +30,32 @@ interface FeaturedMovie {
 }
 
 function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
+  const [ripples, setRipples] = useState<{ [key: string]: { x: number; y: number; id: number }[] }>({})
+
+  // Ripple effect handler
+  const handleRipple = (e: React.MouseEvent, key: string) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const rippleId = Date.now()
+
+    setRipples((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] || []), { x, y, id: rippleId }],
+    }))
+
+    setTimeout(() => {
+      setRipples((prev) => ({
+        ...prev,
+        [key]: (prev[key] || []).filter((r) => r.id !== rippleId),
+      }))
+    }, 600)
+  }
+
   if (!movie) {
     return (
-      <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] bg-card animate-pulse">
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] bg-[#1A1A1A] animate-pulse">
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0F0F0F] to-transparent" />
       </div>
     );
   }
@@ -47,10 +69,10 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
           alt={movie.title}
           className="w-full h-full object-cover object-center"
         />
-        {/* Elegant Gradient Overlays - Minimalist Style */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background to-transparent" />
+        {/* Elegant Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/95 via-[#0F0F0F]/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0F0F0F] to-transparent" />
       </div>
 
       {/* Content */}
@@ -61,57 +83,98 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-tight text-balance"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#F5F5F5] leading-tight text-balance"
           >
             {movie.title}
           </motion.h1>
 
-          {/* Meta Info - Refined */}
+          {/* Meta Info */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex items-center gap-4 text-sm sm:text-base flex-wrap"
           >
-            <span className="text-primary font-medium text-lg">
+            <span className="text-[#14B8A6] font-medium text-lg">
               {Math.round(movie.rating * 10)}%
             </span>
-            <span className="text-muted text-sm">{movie.year}</span>
+            <span className="text-[#A0A0A0] text-sm">{movie.year}</span>
             {movie.genres && movie.genres.length > 0 && (
               <>
-                <div className="w-1 h-1 rounded-full bg-border" />
-                <span className="text-muted text-sm">
+                <div className="w-1 h-1 rounded-full bg-[#2A2A2A]" />
+                <span className="text-[#A0A0A0] text-sm">
                   {movie.genres.slice(0, 2).join(" · ")}
                 </span>
               </>
             )}
           </motion.div>
 
-          {/* Description - Elegant & Concise */}
+          {/* Description */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-sm sm:text-base lg:text-base text-muted line-clamp-2 sm:line-clamp-3 max-w-lg leading-relaxed"
+            className="text-sm sm:text-base lg:text-base text-[#A0A0A0] line-clamp-2 sm:line-clamp-3 max-w-lg leading-relaxed"
           >
             {movie.overview}
           </motion.p>
 
-          {/* Buttons - Minimalist Style */}
+          {/* Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex items-center gap-3 pt-3"
           >
-            <button className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm sm:text-base font-medium transition-all duration-200 hover:shadow-lg hover:scale-105">
-              <Play className="w-5 h-5 sm:w-5 sm:h-5 fill-current" />
-              <span>Watch Now</span>
-            </button>
-            <button className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-transparent border border-border hover:border-primary hover:text-primary text-muted rounded-lg text-sm sm:text-base font-medium transition-all duration-200 hover:bg-primary/5">
-              <Info className="w-5 h-5 sm:w-5 sm:h-5" />
-              <span>Details</span>
-            </button>
+            <motion.button
+              onClick={(e) => handleRipple(e, 'watch-now')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 relative overflow-hidden group"
+            >
+              {/* Ripple effect */}
+              {ripples['watch-now']?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-white/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
+                  animate={{ width: 100, height: 100, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              
+              {/* Gradient glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
+              
+              <Play className="w-5 h-5 sm:w-5 sm:h-5 fill-current relative z-10" />
+              <span className="relative z-10">Watch Now</span>
+            </motion.button>
+
+            <motion.button
+              onClick={(e) => handleRipple(e, 'details')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-transparent border border-[#2A2A2A] hover:border-[#14B8A6] hover:text-[#14B8A6] text-[#A0A0A0] rounded-lg text-sm sm:text-base font-medium transition-all duration-200 backdrop-blur-xl relative overflow-hidden group"
+            >
+              {/* Ripple effect */}
+              {ripples['details']?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
+                  animate={{ width: 100, height: 100, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              
+              <div className="absolute inset-0 bg-[#14B8A6]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              
+              <Info className="w-5 h-5 sm:w-5 sm:h-5 relative z-10" />
+              <span className="relative z-10">Details</span>
+            </motion.button>
           </motion.div>
         </div>
       </div>
@@ -132,6 +195,27 @@ function ScrollContainer({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [ripples, setRipples] = useState<{ [key: string]: { x: number; y: number; id: number }[] }>({})
+
+  // Ripple effect handler
+  const handleRipple = (e: React.MouseEvent, key: string) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const rippleId = Date.now()
+
+    setRipples((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] || []), { x, y, id: rippleId }],
+    }))
+
+    setTimeout(() => {
+      setRipples((prev) => ({
+        ...prev,
+        [key]: (prev[key] || []).filter((r) => r.id !== rippleId),
+      }))
+    }, 600)
+  }
 
   const checkScroll = () => {
     const element = scrollContainerRef.current;
@@ -175,14 +259,14 @@ function ScrollContainer({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Section Header - Minimalist Style */}
-      <h2 className="text-xl md:text-2xl font-semibold text-foreground px-6 sm:px-8 lg:px-16">
+      {/* Section Header */}
+      <h2 className="text-xl md:text-2xl font-semibold text-[#F5F5F5] px-6 sm:px-8 lg:px-16">
         {title}
       </h2>
 
       {/* Scroll Container */}
       <div className="relative">
-        {/* Left Scroll Button - Subtle Hover */}
+        {/* Left Scroll Button */}
         <AnimatePresence>
           {isHovered && canScrollLeft && (
             <motion.button
@@ -190,17 +274,35 @@ function ScrollContainer({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              onClick={() => scroll("left")}
-              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-background via-background/40 to-transparent items-center justify-start pl-3 hover:from-background transition-all"
+              onClick={(e) => {
+                handleRipple(e, 'scroll-left')
+                scroll("left")
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-start pl-3 hover:from-[#0F0F0F] transition-all"
             >
-              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
-                <ChevronLeft className="w-5 h-5 text-foreground" />
+              <div className="w-9 h-9 bg-[#1A1A1A]/50 hover:bg-[#14B8A6] hover:text-[#0F0F0F] rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-xl relative overflow-hidden group/btn">
+                {/* Ripple effect */}
+                {ripples['scroll-left']?.map((ripple) => (
+                  <motion.span
+                    key={ripple.id}
+                    className="absolute bg-white/30 rounded-full pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                    initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
+                    animate={{ width: 60, height: 60, opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                ))}
+                
+                <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200" />
+                <ChevronLeft className="w-5 h-5 text-[#F5F5F5] relative z-10" />
               </div>
             </motion.button>
           )}
         </AnimatePresence>
 
-        {/* Right Scroll Button - Subtle Hover */}
+        {/* Right Scroll Button */}
         <AnimatePresence>
           {isHovered && canScrollRight && (
             <motion.button
@@ -208,11 +310,29 @@ function ScrollContainer({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              onClick={() => scroll("right")}
-              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-background via-background/40 to-transparent items-center justify-end pr-3 hover:from-background transition-all"
+              onClick={(e) => {
+                handleRipple(e, 'scroll-right')
+                scroll("right")
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-end pr-3 hover:from-[#0F0F0F] transition-all"
             >
-              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
-                <ChevronRight className="w-5 h-5 text-foreground" />
+              <div className="w-9 h-9 bg-[#1A1A1A]/50 hover:bg-[#14B8A6] hover:text-[#0F0F0F] rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-xl relative overflow-hidden group/btn">
+                {/* Ripple effect */}
+                {ripples['scroll-right']?.map((ripple) => (
+                  <motion.span
+                    key={ripple.id}
+                    className="absolute bg-white/30 rounded-full pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                    initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
+                    animate={{ width: 60, height: 60, opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                ))}
+                
+                <div className="absolute inset-0 bg-gradient-to-l from-[#14B8A6]/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200" />
+                <ChevronRight className="w-5 h-5 text-[#F5F5F5] relative z-10" />
               </div>
             </motion.button>
           )}
@@ -247,17 +367,17 @@ function ScrollContainer({
         </div>
 
         {/* Gradient Fade Edges - Mobile */}
-        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent" />
-        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#0F0F0F] to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#0F0F0F] to-transparent" />
       </div>
     </div>
   );
 }
 
 export function BrowsePage() {
-  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(
-    null,
-  );
+  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(null);
+  const [featuredMovies, setFeaturedMovies] = useState<FeaturedMovie[]>([]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
@@ -283,107 +403,116 @@ export function BrowsePage() {
     runtime_max: null,
   });
 
+  const transformMovie = (m: TMDBMovie) => ({
+    id: m.id,
+    title: m.title,
+    rating: m.vote_average,
+    poster: m.poster_path
+      ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+      : "",
+    year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+  });
+
+  // Auto-rotate hero banner every 8 seconds
   useEffect(() => {
-  const fetchInitialData = async () => {
-    try {
-      setIsLoading(true);
-      
-      // Fetch only essential data first - trending and genres
-      const [trending, genresData] = await Promise.all([
-        moviesAPI.getTrending(),
-        moviesAPI.getGenres(),
-      ]);
+    if (featuredMovies.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentHeroIndex((prev) => (prev + 1) % featuredMovies.length);
+      }, 8000);
+      return () => clearInterval(interval);
+    }
+  }, [featuredMovies.length]);
 
-      const transformMovie = (m: TMDBMovie) => ({
-        id: m.id,
-        title: m.title,
-        rating: m.vote_average,
-        poster: m.poster_path
-          ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-          : "",
-        year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
-      });
+  // Update featured movie when index changes
+  useEffect(() => {
+    if (featuredMovies.length > 0) {
+      setFeaturedMovie(featuredMovies[currentHeroIndex]);
+    }
+  }, [currentHeroIndex, featuredMovies]);
 
-      const trendingTransformed = trending.results.map(transformMovie);
-      setTrendingMovies(trendingTransformed);
-      setGenres(genresData.genres || []);
+  useEffect(() => {
+    const fetchCriticalData = async () => {
+      try {
+        setIsLoading(true);
 
-      // Set featured movie
-      if (trending.results.length > 0) {
-        const featured = trending.results[0];
-        setFeaturedMovie({
-          id: featured.id,
-          title: featured.title,
-          overview: featured.overview || "",
-          backdrop: featured.backdrop_path
-            ? `https://image.tmdb.org/t/p/original${featured.backdrop_path}`
-            : "",
-          rating: featured.vote_average,
-          year: featured.release_date
-            ? new Date(featured.release_date).getFullYear()
-            : 2024,
+        const trending = await moviesAPI.getTrending().catch(err => {
+          console.error("Trending fetch error:", err);
+          return { results: [] };
         });
-      }
 
-      // Fetch non-critical data after initial render (lazy load)
-      setTimeout(async () => {
-        const [popular, providersData] = await Promise.all([
-          moviesAPI.getPopular(),
-          moviesAPI.getProviders("IN"),
-        ]);
-        setPopularMovies(popular.results.map(transformMovie));
-        setFilteredMovies(popular.results.map(transformMovie));
-        setProviders(providersData.results || []);
-      }, 100); // Load after 100ms
+        if (!trending || !trending.results) {
+          console.error("Invalid trending response:", trending);
+          setIsLoading(false);
+          return;
+        }
 
-    } catch (error) {
-      console.error("Failed to fetch movies:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const trendingTransformed = trending.results.map(transformMovie);
+        setTrendingMovies(trendingTransformed);
 
-  fetchInitialData();
-}, []);
-
-  useEffect(() => {
-  const fetchPersonalized = async () => {
-    try {
-      const token = getAccessToken();
-      if (token) {
-        setIsAuthenticated(true);
-        
-        // Delay personalized fetch - it's not critical for initial render
-        setTimeout(async () => {
-          const data = await moviesAPI.getPersonalized(1, 500, 6.5);
-
-          if (!data || !data.results) {
-            console.error("Invalid response from personalized API:", data);
-            return;
-          }
-
-          const transformMovie = (m: TMDBMovie) => ({
-            id: m.id,
-            title: m.title,
-            rating: m.vote_average,
-            poster: m.poster_path
-              ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+        // Create featured movies array from top 5 trending
+        if (trending.results.length > 0) {
+          const topFeatured = trending.results.slice(0, 5).map((featured: TMDBMovie) => ({
+            id: featured.id,
+            title: featured.title,
+            overview: featured.overview || "",
+            backdrop: featured.backdrop_path
+              ? `https://image.tmdb.org/t/p/original${featured.backdrop_path}`
               : "",
-            year: m.release_date
-              ? new Date(m.release_date).getFullYear()
+            rating: featured.vote_average,
+            year: featured.release_date
+              ? new Date(featured.release_date).getFullYear()
               : 2024,
-          });
+          }));
+          setFeaturedMovies(topFeatured);
+          setFeaturedMovie(topFeatured[0]);
+        }
 
-          setPersonalizedMovies(data.results.map(transformMovie));
-        }, 500); // Load after page is visible
+        setIsLoading(false);
+
+        setTimeout(async () => {
+          try {
+            const [genresData, popular, providersData] = await Promise.all([
+              moviesAPI.getGenres().catch(() => ({ genres: [] })),
+              moviesAPI.getPopular().catch(() => ({ results: [] })),
+              moviesAPI.getProviders("IN").catch(() => ({ results: [] })),
+            ]);
+
+            setGenres(genresData.genres || []);
+            
+            if (popular.results) {
+              const popularTransformed = popular.results.map(transformMovie);
+              setPopularMovies(popularTransformed);
+              setFilteredMovies(popularTransformed);
+            }
+            
+            setProviders(providersData.results || []);
+          } catch (error) {
+            console.error("Failed to load secondary data:", error);
+          }
+        }, 200);
+
+        const token = getAccessToken();
+        if (token) {
+          setIsAuthenticated(true);
+          setTimeout(async () => {
+            try {
+              const data = await moviesAPI.getPersonalized(1, 500, 6.5);
+              if (data?.results) {
+                setPersonalizedMovies(data.results.map(transformMovie));
+              }
+            } catch (error) {
+              console.error("Failed to load personalized:", error);
+            }
+          }, 500);
+        }
+      } catch (error) {
+        console.error("Critical fetch error:", error);
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch personalized movies:", error);
-    }
-  };
+    };
 
-  fetchPersonalized();
-}, []);
+    fetchCriticalData();
+  }, []);
 
   useEffect(() => {
     const fetchFilteredData = async () => {
@@ -411,17 +540,6 @@ export function BrowsePage() {
           params.runtime_max = currentFilters.runtime_max;
 
         const data = await moviesAPI.discover(params);
-
-        const transformMovie = (m: TMDBMovie) => ({
-          id: m.id,
-          title: m.title,
-          rating: m.vote_average,
-          poster: m.poster_path
-            ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-            : "",
-          year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
-        });
-
         setFilteredMovies(data.results.map(transformMovie));
       } catch (error) {
         console.error("Failed to fetch filtered movies:", error);
@@ -450,12 +568,10 @@ export function BrowsePage() {
     currentFilters.runtime_max !== null;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Banner - Only show when no filters active */}
+    <div className="min-h-screen bg-[#0F0F0F]">
       {!hasActiveFilters && <HeroBanner movie={featuredMovie} />}
 
-      {/* Filter Bar - Sticky */}
-      <div className="sticky top-0 z-40 bg-background/98 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 backdrop-blur-md border-b border-[#2A2A2A]">
         <FilterBar
           onFilterChange={handleFilterChange}
           mediaType="movie"
@@ -464,16 +580,14 @@ export function BrowsePage() {
         />
       </div>
 
-      {/* Main Content */}
       <div className="pt-8 pb-24">
-        {/* Carousel Sections */}
         {!hasActiveFilters && (
           <div className="space-y-16">
             {isAuthenticated && personalizedMovies.length > 0 && (
               <ScrollContainer
                 title="Recommended For You"
                 movies={personalizedMovies}
-                isLoading={isLoading}
+                isLoading={false}
               />
             )}
 
@@ -484,22 +598,21 @@ export function BrowsePage() {
             />
 
             <ScrollContainer
-              title="Popular on Netflix"
+              title="Popular"
               movies={popularMovies}
-              isLoading={isLoading}
+              isLoading={false}
             />
           </div>
         )}
 
-        {/* Filtered Results Grid */}
         <div className="px-6 sm:px-8 lg:px-16">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+              <h2 className="text-2xl md:text-3xl font-semibold text-[#F5F5F5]">
                 {hasActiveFilters ? "Search Results" : "Explore All"}
               </h2>
               {isFiltering && (
-                <div className="flex items-center gap-2 text-sm text-muted">
+                <div className="flex items-center gap-2 text-sm text-[#A0A0A0]">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Loading...</span>
                 </div>
@@ -509,10 +622,10 @@ export function BrowsePage() {
             {!isFiltering && filteredMovies.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32">
                 <div className="text-center space-y-2">
-                  <h3 className="text-2xl font-semibold text-foreground">
+                  <h3 className="text-2xl font-semibold text-[#F5F5F5]">
                     No titles found
                   </h3>
-                  <p className="text-base text-muted">
+                  <p className="text-base text-[#A0A0A0]">
                     Try adjusting your filters or search criteria
                   </p>
                 </div>

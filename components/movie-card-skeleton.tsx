@@ -1,12 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Film } from "lucide-react";
 
 export function MovieCardSkeleton() {
   return (
     <div className="relative">
       {/* Poster Skeleton */}
       <div className="relative aspect-[2/3] bg-[#1A1A1A] overflow-hidden rounded-lg border border-[#2A2A2A]">
+        {/* Film Icon Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Film className="w-16 h-16 md:w-20 md:h-20 text-[#2A2A2A]" />
+        </div>
+        
         {/* Shimmer Effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14B8A6]/10 to-transparent"

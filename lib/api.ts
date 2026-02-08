@@ -278,6 +278,21 @@ export const moviesAPI = {
         const res = await fetch(`${API_BASE_URL}/movies/${id}/providers`)
         return res.json()
     },
+
+    // ADD THIS NEW METHOD
+    getBatchDetails: async (ids: number[]) => {
+        const res = await fetch(`${API_BASE_URL}/movies/batch-details?ids=${ids.join(',')}`)
+        return res.json()
+    },
+
+    getFullDetails: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/movies/full-details/${id}`)
+        if (!res.ok) {
+            console.error('Full details API failed:', res.status, await res.text())
+            throw new Error('Failed to fetch movie details')
+        }
+        return res.json()
+    },
 }
 
 // TV Shows API
@@ -381,13 +396,29 @@ export const tvAPI = {
         const res = await fetch(`${API_BASE_URL}/tv/${id}/season/${seasonNumber}`)
         return res.json()
     },
+
+    // ADD THIS NEW METHOD to tvAPI
+    getBatchDetails: async (ids: number[]) => {
+        const res = await fetch(`${API_BASE_URL}/tv/batch-details?ids=${ids.join(',')}`)
+        return res.json()
+    },
+
+    getFullDetails: async (id: number) => {
+        const res = await fetch(`${API_BASE_URL}/tv/full-details/${id}`)
+        if (!res.ok) {
+            console.error('TV full details API failed:', res.status, await res.text())
+            throw new Error('Failed to fetch TV details')
+        }
+        return res.json()
+    },
 }
 
 // Watchlist API (protected)
 export const watchlistAPI = {
     get: async () => {
         const res = await authFetch(`${API_BASE_URL}/watchlist`)
-        return res.json()
+        const data = await res.json()
+        return data.results || []  // <- CHANGED: extract results array
     },
 
     add: async (data: { tmdb_id: number; media_type: 'movie' | 'tv' }) => {
@@ -408,11 +439,13 @@ export const watchlistAPI = {
     },
 }
 
+
 // Ratings API (protected)
 export const ratingsAPI = {
     get: async () => {
         const res = await authFetch(`${API_BASE_URL}/ratings`)
-        return res.json()
+        const data = await res.json()
+        return data.results || []  // <- CHANGED: extract results array
     },
 
     create: async (data: { tmdb_id: number; media_type: 'movie' | 'tv'; rating: string }) => {

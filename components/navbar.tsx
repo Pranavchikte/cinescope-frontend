@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react"
-
+import React from "react";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { authAPI, getAccessToken, moviesAPI, tvAPI } from "@/lib/api";
@@ -17,12 +16,10 @@ import {
   List,
   LogOut,
   ChevronDown,
-  Bell,
+  User,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Link from 'next/link';
-
-// import { AuthModal } from "@/components/auth-modal";
+import Link from "next/link";
 
 interface SearchResult {
   id: number;
@@ -34,7 +31,6 @@ interface SearchResult {
 }
 
 export function Navbar() {
-  // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -42,6 +38,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -50,6 +47,30 @@ export function Navbar() {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Ripple state
+  const [ripples, setRipples] = useState<{
+    [key: string]: { x: number; y: number; id: number }[];
+  }>({});
+
+  const handleRipple = (e: React.MouseEvent, key: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rippleId = Date.now();
+
+    setRipples((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] || []), { x, y, id: rippleId }],
+    }));
+
+    setTimeout(() => {
+      setRipples((prev) => ({
+        ...prev,
+        [key]: (prev[key] || []).filter((r) => r.id !== rippleId),
+      }));
+    }, 600);
+  };
 
   // Scroll detection
   useEffect(() => {
@@ -160,6 +181,7 @@ export function Navbar() {
         !searchRef.current.contains(event.target as Node)
       ) {
         setShowResults(false);
+        setIsSearchExpanded(false);
       }
       if (
         userMenuRef.current &&
@@ -181,12 +203,6 @@ export function Navbar() {
     router.refresh();
   };
 
-  // const handleAuthSuccess = () => {
-  //   setIsAuthModalOpen(false);
-  //   checkAuth();
-  //   router.refresh();
-  // };
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -194,6 +210,7 @@ export function Navbar() {
       setSearchQuery("");
       setShowResults(false);
       setIsMobileSearchOpen(false);
+      setIsSearchExpanded(false);
     }
   };
 
@@ -202,6 +219,16 @@ export function Navbar() {
     setSearchQuery("");
     setShowResults(false);
     setIsMobileSearchOpen(false);
+    setIsSearchExpanded(false);
+  };
+
+  const handleSearchIconClick = () => {
+    if (!isSearchExpanded && !searchQuery) {
+      setIsSearchExpanded(true);
+      setTimeout(() => {
+        desktopSearchInputRef.current?.focus();
+      }, 100);
+    }
   };
 
   const isActive = (path: string) => pathname === path;
@@ -209,66 +236,118 @@ export function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
-          isScrolled ? "bg-[#0F0F0F]/95 backdrop-blur-md border-b border-[#2A2A2A]/50" : "bg-transparent"
+        className={`fixed top-4 left-4 right-4 z-50 transition-all duration-500 rounded-xl mx-auto md:left-6 md:right-6 lg:left-8 lg:right-8 ${
+          isScrolled
+            ? "bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl"
+            : "bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] shadow-xl"
         }`}
       >
-        <div className="px-4 sm:px-6 lg:px-12 h-[68px] flex items-center justify-between gap-4">
+        <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
-          <button
-            onClick={() => router.push("/")}
-            className="shrink-0 group flex items-center hover:opacity-90 transition-opacity"
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={(e) => {
+              handleRipple(e, "logo");
+              router.push("/");
+            }}
+            className="shrink-0 group flex items-center relative overflow-hidden rounded-lg px-2 py-1"
           >
-            <span className="text-[#14B8A6] text-2xl md:text-3xl font-semibold tracking-tight">
+            {ripples["logo"]?.map((ripple) => (
+              <motion.span
+                key={ripple.id}
+                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                style={{ left: ripple.x, top: ripple.y }}
+                initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                animate={{ width: 100, height: 100, opacity: 0 }}
+                transition={{ duration: 0.6 }}
+              />
+            ))}
+            <span className="text-[#14B8A6] text-2xl md:text-3xl font-semibold tracking-tight relative z-10">
               CINESCOPE
             </span>
-          </button>
+          </motion.button>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6 ml-8">
-            <button
-              onClick={() => router.push("/")}
-              className={`text-sm font-medium transition-colors duration-200 ${
+          <div className="hidden lg:flex items-center gap-2 ml-8">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                handleRipple(e, "nav-home");
+                router.push("/");
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 relative overflow-hidden ${
                 isActive("/")
-                  ? "text-[#14B8A6]"
-                  : "text-[#A0A0A0] hover:text-[#F5F5F5]"
+                  ? "text-[#14B8A6] bg-[#14B8A6]/10"
+                  : "text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
               }`}
             >
-              Home
-            </button>
-            <button
-              onClick={() => router.push("/tv")}
-              className={`text-sm font-medium transition-colors duration-200 ${
+              {ripples["nav-home"]?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                  animate={{ width: 100, height: 100, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              <span className="relative z-10">Home</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                handleRipple(e, "nav-tv");
+                router.push("/tv");
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 relative overflow-hidden ${
                 isActive("/tv")
-                  ? "text-[#14B8A6]"
-                  : "text-[#A0A0A0] hover:text-[#F5F5F5]"
+                  ? "text-[#14B8A6] bg-[#14B8A6]/10"
+                  : "text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
               }`}
             >
-              TV Shows
-            </button>
-            <button
-              onClick={() => router.push("/movies")}
-              className={`text-sm font-medium transition-colors duration-200 ${
-                isActive("/movies")
-                  ? "text-[#14B8A6]"
-                  : "text-[#A0A0A0] hover:text-[#F5F5F5]"
-              }`}
-            >
-              Movies
-            </button>
+              {ripples["nav-tv"]?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                  animate={{ width: 100, height: 100, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              <span className="relative z-10">TV Shows</span>
+            </motion.button>
+
             {isAuthenticated && (
-              <>
-                <button
-                  onClick={() => router.push("/watchlist")}
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isActive("/watchlist")
-                      ? "text-[#14B8A6]"
-                      : "text-[#A0A0A0] hover:text-[#F5F5F5]"
-                  }`}
-                >
-                  My List
-                </button>
-              </>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  handleRipple(e, "nav-watchlist");
+                  router.push("/watchlist");
+                }}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 relative overflow-hidden ${
+                  isActive("/watchlist")
+                    ? "text-[#14B8A6] bg-[#14B8A6]/10"
+                    : "text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
+                }`}
+              >
+                {ripples["nav-watchlist"]?.map((ripple) => (
+                  <motion.span
+                    key={ripple.id}
+                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                    initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                    animate={{ width: 100, height: 100, opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                ))}
+                <span className="relative z-10">My List</span>
+              </motion.button>
             )}
           </div>
 
@@ -281,43 +360,30 @@ export function Navbar() {
                   <motion.div
                     initial={false}
                     animate={{
-                      width: showResults || searchQuery ? 260 : 34,
+                      width: isSearchExpanded || searchQuery ? 260 : 34,
                     }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="relative"
                   >
-                      <button
-                        type="submit"
-                        onClick={() => {
-                          if (!searchQuery && !showResults) {
-                            const input =
-                              desktopSearchInputRef.current?.focus();
-
-                          }
-                        }}
-                        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[34px] h-[34px] flex items-center justify-center transition-colors duration-200 ${
-                          showResults || searchQuery
-                            ? "pointer-events-none"
-                            : "hover:text-[#14B8A6]"
-                        }`}
-                      >
-                        <Search className="w-5 h-5 text-[#A0A0A0]" />
-                      </button>
-                    {(showResults || searchQuery) && (
+                    <button
+                      type={
+                        isSearchExpanded || searchQuery ? "submit" : "button"
+                      }
+                      onClick={handleSearchIconClick}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-[34px] h-[34px] flex items-center justify-center hover:text-[#14B8A6] transition-colors duration-200 z-10"
+                    >
+                      <Search className="w-5 h-5 text-[#A0A0A0]" />
+                    </button>
+                    {(isSearchExpanded || searchQuery) && (
                       <input
-                        type="search"
+                        ref={desktopSearchInputRef}
+                        type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => searchQuery && setShowResults(true)}
-                        onBlur={(e) => {
-                          if (!e.relatedTarget) {
-                            setTimeout(() => setShowResults(false), 200);
-                          }
-                        }}
                         placeholder="Titles, people, genres"
-                        className="w-full h-[34px] pl-10 pr-10 bg-[#1A1A1A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 text-sm text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-colors duration-200"
+                        className="w-full h-[34px] pl-10 pr-3 bg-[#1A1A1A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 rounded-lg text-sm text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-all duration-200"
                         autoComplete="off"
-                        autoFocus
                       />
                     )}
                     {isSearching && (
@@ -335,14 +401,34 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 right-0 w-[300px] bg-[#1A1A1A]/95 border border-[#2A2A2A] shadow-2xl rounded-lg max-h-[500px] overflow-y-auto backdrop-blur-md"
+                    className="absolute top-full mt-2 right-0 w-[300px] bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg max-h-[500px] overflow-y-auto"
                   >
                     {searchResults.map((result) => (
-                      <button
+                      <motion.button
                         key={`${result.mediaType}-${result.id}`}
-                        onClick={() => handleResultClick(result)}
-                        className="w-full flex items-start gap-3 p-3 hover:bg-[#14B8A6]/5 transition-colors duration-200 border-b border-[#2A2A2A] last:border-0"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={(e) => {
+                          handleRipple(
+                            e,
+                            `search-result-${result.mediaType}-${result.id}`
+                          );
+                          handleResultClick(result);
+                        }}
+                        className="w-full flex items-start gap-3 p-3 hover:bg-[#14B8A6]/10 transition-all duration-200 border-b border-[#2A2A2A] last:border-0 relative overflow-hidden group"
                       >
+                        {ripples[
+                          `search-result-${result.mediaType}-${result.id}`
+                        ]?.map((ripple) => (
+                          <motion.span
+                            key={ripple.id}
+                            className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                            style={{ left: ripple.x, top: ripple.y }}
+                            initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                            animate={{ width: 150, height: 150, opacity: 0 }}
+                            transition={{ duration: 0.6 }}
+                          />
+                        ))}
                         <div className="w-16 h-24 bg-[#2A2A2A] shrink-0 overflow-hidden rounded-lg">
                           {result.poster ? (
                             <img
@@ -356,7 +442,7 @@ export function Navbar() {
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0 text-left pt-1">
+                        <div className="flex-1 min-w-0 text-left pt-1 relative z-10">
                           <p className="text-sm font-medium text-[#F5F5F5] line-clamp-2 leading-tight">
                             {result.title}
                           </p>
@@ -368,7 +454,7 @@ export function Navbar() {
                             </span>
                           </div>
                         </div>
-                      </button>
+                      </motion.button>
                     ))}
                   </motion.div>
                 )}
@@ -376,244 +462,562 @@ export function Navbar() {
             </div>
 
             {/* Mobile Search Button */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsMobileSearchOpen(true)}
               className="md:hidden w-[34px] h-[34px] flex items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200"
             >
               <Search className="w-5 h-5" />
-            </button>
-
-            {/* Notifications - Authenticated Only */}
-            {isAuthenticated && (
-              <button className="hidden md:flex w-[34px] h-[34px] items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200">
-                <Bell className="w-5 h-5" />
-              </button>
-            )}
+            </motion.button>
 
             {/* Auth Section */}
             {isAuthenticated ? (
-              <div className="relative" ref={userMenuRef}>
-                <button
+              <div
+                className="relative flex items-center gap-2"
+                ref={userMenuRef}
+              >
+                {/* Desktop Menu Strip */}
+                <div className="hidden lg:flex items-center gap-1 px-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      handleRipple(e, "menu-profile");
+                      router.push("/profile");
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#A0A0A0] hover:text-[#14B8A6] hover:bg-[#14B8A6]/10 rounded-lg transition-all duration-200 relative overflow-hidden"
+                    title="Profile Settings"
+                  >
+                    {ripples["menu-profile"]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 100, height: 100, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <User className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Profile</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      handleRipple(e, "menu-list");
+                      router.push("/watchlist");
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#A0A0A0] hover:text-[#14B8A6] hover:bg-[#14B8A6]/10 rounded-lg transition-all duration-200 relative overflow-hidden"
+                    title="My List"
+                  >
+                    {ripples["menu-list"]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 100, height: 100, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <List className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">My List</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      handleRipple(e, "menu-ratings");
+                      router.push("/ratings");
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#A0A0A0] hover:text-[#14B8A6] hover:bg-[#14B8A6]/10 rounded-lg transition-all duration-200 relative overflow-hidden"
+                    title="Ratings"
+                  >
+                    {ripples["menu-ratings"]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 100, height: 100, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <Star className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Ratings</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      handleRipple(e, "menu-creator");
+                      router.push("/creator-picks");
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#A0A0A0] hover:text-[#14B8A6] hover:bg-[#14B8A6]/10 rounded-lg transition-all duration-200 relative overflow-hidden"
+                    title="Creator Picks"
+                  >
+                    {ripples["menu-creator"]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 100, height: 100, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <Crown className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Creator Picks</span>
+                  </motion.button>
+
+                  {user?.role === "admin" && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={(e) => {
+                        handleRipple(e, "menu-admin");
+                        router.push("/admin");
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#A0A0A0] hover:text-[#14B8A6] hover:bg-[#14B8A6]/10 rounded-lg transition-all duration-200 relative overflow-hidden"
+                      title="Admin Panel"
+                    >
+                      {ripples["menu-admin"]?.map((ripple) => (
+                        <motion.span
+                          key={ripple.id}
+                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          style={{ left: ripple.x, top: ripple.y }}
+                          initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                          animate={{ width: 100, height: 100, opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                        />
+                      ))}
+                      <Shield className="w-4 h-4 relative z-10" />
+                      <span className="relative z-10">Admin</span>
+                    </motion.button>
+                  )}
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      handleRipple(e, "menu-logout");
+                      handleLogout();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#A0A0A0] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200 relative overflow-hidden"
+                    title="Logout"
+                  >
+                    {ripples["menu-logout"]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-red-400/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 100, height: 100, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <LogOut className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Logout</span>
+                  </motion.button>
+                </div>
+
+                {/* Avatar Button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 group"
                 >
-                  <Avatar className="w-8 h-8 border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors">
-                    <AvatarImage
-                      src={`https://avatar.vercel.sh/${user?.username || "user"}`}
-                    />
-                    <AvatarFallback className="bg-[#14B8A6] text-[#0F0F0F] text-xs font-semibold">
+                  <Avatar className="w-8 h-8 border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200 bg-[#14B8A6]">
+                    <AvatarFallback className="bg-[#14B8A6] text-[#0F0F0F] text-xs font-bold">
                       {user?.username?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <ChevronDown
-                    className={`hidden md:block w-4 h-4 text-[#A0A0A0] transition-all duration-200 ${
+                    className={`hidden lg:block w-4 h-4 text-[#A0A0A0] transition-all duration-200 ${
                       showUserMenu ? "rotate-180 text-[#14B8A6]" : ""
                     }`}
                   />
-                </button>
+                </motion.button>
 
-                {/* User Dropdown Menu */}
+                {/* User Dropdown Menu - Mobile */}
                 <AnimatePresence>
                   {showUserMenu && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full right-0 mt-2 w-[220px] bg-[#1A1A1A]/95 border border-[#2A2A2A] shadow-2xl overflow-hidden rounded-lg backdrop-blur-md"
+                      initial={{ opacity: 0,y: -10 }}
+animate={{ opacity: 1, y: 0 }}
+exit={{ opacity: 0, y: -10 }}
+transition={{ duration: 0.2 }}
+className="absolute top-full right-0 mt-2 w-[200px] bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl overflow-hidden rounded-lg lg:hidden"
+>
+<div className="py-1">
+<motion.button
+whileHover={{ scale: 1.02 }}
+whileTap={{ scale: 0.98 }}
+onClick={(e) => {
+handleRipple(e, "dropdown-profile");
+setShowUserMenu(false);
+router.push("/profile");
+}}
+className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] transition-all duration-200 relative overflow-hidden"
+>
+{ripples["dropdown-profile"]?.map((ripple) => (
+<motion.span
+key={ripple.id}
+className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+style={{ left: ripple.x, top: ripple.y }}
+initial={{
+width: 0,
+height: 0,
+x: "-50%",
+y: "-50%",
+}}
+animate={{ width: 150, height: 150, opacity: 0 }}
+transition={{ duration: 0.6 }}
+/>
+))}
+<User className="w-4 h-4 relative z-10" />
+<span className="relative z-10">Profile Settings</span>
+</motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={(e) => {
+                        handleRipple(e, "dropdown-watchlist");
+                        setShowUserMenu(false);
+                        router.push("/watchlist");
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] transition-all duration-200 relative overflow-hidden"
                     >
-                      {/* Menu Items */}
-                      <div className="py-1">
-                        <button
-                          onClick={() => {
-                            setShowUserMenu(false);
-                            router.push("/watchlist");
+                      {ripples["dropdown-watchlist"]?.map((ripple) => (
+                        <motion.span
+                          key={ripple.id}
+                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          style={{ left: ripple.x, top: ripple.y }}
+                          initial={{
+                            width: 0,
+                            height: 0,
+                            x: "-50%",
+                            y: "-50%",
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
-                        >
-                          <List className="w-4 h-4" />
-                          <span>My List</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowUserMenu(false);
-                            router.push("/ratings");
+                          animate={{ width: 150, height: 150, opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                        />
+                      ))}
+                      <List className="w-4 h-4 relative z-10" />
+                      <span className="relative z-10">My List</span>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={(e) => {
+                        handleRipple(e, "dropdown-ratings");
+                        setShowUserMenu(false);
+                        router.push("/ratings");
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] transition-all duration-200 relative overflow-hidden"
+                    >
+                      {ripples["dropdown-ratings"]?.map((ripple) => (
+                        <motion.span
+                          key={ripple.id}
+                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          style={{ left: ripple.x, top: ripple.y }}
+                          initial={{
+                            width: 0,
+                            height: 0,
+                            x: "-50%",
+                            y: "-50%",
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
-                        >
-                          <Star className="w-4 h-4" />
-                          <span>Ratings</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowUserMenu(false);
-                            router.push("/creator-picks");
+                          animate={{ width: 150, height: 150, opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                        />
+                      ))}
+                      <Star className="w-4 h-4 relative z-10" />
+                      <span className="relative z-10">Ratings</span>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={(e) => {
+                        handleRipple(e, "dropdown-creator");
+                        setShowUserMenu(false);
+                        router.push("/creator-picks");
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] transition-all duration-200 relative overflow-hidden"
+                    >
+                      {ripples["dropdown-creator"]?.map((ripple) => (
+                        <motion.span
+                          key={ripple.id}
+                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          style={{ left: ripple.x, top: ripple.y }}
+                          initial={{
+                            width: 0,
+                            height: 0,
+                            x: "-50%",
+                            y: "-50%",
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
+                          animate={{ width: 150, height: 150, opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                        />
+                      ))}
+                      <Crown className="w-4 h-4 relative z-10" />
+                      <span className="relative z-10">Creator Picks</span>
+                    </motion.button>
+
+                    {user?.role === "admin" && (
+                      <>
+                        <div className="h-px bg-[#2A2A2A] my-1" />
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={(e) => {
+                            handleRipple(e, "dropdown-admin");
+                            setShowUserMenu(false);
+                            router.push("/admin");
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] transition-all duration-200 relative overflow-hidden"
                         >
-                          <Crown className="w-4 h-4" />
-                          <span>Creator Picks</span>
-                        </button>
-                        {user?.role === "admin" && (
-                          <>
-                            <div className="h-px bg-[#2A2A2A] my-1" />
-                            <button
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                router.push("/admin");
+                          {ripples["dropdown-admin"]?.map((ripple) => (
+                            <motion.span
+                              key={ripple.id}
+                              className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                              style={{ left: ripple.x, top: ripple.y }}
+                              initial={{
+                                width: 0,
+                                height: 0,
+                                x: "-50%",
+                                y: "-50%",
                               }}
-                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/5 hover:text-[#14B8A6] transition-colors duration-200"
-                            >
-                              <Shield className="w-4 h-4" />
-                              <span>Admin Panel</span>
-                            </button>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Account Section */}
-                      <div className="border-t border-[#2A2A2A] py-1">
-                        <div className="px-4 py-3">
-                          <p className="text-xs text-[#A0A0A0] text-center">
-                            {user?.email}
-                          </p>
-                        </div>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full px-4 py-3 text-sm text-[#F5F5F5] hover:bg-red-500/5 hover:text-red-400 text-center transition-colors duration-200"
-                        >
-                          Sign out of CineScope
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <Link href="/login">
-                <button className="h-8 px-5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] text-sm font-semibold rounded-lg transition-all duration-200 hover:shadow-md">
-                  Sign In
-                </button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Search Overlay */}
-      <AnimatePresence>
-        {isMobileSearchOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#0F0F0F]"
-          >
-            <div className="h-full flex flex-col">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
-                <h2 className="text-lg font-semibold text-[#F5F5F5]">Search</h2>
-                <button
-                  onClick={() => {
-                    setIsMobileSearchOpen(false);
-                    setSearchQuery("");
-                  }}
-                  className="w-10 h-10 flex items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Search Input */}
-              <div className="p-4">
-                <form onSubmit={handleSearch}>
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#A0A0A0]" />
-                    <input
-                      type="search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Titles, people, genres"
-                      autoFocus
-                      className="w-full h-12 pl-12 pr-12 bg-[#1A1A1A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 text-base text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-colors duration-200 rounded-lg"
-                    />
-                    {isSearching && (
-                      <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#14B8A6] animate-spin" />
+                              animate={{
+                                width: 150,
+                                height: 150,
+                                opacity: 0,
+                              }}
+                              transition={{ duration: 0.6 }}
+                            />
+                          ))}
+                          <Shield className="w-4 h-4 relative z-10" />
+                          <span className="relative z-10">Admin Panel</span>
+                        </motion.button>
+                      </>
                     )}
                   </div>
-                </form>
-              </div>
 
-              {/* Results */}
-              <div className="flex-1 overflow-y-auto">
-                {searchResults.length > 0 ? (
-                  <div>
-                    {searchResults.map((result) => (
-                      <button
-                        key={`${result.mediaType}-${result.id}`}
-                        onClick={() => handleResultClick(result)}
-                        className="w-full flex items-start gap-4 p-4 hover:bg-[#14B8A6]/5 transition-colors duration-200 border-b border-[#2A2A2A]"
-                      >
-                        <div className="w-16 h-24 bg-[#2A2A2A] shrink-0 overflow-hidden rounded-lg">
-                          {result.poster ? (
-                            <img
-                              src={result.poster || "/placeholder.svg"}
-                              alt={result.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Film className="w-6 h-6 text-[#808080]" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0 text-left pt-1">
-                          <p className="text-base font-medium text-[#F5F5F5] line-clamp-2">
-                            {result.title}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1.5 text-sm text-[#A0A0A0]">
-                            <span>{result.year}</span>
-                            <span>•</span>
-                            <span className="capitalize">
-                              {result.mediaType === "tv" ? "Series" : "Movie"}
-                            </span>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
+                  <div className="border-t border-[#2A2A2A] py-1">
+                    <div className="px-4 py-3">
+                      <p className="text-xs text-[#A0A0A0] text-center truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={(e) => {
+                        handleRipple(e, "dropdown-logout");
+                        handleLogout();
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-[#F5F5F5] hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 relative overflow-hidden"
+                    >
+                      {ripples["dropdown-logout"]?.map((ripple) => (
+                        <motion.span
+                          key={ripple.id}
+                          className="absolute bg-red-400/30 rounded-full pointer-events-none"
+                          style={{ left: ripple.x, top: ripple.y }}
+                          initial={{
+                            width: 0,
+                            height: 0,
+                            x: "-50%",
+                            y: "-50%",
+                          }}
+                          animate={{ width: 150, height: 150, opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                        />
+                      ))}
+                      <LogOut className="w-4 h-4 relative z-10" />
+                      <span className="relative z-10">Sign out</span>
+                    </motion.button>
                   </div>
-                ) : searchQuery && !isSearching ? (
-                  <div className="text-center py-20">
-                    <p className="text-base text-[#A0A0A0]">
-                      No results found for "{searchQuery}"
-                    </p>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <Link href="/login">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => handleRipple(e, "signin")}
+              className="h-8 px-5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] text-sm font-semibold rounded-lg transition-all duration-200 relative overflow-hidden group"
+            >
+              {ripples["signin"]?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-white/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                  animate={{ width: 100, height: 100, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              {/* Gradient glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)",
+                }}
+              />
+              <span className="relative z-10">Sign In</span>
+            </motion.button>
+          </Link>
         )}
-      </AnimatePresence>
+      </div>
+    </div>
+  </nav>
 
-      {/* Auth Modal */}
-      
+  {/* Mobile Search Overlay */}
+  <AnimatePresence>
+    {isMobileSearchOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-[#0F0F0F]"
+      >
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
+            <h2 className="text-lg font-semibold text-[#F5F5F5]">
+              Search
+            </h2>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                setIsMobileSearchOpen(false);
+                setSearchQuery("");
+              }}
+              className="w-10 h-10 flex items-center justify-center text-[#A0A0A0] hover:text-[#14B8A6] transition-colors duration-200"
+            >
+              <X className="w-6 h-6" />
+            </motion.button>
+          </div>
 
-      {/* Custom Scrollbar */}
-      <style jsx global>{`
-        .overflow-y-auto::-webkit-scrollbar {
-          width: 10px;
-        }
-        .overflow-y-auto::-webkit-scrollbar-track {
-          background: #0F0F0F;
-        }
-        .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #2A2A2A;
-          border-radius: 5px;
-        }
-        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-          background: #14B8A6;
-        }
-      `}</style>
-    </>
-  );
+          {/* Search Input */}
+          <div className="p-4">
+            <form onSubmit={handleSearch}>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#A0A0A0]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Titles, people, genres"
+                  autoFocus
+                  className="w-full h-12 pl-12 pr-4 bg-[#1A1A1A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 text-base text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-all duration-200 rounded-lg"
+                />
+                {isSearching && (
+                  <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#14B8A6] animate-spin" />
+                )}
+              </div>
+            </form>
+          </div>
+
+          {/* Results */}
+          <div className="flex-1 overflow-y-auto">
+            {searchResults.length > 0 ? (
+              <div>
+                {searchResults.map((result) => (
+                  <motion.button
+                    key={`${result.mediaType}-${result.id}`}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={(e) => {
+                      handleRipple(
+                        e,
+                        `mobile-result-${result.mediaType}-${result.id}`
+                      );
+                      handleResultClick(result);
+                    }}
+                    className="w-full flex items-start gap-4 p-4 hover:bg-[#14B8A6]/5 transition-all duration-200 border-b border-[#2A2A2A] relative overflow-hidden"
+                  >
+                    {ripples[
+                      `mobile-result-${result.mediaType}-${result.id}`
+                    ]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 200, height: 200, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <div className="w-16 h-24 bg-[#2A2A2A] shrink-0 overflow-hidden rounded-lg">
+                      {result.poster ? (
+                        <img
+                          src={result.poster || "/placeholder.svg"}
+                          alt={result.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Film className="w-6 h-6 text-[#808080]" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 text-left pt-1 relative z-10">
+                      <p className="text-base font-medium text-[#F5F5F5] line-clamp-2">
+                        {result.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1.5 text-sm text-[#A0A0A0]">
+                        <span>{result.year}</span>
+                        <span>•</span>
+                        <span className="capitalize">
+                          {result.mediaType === "tv" ? "Series" : "Movie"}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            ) : searchQuery && !isSearching ? (
+              <div className="text-center py-20">
+                <p className="text-base text-[#A0A0A0]">
+                  No results found for "{searchQuery}"
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+
+  {/* Custom Scrollbar */}
+  <style jsx global>{`
+    .overflow-y-auto::-webkit-scrollbar {
+      width: 10px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-track {
+      background: #0f0f0f;
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb {
+      background: #2a2a2a;
+      border-radius: 5px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+      background: #14b8a6;
+    }
+  `}</style>
+</>
+);
 }
