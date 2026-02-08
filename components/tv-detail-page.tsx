@@ -69,7 +69,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   });
   const [activeMediaTab, setActiveMediaTab] = useState<
     "videos" | "backdrops" | "posters"
-  >("videos");
+  >("posters");
   const [seasons, setSeasons] = useState<any[]>([]);
   const [expandedSeason, setExpandedSeason] = useState<number | null>(null);
   const [seasonData, setSeasonData] = useState<{ [key: number]: any }>({});
@@ -103,74 +103,74 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   };
 
   useEffect(() => {
-  const fetchShowData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+    const fetchShowData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // 🔥 NEW: Single API call gets everything
-      const fullData = await tvAPI.getFullDetails(parseInt(tvId));
+        // 🔥 NEW: Single API call gets everything
+        const fullData = await tvAPI.getFullDetails(parseInt(tvId));
 
-      setShow(fullData.details);
-      setCast(fullData.credits.cast?.slice(0, 15) || []);
+        setShow(fullData.details);
+        setCast(fullData.credits.cast?.slice(0, 15) || []);
 
-      const trailerVideo =
-        fullData.videos.results?.find(
-          (v: Video) => v.type === "Trailer" && v.site === "YouTube"
-        ) || fullData.videos.results?.[0];
-      setTrailer(trailerVideo || null);
+        const trailerVideo =
+          fullData.videos.results?.find(
+            (v: Video) => v.type === "Trailer" && v.site === "YouTube",
+          ) || fullData.videos.results?.[0];
+        setTrailer(trailerVideo || null);
 
-      const inProviders = fullData.providers.results?.IN?.flatrate || [];
-      setProviders(inProviders);
+        const inProviders = fullData.providers.results?.IN?.flatrate || [];
+        setProviders(inProviders);
 
-      setImages({
-        backdrops: fullData.images.backdrops?.slice(0, 12) || [],
-        posters: fullData.images.posters?.slice(0, 12) || [],
-      });
-
-      // Create seasons array
-      const seasonsArr = Array.from(
-        { length: fullData.details.number_of_seasons },
-        (_, i) => ({
-          season_number: i + 1,
-          name: `Season ${i + 1}`,
-        })
-      );
-      setSeasons(seasonsArr);
-
-      setIsLoading(false);
-
-      // 🔥 LAZY LOAD: Recommendations after main content loads
-      setTimeout(() => {
-        const transformShow = (s: any) => ({
-          id: s.id,
-          title: s.name,
-          rating: s.vote_average,
-          poster: s.poster_path
-            ? `https://image.tmdb.org/t/p/w500${s.poster_path}`
-            : "",
-          year: s.first_air_date
-            ? new Date(s.first_air_date).getFullYear()
-            : 2024,
+        setImages({
+          backdrops: fullData.images.backdrops?.slice(0, 12) || [],
+          posters: fullData.images.posters?.slice(0, 12) || [],
         });
 
-        setRecommendations(
-          fullData.recommendations.results?.slice(0, 12).map(transformShow) || []
+        // Create seasons array
+        const seasonsArr = Array.from(
+          { length: fullData.details.number_of_seasons },
+          (_, i) => ({
+            season_number: i + 1,
+            name: `Season ${i + 1}`,
+          }),
         );
-        setSimilarShows(
-          fullData.similar.results?.slice(0, 12).map(transformShow) || []
-        );
-      }, 100);
+        setSeasons(seasonsArr);
 
-    } catch (err) {
-      console.error("Failed to fetch TV show data:", err);
-      setError("Failed to load TV show details. Please try again.");
-      setIsLoading(false);
-    }
-  };
+        setIsLoading(false);
 
-  fetchShowData();
-}, [tvId]);
+        // 🔥 LAZY LOAD: Recommendations after main content loads
+        setTimeout(() => {
+          const transformShow = (s: any) => ({
+            id: s.id,
+            title: s.name,
+            rating: s.vote_average,
+            poster: s.poster_path
+              ? `https://image.tmdb.org/t/p/w500${s.poster_path}`
+              : "",
+            year: s.first_air_date
+              ? new Date(s.first_air_date).getFullYear()
+              : 2024,
+          });
+
+          setRecommendations(
+            fullData.recommendations.results?.slice(0, 12).map(transformShow) ||
+              [],
+          );
+          setSimilarShows(
+            fullData.similar.results?.slice(0, 12).map(transformShow) || [],
+          );
+        }, 100);
+      } catch (err) {
+        console.error("Failed to fetch TV show data:", err);
+        setError("Failed to load TV show details. Please try again.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchShowData();
+  }, [tvId]);
 
   const handleAddToWatchlist = async () => {
     setIsAddingToWatchlist(true);
@@ -331,15 +331,23 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
         <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/90 via-transparent to-transparent" />
 
         {trailerUrl && (
-          <motion.a
-            href={`#trailer`}
+          <motion.button
+            onClick={() => {
+              const trailerElement = document.getElementById("trailer");
+              if (trailerElement) {
+                trailerElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
             className="absolute bottom-8 right-8 w-16 h-16 bg-[#14B8A6]/20 backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/50 hover:bg-[#14B8A6]/30 transition-all duration-200 group"
           >
             <Play className="w-6 h-6 text-[#14B8A6] ml-1 group-hover:scale-110 transition-transform" />
-          </motion.a>
+          </motion.button>
         )}
       </motion.div>
 
@@ -526,7 +534,9 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-6">Available On</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-6">
+              Available On
+            </h2>
             <div className="flex flex-wrap gap-4">
               {providers.map((provider) => (
                 <div

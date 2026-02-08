@@ -417,7 +417,8 @@ export const tvAPI = {
 export const watchlistAPI = {
     get: async () => {
         const res = await authFetch(`${API_BASE_URL}/watchlist`)
-        return res.json()
+        const data = await res.json()
+        return data.results || []  // <- CHANGED: extract results array
     },
 
     add: async (data: { tmdb_id: number; media_type: 'movie' | 'tv' }) => {
@@ -438,11 +439,13 @@ export const watchlistAPI = {
     },
 }
 
+
 // Ratings API (protected)
 export const ratingsAPI = {
     get: async () => {
         const res = await authFetch(`${API_BASE_URL}/ratings`)
-        return res.json()
+        const data = await res.json()
+        return data.results || []  // <- CHANGED: extract results array
     },
 
     create: async (data: { tmdb_id: number; media_type: 'movie' | 'tv'; rating: string }) => {

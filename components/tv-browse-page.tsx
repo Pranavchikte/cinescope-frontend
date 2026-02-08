@@ -3,7 +3,7 @@
 import { tvAPI, getAccessToken } from "@/lib/api";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Play, Info } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
 import { MovieGrid } from "@/components/movie-grid";
 import { FilterBar, FilterState } from "@/components/filter-bar";
@@ -14,16 +14,166 @@ interface TMDBShow {
   vote_average: number;
   poster_path: string;
   first_air_date: string;
+  backdrop_path?: string;
+  overview?: string;
+}
+
+interface FeaturedShow {
+  id: number;
+  title: string;
+  overview: string;
+  backdrop: string;
+  rating: number;
+  year: number;
+  genres?: string[];
+}
+
+function HeroBanner({
+  show,
+  ripples,
+  handleRipple,
+}: {
+  show: FeaturedShow | null;
+  ripples: { [key: string]: { x: number; y: number; id: number }[] };
+  handleRipple: (e: React.MouseEvent, key: string) => void;
+}) {
+  if (!show) {
+    return (
+      <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] bg-[#1A1A1A] animate-pulse">
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0F0F0F] to-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] overflow-hidden">
+      <div className="absolute inset-0">
+        <img
+          src={show.backdrop || "/placeholder.svg"}
+          alt={show.title}
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/95 via-[#0F0F0F]/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0F0F0F] to-transparent" />
+      </div>
+
+      <div className="relative h-full flex items-end pb-12 sm:pb-16 lg:pb-24 px-6 sm:px-8 lg:px-16">
+        <div className="max-w-2xl space-y-4 sm:space-y-5">
+          <motion.h1
+            key={show.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#F5F5F5] leading-tight text-balance"
+          >
+            {show.title}
+          </motion.h1>
+
+          <motion.div
+            key={`${show.id}-meta`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center gap-4 text-sm sm:text-base flex-wrap"
+          >
+            <span className="text-[#14B8A6] font-medium text-lg">
+              {Math.round(show.rating * 10)}%
+            </span>
+            <span className="text-[#A0A0A0] text-sm">{show.year}</span>
+            {show.genres && show.genres.length > 0 && (
+              <>
+                <div className="w-1 h-1 rounded-full bg-[#2A2A2A]" />
+                <span className="text-[#A0A0A0] text-sm">
+                  {show.genres.slice(0, 2).join(" · ")}
+                </span>
+              </>
+            )}
+          </motion.div>
+
+          <motion.p
+            key={`${show.id}-overview`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-sm sm:text-base lg:text-base text-[#A0A0A0] line-clamp-2 sm:line-clamp-3 max-w-lg leading-relaxed"
+          >
+            {show.overview}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex items-center gap-3 pt-3"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => handleRipple(e, "watch-now")}
+              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 relative overflow-hidden group"
+            >
+              {ripples["watch-now"]?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-white/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                  animate={{ width: 200, height: 200, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              {/* Gradient glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)",
+                }}
+              />
+              <Play className="w-5 h-5 sm:w-5 sm:h-5 fill-current relative z-10" />
+              <span className="relative z-10">Watch Now</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => handleRipple(e, "details")}
+              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#1A1A1A]/50 border border-[#2A2A2A] hover:border-[#14B8A6]/50 hover:text-[#14B8A6] text-[#F5F5F5] rounded-lg text-sm sm:text-base font-medium transition-all duration-200 backdrop-blur-xl relative overflow-hidden hover:bg-[#14B8A6]/5"
+            >
+              {ripples["details"]?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                  animate={{ width: 200, height: 200, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              <Info className="w-5 h-5 sm:w-5 sm:h-5 relative z-10" />
+              <span className="relative z-10">Details</span>
+            </motion.button>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function ScrollContainer({
   title,
   shows,
   isLoading = false,
+  ripples,
+  handleRipple,
 }: {
   title: string;
   shows: any[];
   isLoading?: boolean;
+  ripples: { [key: string]: { x: number; y: number; id: number }[] };
+  handleRipple: (e: React.MouseEvent, key: string) => void;
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -72,14 +222,11 @@ function ScrollContainer({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Section Header - Minimalist Style */}
       <h2 className="text-xl md:text-2xl font-semibold text-[#F5F5F5] px-6 sm:px-8 lg:px-16">
         {title}
       </h2>
 
-      {/* Scroll Container */}
       <div className="relative">
-        {/* Left Scroll Button - Subtle Hover */}
         <AnimatePresence>
           {isHovered && canScrollLeft && (
             <motion.button
@@ -87,17 +234,33 @@ function ScrollContainer({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              onClick={() => scroll("left")}
-              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-background via-background/40 to-transparent items-center justify-start pl-3 hover:from-background transition-all"
+              onClick={(e) => {
+                handleRipple(e, `scroll-left-${title}`);
+                scroll("left");
+              }}
+              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-start pl-3 hover:from-[#0F0F0F] transition-all"
             >
-              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
-                <ChevronLeft className="w-5 h-5 text-foreground" />
-              </div>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="w-9 h-9 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 hover:border-[#14B8A6]/50 border border-[#2A2A2A] rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-xl relative overflow-hidden group/btn"
+              >
+                {ripples[`scroll-left-${title}`]?.map((ripple) => (
+                  <motion.span
+                    key={ripple.id}
+                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                    initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                    animate={{ width: 50, height: 50, opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                ))}
+                <ChevronLeft className="w-5 h-5 text-[#F5F5F5] group-hover/btn:text-[#14B8A6] transition-colors relative z-10" />
+              </motion.div>
             </motion.button>
           )}
         </AnimatePresence>
 
-        {/* Right Scroll Button - Subtle Hover */}
         <AnimatePresence>
           {isHovered && canScrollRight && (
             <motion.button
@@ -105,17 +268,33 @@ function ScrollContainer({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              onClick={() => scroll("right")}
-              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-background via-background/40 to-transparent items-center justify-end pr-3 hover:from-background transition-all"
+              onClick={(e) => {
+                handleRipple(e, `scroll-right-${title}`);
+                scroll("right");
+              }}
+              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-end pr-3 hover:from-[#0F0F0F] transition-all"
             >
-              <div className="w-9 h-9 bg-secondary/50 hover:bg-primary hover:text-primary-foreground rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-md">
-                <ChevronRight className="w-5 h-5 text-foreground" />
-              </div>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="w-9 h-9 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 hover:border-[#14B8A6]/50 border border-[#2A2A2A] rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-xl relative overflow-hidden group/btn"
+              >
+                {ripples[`scroll-right-${title}`]?.map((ripple) => (
+                  <motion.span
+                    key={ripple.id}
+                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                    initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                    animate={{ width: 50, height: 50, opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                ))}
+                <ChevronRight className="w-5 h-5 text-[#F5F5F5] group-hover/btn:text-[#14B8A6] transition-colors relative z-10" />
+              </motion.div>
             </motion.button>
           )}
         </AnimatePresence>
 
-        {/* Cards Container */}
         <div
           ref={scrollContainerRef}
           className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-6 sm:px-8 lg:px-16 pb-6"
@@ -143,15 +322,17 @@ function ScrollContainer({
               ))}
         </div>
 
-        {/* Gradient Fade Edges - Mobile */}
-        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent" />
-        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#0F0F0F] to-transparent" />
+        <div className="md:hidden pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#0F0F0F] to-transparent" />
       </div>
     </div>
   );
 }
 
 export function TVBrowsePage() {
+  const [featuredShow, setFeaturedShow] = useState<FeaturedShow | null>(null);
+  const [featuredShows, setFeaturedShows] = useState<FeaturedShow[]>([]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [trendingShows, setTrendingShows] = useState<any[]>([]);
   const [popularShows, setPopularShows] = useState<any[]>([]);
   const [filteredShows, setFilteredShows] = useState<any[]>([]);
@@ -177,6 +358,30 @@ export function TVBrowsePage() {
     runtime_max: null,
   });
 
+  // Ripple state
+  const [ripples, setRipples] = useState<{
+    [key: string]: { x: number; y: number; id: number }[];
+  }>({});
+
+  const handleRipple = (e: React.MouseEvent, key: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rippleId = Date.now();
+
+    setRipples((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] || []), { x, y, id: rippleId }],
+    }));
+
+    setTimeout(() => {
+      setRipples((prev) => ({
+        ...prev,
+        [key]: (prev[key] || []).filter((r) => r.id !== rippleId),
+      }));
+    }, 600);
+  };
+
   const transformShow = (s: TMDBShow) => ({
     id: s.id,
     title: s.name,
@@ -189,13 +394,28 @@ export function TVBrowsePage() {
       : 2024,
   });
 
-  // Load critical data first
+  // Auto-rotate hero banner every 8 seconds
+  useEffect(() => {
+    if (featuredShows.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentHeroIndex((prev) => (prev + 1) % featuredShows.length);
+      }, 8000);
+      return () => clearInterval(interval);
+    }
+  }, [featuredShows.length]);
+
+  // Update featured show when index changes
+  useEffect(() => {
+    if (featuredShows.length > 0) {
+      setFeaturedShow(featuredShows[currentHeroIndex]);
+    }
+  }, [currentHeroIndex, featuredShows]);
+
   useEffect(() => {
     const fetchCriticalData = async () => {
       try {
         setIsLoading(true);
 
-        // Only fetch trending first
         const trending = await tvAPI.getTrending().catch((err) => {
           console.error("Trending TV fetch error:", err);
           return { results: [] };
@@ -208,9 +428,29 @@ export function TVBrowsePage() {
         }
 
         setTrendingShows(trending.results.map(transformShow));
+
+        // Create featured shows array from top 5 trending
+        if (trending.results.length > 0) {
+          const topFeatured = trending.results
+            .slice(0, 5)
+            .map((featured: TMDBShow) => ({
+              id: featured.id,
+              title: featured.name,
+              overview: featured.overview || "",
+              backdrop: featured.backdrop_path
+                ? `https://image.tmdb.org/t/p/original${featured.backdrop_path}`
+                : "",
+              rating: featured.vote_average,
+              year: featured.first_air_date
+                ? new Date(featured.first_air_date).getFullYear()
+                : 2024,
+            }));
+          setFeaturedShows(topFeatured);
+          setFeaturedShow(topFeatured[0]);
+        }
+
         setIsLoading(false);
 
-        // Lazy load secondary data
         setTimeout(async () => {
           try {
             const [genresData, popular, providersData] = await Promise.all([
@@ -233,7 +473,6 @@ export function TVBrowsePage() {
           }
         }, 200);
 
-        // Load personalized if authenticated
         const token = getAccessToken();
         if (token) {
           setIsAuthenticated(true);
@@ -257,7 +496,6 @@ export function TVBrowsePage() {
     fetchCriticalData();
   }, []);
 
-  // Handle filter changes
   useEffect(() => {
     const fetchFilteredData = async () => {
       try {
@@ -310,7 +548,15 @@ export function TVBrowsePage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">
-      <div className="sticky top-0 z-40 bg-[#0F0F0F]/95 backdrop-blur-md border-b border-[#2A2A2A]/50">
+      {!hasActiveFilters && (
+        <HeroBanner
+          show={featuredShow}
+          ripples={ripples}
+          handleRipple={handleRipple}
+        />
+      )}
+
+      <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 backdrop-blur-md border-b border-[#2A2A2A]">
         <FilterBar
           onFilterChange={handleFilterChange}
           mediaType="tv"
@@ -327,6 +573,8 @@ export function TVBrowsePage() {
                 title="Recommended For You"
                 shows={personalizedShows}
                 isLoading={false}
+                ripples={ripples}
+                handleRipple={handleRipple}
               />
             )}
 
@@ -334,12 +582,16 @@ export function TVBrowsePage() {
               title="Trending Now"
               shows={trendingShows}
               isLoading={isLoading}
+              ripples={ripples}
+              handleRipple={handleRipple}
             />
 
             <ScrollContainer
-              title="Popular on Netflix"
+              title="Popular"
               shows={popularShows}
               isLoading={false}
+              ripples={ripples}
+              handleRipple={handleRipple}
             />
           </div>
         )}

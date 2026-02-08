@@ -65,11 +65,14 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   });
   const [activeMediaTab, setActiveMediaTab] = useState<
     "videos" | "backdrops" | "posters"
-  >("videos");
+  >("posters");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRatingSheet, setShowRatingSheet] = useState(false);
   const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false);
+  const [ripples, setRipples] = useState<{
+    [key: string]: { x: number; y: number; id: number }[];
+  }>({});
   const [showToast, setShowToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -89,68 +92,91 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
     },
   ];
 
+  // Ripple effect handler
+  const handleRipple = (e: React.MouseEvent, key: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rippleId = Date.now();
+
+    setRipples((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] || []), { x, y, id: rippleId }],
+    }));
+
+    setTimeout(() => {
+      setRipples((prev) => ({
+        ...prev,
+        [key]: (prev[key] || []).filter((r) => r.id !== rippleId),
+      }));
+    }, 600);
+  };
+
   const showNotification = (message: string, type: "success" | "error") => {
     setShowToast({ message, type });
     setTimeout(() => setShowToast(null), 3000);
   };
 
   useEffect(() => {
-  const fetchMovieData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+    const fetchMovieData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // 🔥 NEW: Single API call gets everything
-      const fullData = await moviesAPI.getFullDetails(parseInt(movieId));
+        // 🔥 NEW: Single API call gets everything
+        const fullData = await moviesAPI.getFullDetails(parseInt(movieId));
 
-      setMovie(fullData.details);
-      setCast(fullData.credits.cast?.slice(0, 15) || []);
+        setMovie(fullData.details);
+        setCast(fullData.credits.cast?.slice(0, 15) || []);
 
-      const trailerVideo =
-        fullData.videos.results?.find(
-          (v: Video) => v.type === "Trailer" && v.site === "YouTube"
-        ) || fullData.videos.results?.[0];
-      setTrailer(trailerVideo || null);
+        const trailerVideo =
+          fullData.videos.results?.find(
+            (v: Video) => v.type === "Trailer" && v.site === "YouTube",
+          ) || fullData.videos.results?.[0];
+        setTrailer(trailerVideo || null);
 
-      const inProviders = fullData.providers.results?.IN?.flatrate || [];
-      setProviders(inProviders);
+        const inProviders = fullData.providers.results?.IN?.flatrate || [];
+        setProviders(inProviders);
 
-      setImages({
-        backdrops: fullData.images.backdrops?.slice(0, 12) || [],
-        posters: fullData.images.posters?.slice(0, 12) || [],
-      });
-
-      setIsLoading(false);
-
-      // 🔥 LAZY LOAD: Recommendations after main content loads
-      setTimeout(() => {
-        const transformMovie = (m: any) => ({
-          id: m.id,
-          title: m.title,
-          rating: m.vote_average,
-          poster: m.poster_path
-            ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-            : "",
-          year: m.release_date ? new Date(m.release_date).getFullYear() : 2024,
+        setImages({
+          backdrops: fullData.images.backdrops?.slice(0, 12) || [],
+          posters: fullData.images.posters?.slice(0, 12) || [],
         });
 
-        setRecommendations(
-          fullData.recommendations.results?.slice(0, 12).map(transformMovie) || []
-        );
-        setSimilarMovies(
-          fullData.similar.results?.slice(0, 12).map(transformMovie) || []
-        );
-      }, 100);
+        setIsLoading(false);
 
-    } catch (err) {
-      console.error("Failed to fetch movie data:", err);
-      setError("Failed to load movie details. Please try again.");
-      setIsLoading(false);
-    }
-  };
+        // 🔥 LAZY LOAD: Recommendations after main content loads
+        setTimeout(() => {
+          const transformMovie = (m: any) => ({
+            id: m.id,
+            title: m.title,
+            rating: m.vote_average,
+            poster: m.poster_path
+              ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+              : "",
+            year: m.release_date
+              ? new Date(m.release_date).getFullYear()
+              : 2024,
+          });
 
-  fetchMovieData();
-}, [movieId]);
+          setRecommendations(
+            fullData.recommendations.results
+              ?.slice(0, 12)
+              .map(transformMovie) || [],
+          );
+          setSimilarMovies(
+            fullData.similar.results?.slice(0, 12).map(transformMovie) || [],
+          );
+        }, 100);
+      } catch (err) {
+        console.error("Failed to fetch movie data:", err);
+        setError("Failed to load movie details. Please try again.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovieData();
+  }, [movieId]);
 
   const handleAddToWatchlist = async () => {
     setIsAddingToWatchlist(true);
@@ -258,10 +284,26 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        onClick={() => router.back()}
-        className="fixed top-20 left-4 z-50 w-11 h-11 bg-[#1A1A1A]/70 backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
+        onClick={(e) => {
+          handleRipple(e, "back-btn");
+          router.back();
+        }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed top-20 left-4 z-50 w-11 h-11 bg-[#1A1A1A]/70 backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200 relative overflow-hidden group"
       >
-        <ArrowLeft className="w-5 h-5 text-[#F5F5F5]" />
+        {/* Ripple effect */}
+        {ripples["back-btn"]?.map((ripple) => (
+          <motion.span
+            key={ripple.id}
+            className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+            style={{ left: ripple.x, top: ripple.y }}
+            initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+            animate={{ width: 60, height: 60, opacity: 0 }}
+            transition={{ duration: 0.6 }}
+          />
+        ))}
+        <ArrowLeft className="w-5 h-5 text-[#F5F5F5] relative z-10" />
       </motion.button>
 
       {/* Hero Section - Responsive Height */}
@@ -497,8 +539,16 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
         {/* Play Trailer FAB */}
         {trailerUrl && (
-          <motion.a
-            href="#trailer"
+          <motion.button
+            onClick={() => {
+              const trailerElement = document.getElementById("trailer");
+              if (trailerElement) {
+                trailerElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
@@ -508,7 +558,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               className="w-5 h-5 md:w-6 md:h-6 ml-0.5"
               fill="currentColor"
             />
-          </motion.a>
+          </motion.button>
         )}
       </div>
 

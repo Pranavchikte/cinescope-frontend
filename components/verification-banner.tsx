@@ -1,60 +1,86 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Mail, RefreshCw, X, CheckCircle2 } from "lucide-react"
-import { authAPI } from "@/lib/api"
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, RefreshCw, X, CheckCircle2 } from "lucide-react";
+import { authAPI } from "@/lib/api";
 
 export function VerificationBanner() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [isVerified, setIsVerified] = useState(true)
-  const [isResending, setIsResending] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [isDismissed, setIsDismissed] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
+  const [isVerified, setIsVerified] = useState(true);
+  const [isResending, setIsResending] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  // Ripple state
+  const [ripples, setRipples] = useState<{
+    [key: string]: { x: number; y: number; id: number }[];
+  }>({});
+
+  const handleRipple = (e: React.MouseEvent, key: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rippleId = Date.now();
+
+    setRipples((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] || []), { x, y, id: rippleId }],
+    }));
+
+    setTimeout(() => {
+      setRipples((prev) => ({
+        ...prev,
+        [key]: (prev[key] || []).filter((r) => r.id !== rippleId),
+      }));
+    }, 600);
+  };
 
   useEffect(() => {
     const checkVerificationStatus = async () => {
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) return
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
 
-        const user = await authAPI.getCurrentUser()
+        const user = await authAPI.getCurrentUser();
         if (!user.is_email_verified) {
-          setIsVerified(false)
-          
-          const dismissed = sessionStorage.getItem('verification_banner_dismissed')
+          setIsVerified(false);
+
+          const dismissed = sessionStorage.getItem(
+            "verification_banner_dismissed"
+          );
           if (!dismissed) {
-            setIsVisible(true)
+            setIsVisible(true);
           }
         }
       } catch (err) {
-        setIsVisible(false)
+        setIsVisible(false);
       }
-    }
+    };
 
-    checkVerificationStatus()
-  }, [])
+    checkVerificationStatus();
+  }, []);
 
   const handleResend = async () => {
-    setIsResending(true)
+    setIsResending(true);
     try {
-      await authAPI.resendVerification()
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 4000)
+      await authAPI.resendVerification();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 4000);
     } catch (err) {
-      console.error("Failed to resend verification email:", err)
+      console.error("Failed to resend verification email:", err);
     } finally {
-      setIsResending(false)
+      setIsResending(false);
     }
-  }
+  };
 
   const handleDismiss = () => {
-    setIsDismissed(true)
-    setIsVisible(false)
-    sessionStorage.setItem('verification_banner_dismissed', 'true')
-  }
+    setIsDismissed(true);
+    setIsVisible(false);
+    sessionStorage.setItem("verification_banner_dismissed", "true");
+  };
 
-  const shouldShow = isVisible && !isVerified && !isDismissed
+  const shouldShow = isVisible && !isVerified && !isDismissed;
 
   return (
     <AnimatePresence>
@@ -66,7 +92,7 @@ export function VerificationBanner() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50"
         >
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg shadow-2xl">
+          <div className="bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] rounded-lg shadow-2xl">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-start justify-between gap-3 mb-3">
@@ -84,12 +110,27 @@ export function VerificationBanner() {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleDismiss}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-[#14B8A6]/10 rounded-lg transition-colors duration-200 shrink-0"
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => {
+                    handleRipple(e, "dismiss");
+                    handleDismiss();
+                  }}
+                  className="w-7 h-7 flex items-center justify-center hover:bg-[#14B8A6]/10 rounded-lg transition-colors duration-200 shrink-0 relative overflow-hidden"
                 >
-                  <X className="w-4 h-4 text-[#A0A0A0] hover:text-[#14B8A6]" />
-                </button>
+                  {ripples["dismiss"]?.map((ripple) => (
+                    <motion.span
+                      key={ripple.id}
+                      className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                      style={{ left: ripple.x, top: ripple.y }}
+                      initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                      animate={{ width: 50, height: 50, opacity: 0 }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  ))}
+                  <X className="w-4 h-4 text-[#A0A0A0] hover:text-[#14B8A6] relative z-10" />
+                </motion.button>
               </div>
 
               {/* Body */}
@@ -109,14 +150,48 @@ export function VerificationBanner() {
                     Email sent successfully
                   </motion.div>
                 ) : (
-                  <button
-                    onClick={handleResend}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      handleRipple(e, "resend");
+                      handleResend();
+                    }}
                     disabled={isResending}
-                    className="h-9 px-4 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#1A1A1A] disabled:border disabled:border-[#2A2A2A] disabled:cursor-not-allowed text-[#0F0F0F] disabled:text-[#A0A0A0] rounded-lg text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
+                    className="h-9 px-4 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#1A1A1A] disabled:border disabled:border-[#2A2A2A] disabled:cursor-not-allowed text-[#0F0F0F] disabled:text-[#A0A0A0] rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
                   >
-                    <RefreshCw className={`w-4 h-4 ${isResending ? 'animate-spin' : ''}`} />
-                    {isResending ? 'Sending...' : 'Resend Email'}
-                  </button>
+                    {ripples["resend"]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-white/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 100, height: 100, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    {/* Gradient glow */}
+                    {!isResending && (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
+                          style={{
+                            background:
+                              "radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)",
+                          }}
+                        />
+                      </>
+                    )}
+                    <RefreshCw
+                      className={`w-4 h-4 relative z-10 ${
+                        isResending ? "animate-spin" : ""
+                      }`}
+                    />
+                    <span className="relative z-10">
+                      {isResending ? "Sending..." : "Resend Email"}
+                    </span>
+                  </motion.button>
                 )}
               </div>
             </div>
@@ -124,5 +199,5 @@ export function VerificationBanner() {
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

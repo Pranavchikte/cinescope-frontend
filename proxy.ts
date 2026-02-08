@@ -5,20 +5,30 @@ export function proxy(request: NextRequest) {
     const token = request.cookies.get("access_token")?.value;
     const { pathname } = request.nextUrl;
 
-    // Public routes (no auth needed)
-    const publicRoutes = ["/login", "/signup"];
-    const isPublicRoute = publicRoutes.includes(pathname);
+    // Always allow public routes
+    const publicRoutes = [
+        "/login",
+        "/signup",
+        "/forgot-password",
+        "/reset-password",
+        "/verify-email",
+    ];
 
-    // If user has token and tries to access login/signup, redirect to home
-    if (token && isPublicRoute) {
-        return NextResponse.redirect(new URL("/", request.url));
+    const isPublicRoute = publicRoutes.some(route =>
+        pathname === route || pathname.startsWith(route + "/")
+    );
+
+    // 🚨 CRITICAL RULE: Never block public routes
+    if (isPublicRoute) {
+        return NextResponse.next();
     }
 
-    // If user has no token and tries to access protected routes, redirect to login
-    if (!token && !isPublicRoute && pathname !== "/") {
+    // Protect private routes
+    if (!token) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
+    // Let backend decide if token is valid
     return NextResponse.next();
 }
 
