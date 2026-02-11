@@ -105,6 +105,7 @@ const authFetch = async (url: string, options: RequestInit = {}): Promise<Respon
 }
 
 // Auth API
+// Auth API
 export const authAPI = {
     register: async (data: { username: string; email: string; password: string }) => {
         const res = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -112,7 +113,10 @@ export const authAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
-        if (!res.ok) throw new Error(await res.text())
+        if (!res.ok) {
+            const error = await res.json()
+            throw new Error(error.detail || 'Registration failed')
+        }
         return res.json()
     },
 
@@ -122,7 +126,10 @@ export const authAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
-        if (!res.ok) throw new Error(await res.text())
+        if (!res.ok) {
+            const error = await res.json()
+            throw new Error(error.detail || 'Login failed')
+        }
         const tokens = await res.json()
         setTokens(tokens.access_token, tokens.refresh_token)
         return tokens

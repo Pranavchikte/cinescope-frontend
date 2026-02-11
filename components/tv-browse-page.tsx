@@ -32,10 +32,12 @@ function HeroBanner({
   show,
   ripples,
   handleRipple,
+  isMobile,
 }: {
   show: FeaturedShow | null;
   ripples: { [key: string]: { x: number; y: number; id: number }[] };
   handleRipple: (e: React.MouseEvent, key: string) => void;
+  isMobile: boolean;
 }) {
   if (!show) {
     return (
@@ -53,9 +55,10 @@ function HeroBanner({
           alt={show.title}
           className="w-full h-full object-cover object-center"
         />
+        {/* Mobile: 2 gradients, Desktop: Full gradients */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/95 via-[#0F0F0F]/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0F0F0F] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/95 via-[#0F0F0F]/40 to-transparent md:block" />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0F0F0F] to-transparent md:hidden" />
       </div>
 
       <div className="relative h-full flex items-end pb-12 sm:pb-16 lg:pb-24 px-6 sm:px-8 lg:px-16">
@@ -113,7 +116,8 @@ function HeroBanner({
               onClick={(e) => handleRipple(e, "watch-now")}
               className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 relative overflow-hidden group"
             >
-              {ripples["watch-now"]?.map((ripple) => (
+              {/* Ripple - desktop only */}
+              {!isMobile && ripples["watch-now"]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
                   className="absolute bg-white/30 rounded-full pointer-events-none"
@@ -123,10 +127,10 @@ function HeroBanner({
                   transition={{ duration: 0.6 }}
                 />
               ))}
-              {/* Gradient glow */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              {/* Blur - desktop only */}
               <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:blur-lg"
                 style={{
                   background:
                     "radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)",
@@ -140,9 +144,10 @@ function HeroBanner({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={(e) => handleRipple(e, "details")}
-              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#1A1A1A]/50 border border-[#2A2A2A] hover:border-[#14B8A6]/50 hover:text-[#14B8A6] text-[#F5F5F5] rounded-lg text-sm sm:text-base font-medium transition-all duration-200 backdrop-blur-xl relative overflow-hidden hover:bg-[#14B8A6]/5"
+              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#1A1A1A]/50 border border-[#2A2A2A] hover:border-[#14B8A6]/50 hover:text-[#14B8A6] text-[#F5F5F5] rounded-lg text-sm sm:text-base font-medium transition-all duration-200 md:backdrop-blur-xl relative overflow-hidden hover:bg-[#14B8A6]/5"
             >
-              {ripples["details"]?.map((ripple) => (
+              {/* Ripple - desktop only */}
+              {!isMobile && ripples["details"]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
                   className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
@@ -168,12 +173,14 @@ function ScrollContainer({
   isLoading = false,
   ripples,
   handleRipple,
+  isMobile,
 }: {
   title: string;
   shows: any[];
   isLoading?: boolean;
   ripples: { [key: string]: { x: number; y: number; id: number }[] };
   handleRipple: (e: React.MouseEvent, key: string) => void;
+  isMobile: boolean;
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -227,73 +234,78 @@ function ScrollContainer({
       </h2>
 
       <div className="relative">
-        <AnimatePresence>
-          {isHovered && canScrollLeft && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={(e) => {
-                handleRipple(e, `scroll-left-${title}`);
-                scroll("left");
-              }}
-              className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-start pl-3 hover:from-[#0F0F0F] transition-all"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-9 h-9 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 hover:border-[#14B8A6]/50 border border-[#2A2A2A] rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-xl relative overflow-hidden group/btn"
-              >
-                {ripples[`scroll-left-${title}`]?.map((ripple) => (
-                  <motion.span
-                    key={ripple.id}
-                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
-                    style={{ left: ripple.x, top: ripple.y }}
-                    initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
-                    animate={{ width: 50, height: 50, opacity: 0 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                ))}
-                <ChevronLeft className="w-5 h-5 text-[#F5F5F5] group-hover/btn:text-[#14B8A6] transition-colors relative z-10" />
-              </motion.div>
-            </motion.button>
-          )}
-        </AnimatePresence>
+        {/* Desktop only: AnimatePresence */}
+        {!isMobile ? (
+          <>
+            <AnimatePresence>
+              {isHovered && canScrollLeft && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={(e) => {
+                    handleRipple(e, `scroll-left-${title}`);
+                    scroll("left");
+                  }}
+                  className="hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-start pl-3 hover:from-[#0F0F0F] transition-all"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-9 h-9 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 hover:border-[#14B8A6]/50 border border-[#2A2A2A] rounded-full flex items-center justify-center transition-all duration-200 md:backdrop-blur-xl relative overflow-hidden group/btn"
+                  >
+                    {ripples[`scroll-left-${title}`]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 50, height: 50, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <ChevronLeft className="w-5 h-5 text-[#F5F5F5] group-hover/btn:text-[#14B8A6] transition-colors relative z-10" />
+                  </motion.div>
+                </motion.button>
+              )}
+            </AnimatePresence>
 
-        <AnimatePresence>
-          {isHovered && canScrollRight && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={(e) => {
-                handleRipple(e, `scroll-right-${title}`);
-                scroll("right");
-              }}
-              className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-end pr-3 hover:from-[#0F0F0F] transition-all"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-9 h-9 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 hover:border-[#14B8A6]/50 border border-[#2A2A2A] rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-xl relative overflow-hidden group/btn"
-              >
-                {ripples[`scroll-right-${title}`]?.map((ripple) => (
-                  <motion.span
-                    key={ripple.id}
-                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
-                    style={{ left: ripple.x, top: ripple.y }}
-                    initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
-                    animate={{ width: 50, height: 50, opacity: 0 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                ))}
-                <ChevronRight className="w-5 h-5 text-[#F5F5F5] group-hover/btn:text-[#14B8A6] transition-colors relative z-10" />
-              </motion.div>
-            </motion.button>
-          )}
-        </AnimatePresence>
+            <AnimatePresence>
+              {isHovered && canScrollRight && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={(e) => {
+                    handleRipple(e, `scroll-right-${title}`);
+                    scroll("right");
+                  }}
+                  className="hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-16 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent items-center justify-end pr-3 hover:from-[#0F0F0F] transition-all"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-9 h-9 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/20 hover:border-[#14B8A6]/50 border border-[#2A2A2A] rounded-full flex items-center justify-center transition-all duration-200 md:backdrop-blur-xl relative overflow-hidden group/btn"
+                  >
+                    {ripples[`scroll-right-${title}`]?.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                        style={{ left: ripple.x, top: ripple.y }}
+                        initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                        animate={{ width: 50, height: 50, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    ))}
+                    <ChevronRight className="w-5 h-5 text-[#F5F5F5] group-hover/btn:text-[#14B8A6] transition-colors relative z-10" />
+                  </motion.div>
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </>
+        ) : null}
 
         <div
           ref={scrollContainerRef}
@@ -344,6 +356,7 @@ export function TVBrowsePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<FilterState>({
     genre: "",
     year: null,
@@ -363,7 +376,17 @@ export function TVBrowsePage() {
     [key: string]: { x: number; y: number; id: number }[];
   }>({});
 
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const handleRipple = (e: React.MouseEvent, key: string) => {
+    if (isMobile) return; // Skip on mobile
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -553,6 +576,7 @@ export function TVBrowsePage() {
           show={featuredShow}
           ripples={ripples}
           handleRipple={handleRipple}
+          isMobile={isMobile}
         />
       )}
 
@@ -575,6 +599,7 @@ export function TVBrowsePage() {
                 isLoading={false}
                 ripples={ripples}
                 handleRipple={handleRipple}
+                isMobile={isMobile}
               />
             )}
 
@@ -584,6 +609,7 @@ export function TVBrowsePage() {
               isLoading={isLoading}
               ripples={ripples}
               handleRipple={handleRipple}
+              isMobile={isMobile}
             />
 
             <ScrollContainer
@@ -592,6 +618,7 @@ export function TVBrowsePage() {
               isLoading={false}
               ripples={ripples}
               handleRipple={handleRipple}
+              isMobile={isMobile}
             />
           </div>
         )}
