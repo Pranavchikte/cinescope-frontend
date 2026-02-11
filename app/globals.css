@@ -234,3 +234,48 @@ body {
 .animate-shimmer {
   animation: shimmer 2s infinite;
 }
+
+/* Sonner Toast Custom Styles */
+.custom-toast {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(42, 42, 42, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  padding: 16px 20px !important;
+}
+
+.custom-toast[data-type="success"] {
+  background: rgba(20, 184, 166, 0.15) !important;
+  border: 1px solid rgba(20, 184, 166, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(20, 184, 166, 0.25) !important;
+  color: #14B8A6 !important;
+}
+
+.custom-toast[data-type="error"] {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.25) !important;
+  color: #EF4444 !important;
+}
+
+.custom-toast[data-type="info"] {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.25) !important;
+  color: #3B82F6 !important;
+}
+
+.custom-toast[data-type="warning"] {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.25) !important;
+  color: #F59E0B !important;
+}
+
+/* Toast text styling */
+.custom-toast div {
+  font-weight: 500 !important;
+  font-size: 14px !important;
+}

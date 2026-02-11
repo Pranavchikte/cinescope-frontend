@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { AuthBackground } from '@/components/auth-background'
+import { toast } from 'sonner'
 
 interface LoginFormData {
   email: string
@@ -23,7 +24,6 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors },
   } = useForm<LoginFormData>({
     mode: 'onBlur',
@@ -54,10 +54,14 @@ export default function LoginPage() {
     setIsSubmitting(true)
     try {
       await authAPI.login(data)
-      window.location.href = '/' // Force full page reload to trigger middleware
+      toast.success('Welcome back!', {
+        description: 'You have successfully signed in.',
+      })
+      window.location.href = '/'
     } catch (error: any) {
-      setError('root', {
-        message: error.message || 'Incorrect email or password.',
+      const errorMessage = error.message || 'Incorrect email or password.'
+      toast.error('Login failed', {
+        description: errorMessage,
       })
     } finally {
       setIsSubmitting(false)
@@ -105,21 +109,6 @@ export default function LoginPage() {
               </motion.div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                {/* Error Message */}
-                <AnimatePresence>
-                  {errors.root && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium backdrop-blur-xl relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent" />
-                      <span className="relative z-10">{errors.root.message}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
                 {/* Email Input */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -132,7 +121,7 @@ export default function LoginPage() {
                   <div className="relative">
                     <input
                       {...register('email', {
-                        required: 'Please enter a valid email or phone number.',
+                        required: 'Please enter your email address.',
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                           message: 'Please enter a valid email address.',
@@ -146,7 +135,6 @@ export default function LoginPage() {
                           : 'border-[#2A2A2A] focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20'
                       }`}
                     />
-                    {/* Gradient glow on focus */}
                     <div className="absolute inset-0 rounded-lg opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: errors.email ? '0 0 20px rgba(239, 68, 68, 0.2)' : '0 0 20px rgba(20, 184, 166, 0.2)' }} />
                   </div>
                   <AnimatePresence>
@@ -184,15 +172,10 @@ export default function LoginPage() {
                   <div className="relative">
                     <input
                       {...register('password', {
-                        required:
-                          'Your password must contain between 4 and 60 characters.',
+                        required: 'Please enter your password.',
                         minLength: {
-                          value: 4,
-                          message: 'Password must be at least 4 characters.',
-                        },
-                        maxLength: {
-                          value: 60,
-                          message: 'Password must not exceed 60 characters.',
+                          value: 8,
+                          message: 'Password must be at least 8 characters.',
                         },
                       })}
                       type={showPassword ? 'text' : 'password'}
@@ -203,28 +186,11 @@ export default function LoginPage() {
                           : 'border-[#2A2A2A] focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20'
                       }`}
                     />
-                    <motion.button
+                    <button
                       type="button"
-                      onClick={(e) => {
-                        handleRipple(e, 'password-toggle')
-                        setShowPassword(!showPassword)
-                      }}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A0A0] hover:text-[#F5F5F5] transition-colors relative overflow-hidden"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#A0A0A0] hover:text-[#F5F5F5] transition-colors"
                     >
-                      {/* Ripple effect */}
-                      {ripples['password-toggle']?.map((ripple) => (
-                        <motion.span
-                          key={ripple.id}
-                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
-                          style={{ left: ripple.x, top: ripple.y }}
-                          initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
-                          animate={{ width: 40, height: 40, opacity: 0 }}
-                          transition={{ duration: 0.6 }}
-                        />
-                      ))}
-                      
                       <AnimatePresence mode="wait">
                         {showPassword ? (
                           <motion.div
@@ -248,8 +214,7 @@ export default function LoginPage() {
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </motion.button>
-                    {/* Gradient glow on focus */}
+                    </button>
                     <div className="absolute inset-0 rounded-lg opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: errors.password ? '0 0 20px rgba(239, 68, 68, 0.2)' : '0 0 20px rgba(20, 184, 166, 0.2)' }} />
                   </div>
                   <AnimatePresence>
@@ -298,7 +263,6 @@ export default function LoginPage() {
                   whileTap={{ scale: 0.98 }}
                   className="w-full h-12 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#2A2A2A] disabled:text-[#A0A0A0] text-[#0F0F0F] font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:cursor-not-allowed relative overflow-hidden"
                 >
-                  {/* Ripple effect */}
                   {ripples['submit-button']?.map((ripple) => (
                     <motion.span
                       key={ripple.id}
@@ -310,7 +274,6 @@ export default function LoginPage() {
                     />
                   ))}
                   
-                  {/* Gradient glow */}
                   <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                   

@@ -39,6 +39,7 @@ export function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -54,6 +55,8 @@ export function Navbar() {
   }>({});
 
   const handleRipple = (e: React.MouseEvent, key: string) => {
+    if (isMobile) return; // Skip ripples on mobile
+    
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -71,6 +74,14 @@ export function Navbar() {
       }));
     }, 600);
   };
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Scroll detection
   useEffect(() => {
@@ -253,7 +264,7 @@ export function Navbar() {
             }}
             className="shrink-0 group flex items-center relative overflow-hidden rounded-lg px-2 py-1"
           >
-            {ripples["logo"]?.map((ripple) => (
+            {!isMobile && ripples["logo"]?.map((ripple) => (
               <motion.span
                 key={ripple.id}
                 className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
@@ -266,6 +277,20 @@ export function Navbar() {
             <span className="text-[#14B8A6] text-2xl md:text-3xl font-semibold tracking-tight relative z-10">
               CINESCOPE
             </span>
+          </motion.button>
+
+          {/* Mobile TV Shows Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push("/tv")}
+            className={`lg:hidden px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+              isActive("/tv")
+                ? "text-[#14B8A6] bg-[#14B8A6]/10"
+                : "text-[#A0A0A0] hover:text-[#F5F5F5]"
+            }`}
+          >
+            TV Shows
           </motion.button>
 
           {/* Desktop Navigation */}
@@ -283,7 +308,7 @@ export function Navbar() {
                   : "text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
               }`}
             >
-              {ripples["nav-home"]?.map((ripple) => (
+              {!isMobile && ripples["nav-home"]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
                   className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
@@ -309,7 +334,7 @@ export function Navbar() {
                   : "text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
               }`}
             >
-              {ripples["nav-tv"]?.map((ripple) => (
+              {!isMobile && ripples["nav-tv"]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
                   className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
@@ -336,7 +361,7 @@ export function Navbar() {
                     : "text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
                 }`}
               >
-                {ripples["nav-watchlist"]?.map((ripple) => (
+                {!isMobile && ripples["nav-watchlist"]?.map((ripple) => (
                   <motion.span
                     key={ripple.id}
                     className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
@@ -401,7 +426,7 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 right-0 w-[300px] bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg max-h-[500px] overflow-y-auto"
+                    className="absolute top-full mt-2 right-0 w-[300px] bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg max-h-[500px] overflow-y-auto"
                   >
                     {searchResults.map((result) => (
                       <motion.button
@@ -417,9 +442,7 @@ export function Navbar() {
                         }}
                         className="w-full flex items-start gap-3 p-3 hover:bg-[#14B8A6]/10 transition-all duration-200 border-b border-[#2A2A2A] last:border-0 relative overflow-hidden group"
                       >
-                        {ripples[
-                          `search-result-${result.mediaType}-${result.id}`
-                        ]?.map((ripple) => (
+                        {!isMobile && ripples[`search-result-${result.mediaType}-${result.id}`]?.map((ripple) => (
                           <motion.span
                             key={ripple.id}
                             className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
