@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { useMobile } from '@/hooks/use-mobile'
 
 const MOVIE_POSTERS = [
   '/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg', '/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg',
@@ -36,6 +37,9 @@ export function AuthBackground() {
     blur: number
     offset: number
   }>>([])
+  const isMobile = useMobile()
+
+  
 
   useEffect(() => {
     // Generate random columns with varied properties
