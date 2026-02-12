@@ -401,7 +401,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                   <div className="flex items-center gap-1.5">
                     <Star className="w-4 h-4 fill-[#14B8A6] text-[#14B8A6]" />
                     <span className="font-semibold text-[#F5F5F5]">
-                      {movie.vote_average.toFixed(1)}/10
+                      {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}/10
                     </span>
                   </div>
                 </div>
@@ -414,7 +414,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                 transition={{ delay: 0.2 }}
               >
                 <div className="flex flex-wrap gap-2 mb-4 md:mb-5">
-                  {movie.genres.slice(0, 3).map((genre) => (
+                  {movie.genres?.slice(0, 3).map((genre) => (
                     <span
                       key={genre.id}
                       className="px-3 py-1.5 rounded-lg bg-[#14B8A6]/10 backdrop-blur-md text-xs md:text-sm text-[#14B8A6] border border-[#14B8A6]/30 font-medium"

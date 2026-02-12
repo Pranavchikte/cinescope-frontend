@@ -12,7 +12,7 @@ import {
   Trash2,
   Edit3,
 } from "lucide-react";
-import { ratingsAPI, moviesAPI } from "@/lib/api";
+import { ratingsAPI, moviesAPI, tvAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -107,7 +107,12 @@ export function RatingsPage() {
         const enrichedItems = await Promise.all(
           ratingsData.map(async (item) => {
             try {
-              const tmdbData = await moviesAPI.getDetails(item.tmdb_id);
+              // ✅ FIX: Check media_type before fetching
+              const tmdbData =
+                item.media_type === "tv"
+                  ? await tvAPI.getDetails(item.tmdb_id) // Fetch TV data
+                  : await moviesAPI.getDetails(item.tmdb_id); // Fetch movie data
+
               return {
                 id: item.id,
                 tmdb_id: item.tmdb_id,
@@ -116,23 +121,26 @@ export function RatingsPage() {
                   ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}`
                   : "",
                 rating: item.rating,
-                year: tmdbData.release_date
-                  ? new Date(tmdbData.release_date).getFullYear()
-                  : 2024,
+                year:
+                  tmdbData.release_date || tmdbData.first_air_date
+                    ? new Date(
+                        tmdbData.release_date || tmdbData.first_air_date,
+                      ).getFullYear()
+                    : 2024,
                 mediaType: item.media_type,
               };
             } catch (err) {
               console.error(
                 `Failed to fetch details for tmdb_id ${item.tmdb_id}:`,
-                err
+                err,
               );
               return null;
             }
-          })
+          }),
         );
 
         const validItems = enrichedItems.filter(
-          (item): item is EnrichedRatingItem => item !== null
+          (item): item is EnrichedRatingItem => item !== null,
         );
         setRatings(validItems);
       } catch (err) {
@@ -170,8 +178,8 @@ export function RatingsPage() {
                   | "go_for_it"
                   | "perfection",
               }
-            : r
-        )
+            : r,
+        ),
       );
       setEditingId(null);
     } catch (err) {
@@ -562,9 +570,7 @@ function RatedMovieCard({
                 e.preventDefault();
                 handleRipple(e, `remove-${movie.id}`);
                 if (
-                  window.confirm(
-                    `Remove "${movie.title}" from your ratings?`
-                  )
+                  window.confirm(`Remove "${movie.title}" from your ratings?`)
                 ) {
                   onRemove();
                 }
@@ -624,7 +630,7 @@ function RatedMovieCard({
                         animate={{ width: 150, height: 150, opacity: 0 }}
                         transition={{ duration: 0.6 }}
                       />
-                    )
+                    ),
                   )}
                   <OptionIcon
                     className="w-4 h-4 relative z-10"
@@ -645,12 +651,10 @@ function RatedMovieCard({
         onClick={(e) => {
           e.preventDefault();
           const newRating = prompt(
-            `Current rating: ${config.label}\n\nSelect new rating:\n1 - Skip\n2 - Timepass\n3 - Go For It\n4 - Perfection\n\nOr press Cancel to delete`
+            `Current rating: ${config.label}\n\nSelect new rating:\n1 - Skip\n2 - Timepass\n3 - Go For It\n4 - Perfection\n\nOr press Cancel to delete`,
           );
           if (newRating === null) {
-            if (
-              window.confirm(`Remove "${movie.title}" from your ratings?`)
-            ) {
+            if (window.confirm(`Remove "${movie.title}" from your ratings?`)) {
               onRemove();
             }
           } else if (newRating === "1") {
@@ -666,7 +670,7 @@ function RatedMovieCard({
         className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#14B8A6]/20 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
       >
         <Edit3 className="w-3.5 h-3.5" />
-</motion.button>
-</motion.div>
-);
+      </motion.button>
+    </motion.div>
+  );
 }
