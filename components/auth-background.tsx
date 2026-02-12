@@ -39,8 +39,6 @@ export function AuthBackground() {
   }>>([])
   const isMobile = useMobile()
 
-  
-
   useEffect(() => {
     // Generate random columns with varied properties
     const generatedColumns = Array.from({ length: COLUMN_COUNT }, (_, i) => {
@@ -62,6 +60,38 @@ export function AuthBackground() {
 
   if (columns.length === 0) return null
 
+  // MOBILE VERSION - Static grid, zero animations
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 overflow-hidden bg-[#0F0F0F]" style={{ zIndex: 0 }}>
+        {/* Static grid of posters */}
+        <div className="absolute inset-0 grid grid-cols-3 gap-2 p-2 opacity-30">
+          {MOVIE_POSTERS.slice(0, 12).map((poster, index) => (
+            <div
+              key={index}
+              className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A]"
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w500${poster}`}
+                alt="Movie poster"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Dark overlay - no blur, solid color */}
+        <div className="absolute inset-0 bg-[#0F0F0F]/85 pointer-events-none" />
+      </div>
+    )
+  }
+
+  // DESKTOP VERSION - Unchanged, all animations intact
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#0F0F0F]" style={{ zIndex: 0 }}>
       {/* Animated poster columns */}
