@@ -32,7 +32,7 @@ export function MovieSuggestionCard({ movie }: MovieSuggestionCardProps) {
       onClick={handleClick}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="w-full flex items-start gap-3 p-3 bg-[#2A2A2A]/50 hover:bg-[#14B8A6]/10 border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg transition-all duration-200 text-left group"
+      className="w-full flex items-start gap-3 p-3 bg-[#2A2A2A]/50 hover:bg-[#14B8A6]/10 border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:transition-all duration-200 text-left group"
     >
       {/* Poster */}
       <div className="w-16 h-24 bg-[#1A1A1A] shrink-0 overflow-hidden rounded-lg border border-[#2A2A2A]">

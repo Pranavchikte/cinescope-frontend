@@ -129,9 +129,9 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
               handleRipple(e, 'genre-btn')
               toggleDropdown("genre")
             }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`h-9 px-4 text-sm font-medium transition-all flex items-center gap-2 border rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group ${
+            whileHover={undefined}
+            whileTap={undefined}
+            className={`h-9 px-4 text-sm font-medium flex items-center gap-2 border rounded-lg whitespace-nowrap relative overflow-hidden group ${
               filters.genre
                 ? "bg-[#14B8A6] text-[#0F0F0F] border-[#14B8A6]"
                 : "bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50"
@@ -175,7 +175,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="absolute top-full mt-2 left-0 bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg z-50 min-w-[180px] max-w-[240px] max-h-[400px] overflow-y-auto"
+                  className="absolute top-full mt-2 left-0 bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg z-50 min-w-[180px] max-w-[240px] max-h-[400px] overflow-y-auto"
                 >
                   <motion.button
                     onClick={(e) => {
@@ -184,7 +184,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                       closeAllDropdowns()
                     }}
                     whileHover={{ x: 4 }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] hover:bg-[#2A2A2A] transition-all relative overflow-hidden group"
+                    className="w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] hover:bg-[#2A2A2A] md:transition-all relative overflow-hidden group"
                   >
                     {/* Ripple effect */}
                     {ripples['genre-all']?.map((ripple) => (
@@ -211,7 +211,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                         closeAllDropdowns()
                       }}
                       whileHover={{ x: 4 }}
-                      className={`w-full px-4 py-2.5 text-left text-sm transition-all relative overflow-hidden group ${
+                      className={`w-full px-4 py-2.5 text-left text-sm md:transition-all relative overflow-hidden group ${
                         filters.genre === genre.id.toString()
                           ? "bg-[#14B8A6]/10 text-[#14B8A6]"
                           : "text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]"
@@ -248,7 +248,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
             }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`h-9 px-4 text-sm font-medium transition-all flex items-center gap-2 border rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group ${
+            className={`h-9 px-4 text-sm font-medium md:transition-all flex items-center gap-2 border rounded-lg whitespace-nowrap md:backdrop-blur-xl relative overflow-hidden group ${
               filters.provider
                 ? "bg-[#14B8A6] text-[#0F0F0F] border-[#14B8A6]"
                 : "bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50"
@@ -292,7 +292,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="absolute top-full mt-2 left-0 bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg z-50 min-w-[200px] max-w-[280px] max-h-[400px] overflow-y-auto"
+                  className="absolute top-full mt-2 left-0 bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg z-50 min-w-[200px] max-w-[280px] max-h-[400px] overflow-y-auto"
                 >
                   <motion.button
                     onClick={(e) => {
@@ -301,7 +301,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                       closeAllDropdowns()
                     }}
                     whileHover={{ x: 4 }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] hover:bg-[#2A2A2A] transition-all relative overflow-hidden group"
+                    className="w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] hover:bg-[#2A2A2A] md:transition-all relative overflow-hidden group"
                   >
                     {/* Ripple effect */}
                     {ripples['provider-all']?.map((ripple) => (
@@ -328,7 +328,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                         closeAllDropdowns()
                       }}
                       whileHover={{ x: 4 }}
-                      className={`w-full px-4 py-2.5 text-left text-sm transition-all flex items-center gap-3 relative overflow-hidden group ${
+                      className={`w-full px-4 py-2.5 text-left text-sm md:transition-all flex items-center gap-3 relative overflow-hidden group ${
                         filters.provider === provider.provider_id.toString()
                           ? "bg-[#14B8A6]/10 text-[#14B8A6]"
                           : "text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]"
@@ -372,7 +372,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
             }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="h-9 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
+            className="h-9 px-4 text-sm font-medium md:transition-all flex items-center gap-2 border bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg whitespace-nowrap md:backdrop-blur-xl relative overflow-hidden group"
           >
             {/* Ripple effect */}
             {ripples['sort-btn']?.map((ripple) => (
@@ -403,7 +403,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="absolute top-full mt-2 right-0 bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg z-50 min-w-[160px]"
+                  className="absolute top-full mt-2 right-0 bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] shadow-2xl rounded-lg z-50 min-w-[160px]"
                 >
                   {SORT_OPTIONS.map((option) => (
                     <motion.button
@@ -414,7 +414,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                         closeAllDropdowns()
                       }}
                       whileHover={{ x: 4 }}
-                      className={`w-full px-4 py-2.5 text-left text-sm transition-all relative overflow-hidden group ${
+                      className={`w-full px-4 py-2.5 text-left text-sm md:transition-all relative overflow-hidden group ${
                         filters.sort_by === option.value
                           ? "bg-[#14B8A6]/10 text-[#14B8A6]"
                           : "text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]"
@@ -455,7 +455,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="h-9 px-4 text-sm font-medium bg-[#1A1A1A]/50 text-[#A0A0A0] hover:text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all flex items-center gap-2 rounded-lg backdrop-blur-xl relative overflow-hidden group"
+              className="h-9 px-4 text-sm font-medium bg-[#1A1A1A]/50 text-[#A0A0A0] hover:text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:transition-all flex items-center gap-2 rounded-lg md:backdrop-blur-xl relative overflow-hidden group"
             >
               {/* Ripple effect */}
               {ripples['reset-btn']?.map((ripple) => (

@@ -311,7 +311,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         onClick={() => router.back()}
-        className="fixed top-20 left-4 z-50 w-10 h-10 bg-[#1A1A1A]/80 backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
+        className="fixed top-20 left-4 z-50 w-10 h-10 bg-[#1A1A1A]/80 md:backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
       >
         <ArrowLeft className="w-5 h-5 text-[#F5F5F5]" />
       </motion.button>
@@ -344,7 +344,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute bottom-8 right-8 w-16 h-16 bg-[#14B8A6]/20 backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/50 hover:bg-[#14B8A6]/30 transition-all duration-200 group"
+            className="absolute bottom-8 right-8 w-16 h-16 bg-[#14B8A6]/20 md:backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/50 hover:bg-[#14B8A6]/30 transition-all duration-200 group"
           >
             <Play className="w-6 h-6 text-[#14B8A6] ml-1 group-hover:scale-110 transition-transform" />
           </motion.button>
@@ -424,7 +424,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               {show.genres.slice(0, 4).map((genre) => (
                 <span
                   key={genre.id}
-                  className="px-3 py-1.5 rounded-full bg-[#1A1A1A] backdrop-blur-sm text-sm text-[#F5F5F5] border border-[#2A2A2A]"
+                  className="px-3 py-1.5 rounded-full bg-[#1A1A1A] md:backdrop-blur-sm text-sm text-[#F5F5F5] border border-[#2A2A2A]"
                 >
                   {genre.name}
                 </span>
@@ -910,7 +910,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowRatingSheet(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-black/80 md:backdrop-blur-sm z-[100]"
             />
 
             {/* Modal */}
@@ -982,7 +982,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ type: "spring", duration: 0.3 }}
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md border min-w-[200px] max-w-[90vw] md:max-w-md ${
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-4 py-3 rounded-xl shadow-2xl md:backdrop-blur-md border min-w-[200px] max-w-[90vw] md:max-w-md ${
               showToast.type === "success"
                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
                 : "bg-red-500/10 border-red-500/20 text-red-300"

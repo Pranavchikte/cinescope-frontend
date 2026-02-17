@@ -116,7 +116,7 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
               <>
                 <div className="w-1 h-1 rounded-full bg-[#2A2A2A]" />
                 <span className="text-[#A0A0A0] text-sm">
-                  {movie.genres.slice(0, 2).join(" · ")}
+                  {movie.genres.slice(0, 2).join(" Â· ")}
                 </span>
               </>
             )}
@@ -617,7 +617,7 @@ export function BrowsePage() {
     <div className="min-h-screen bg-[#0F0F0F]">
       {!hasActiveFilters && <HeroBanner movie={featuredMovie} />}
 
-      <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 backdrop-blur-md border-b border-[#2A2A2A]">
+      <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 border-b border-[#2A2A2A] md:backdrop-blur-md">
         <FilterBar
           onFilterChange={handleFilterChange}
           mediaType="movie"

@@ -246,31 +246,17 @@ export const moviesAPI = {
     },
     discover: async (params: {
         genre?: string
-        year?: number
-        language?: string
-        country?: string
         provider?: string
-        sort_by?: string
         page?: number
-        vote_count_min?: number
-        vote_average_min?: number
-        vote_average_max?: number
-        runtime_min?: number
-        runtime_max?: number
     }) => {
         const queryParams = new URLSearchParams()
         if (params.genre) queryParams.append('genre', params.genre)
-        if (params.year) queryParams.append('year', params.year.toString())
-        if (params.language) queryParams.append('language', params.language)
-        if (params.country) queryParams.append('country', params.country)
         if (params.provider) queryParams.append('provider', params.provider)
-        if (params.sort_by) queryParams.append('sort_by', params.sort_by)
         if (params.page) queryParams.append('page', params.page.toString())
-        if (params.vote_count_min !== undefined) queryParams.append('vote_count_min', params.vote_count_min.toString())
-        if (params.vote_average_min !== undefined) queryParams.append('vote_average_min', params.vote_average_min.toString())
-        if (params.vote_average_max !== undefined) queryParams.append('vote_average_max', params.vote_average_max.toString())
-        if (params.runtime_min !== undefined) queryParams.append('runtime_min', params.runtime_min.toString())
-        if (params.runtime_max !== undefined) queryParams.append('runtime_max', params.runtime_max.toString())
+
+        // Hardcoded values
+        queryParams.append('sort_by', 'popularity.desc')
+        queryParams.append('vote_count_min', '100')
 
         const res = await fetch(`${API_BASE_URL}/movies/discover?${queryParams}`)
         return res.json()
@@ -363,27 +349,17 @@ export const tvAPI = {
 
     discover: async (params: {
         genre?: string
-        year?: number
-        language?: string
-        country?: string
         provider?: string
-        sort_by?: string
         page?: number
-        vote_count_min?: number
-        vote_average_min?: number
-        vote_average_max?: number
     }) => {
         const queryParams = new URLSearchParams()
         if (params.genre) queryParams.append('genre', params.genre)
-        if (params.year) queryParams.append('year', params.year.toString())
-        if (params.language) queryParams.append('language', params.language)
-        if (params.country) queryParams.append('country', params.country)
         if (params.provider) queryParams.append('provider', params.provider)
-        if (params.sort_by) queryParams.append('sort_by', params.sort_by)
         if (params.page) queryParams.append('page', params.page.toString())
-        if (params.vote_count_min !== undefined) queryParams.append('vote_count_min', params.vote_count_min.toString())
-        if (params.vote_average_min !== undefined) queryParams.append('vote_average_min', params.vote_average_min.toString())
-        if (params.vote_average_max !== undefined) queryParams.append('vote_average_max', params.vote_average_max.toString())
+
+        // Hardcoded values
+        queryParams.append('sort_by', 'popularity.desc')
+        queryParams.append('vote_count_min', '100')
 
         const res = await fetch(`${API_BASE_URL}/tv/discover?${queryParams}`)
         return res.json()

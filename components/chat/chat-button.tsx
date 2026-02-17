@@ -25,7 +25,7 @@ export function ChatButton() {
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 md:w-16 md:h-16 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-full shadow-2xl flex items-center justify-center transition-all duration-200 group"
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 md:w-16 md:h-16 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-full shadow-2xl flex items-center justify-center md:transition-all duration-200 group"
         aria-label="Open AI Chat"
       >
         {/* Glow effect */}

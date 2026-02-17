@@ -64,6 +64,7 @@ export function RatingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [mediaFilter, setMediaFilter] = useState<string>("all"); 
   const router = useRouter();
 
   // Ripple state
@@ -155,14 +156,30 @@ export function RatingsPage() {
   }, []);
 
   const stats = {
-    skip: ratings.filter((r) => r.rating === "skip").length,
-    timepass: ratings.filter((r) => r.rating === "timepass").length,
-    go_for_it: ratings.filter((r) => r.rating === "go_for_it").length,
-    perfection: ratings.filter((r) => r.rating === "perfection").length,
-  };
+  skip: ratings.filter((r) => 
+    (mediaFilter === "all" || r.mediaType === mediaFilter) && r.rating === "skip"
+  ).length,
+  timepass: ratings.filter((r) => 
+    (mediaFilter === "all" || r.mediaType === mediaFilter) && r.rating === "timepass"
+  ).length,
+  go_for_it: ratings.filter((r) => 
+    (mediaFilter === "all" || r.mediaType === mediaFilter) && r.rating === "go_for_it"
+  ).length,
+  perfection: ratings.filter((r) => 
+    (mediaFilter === "all" || r.mediaType === mediaFilter) && r.rating === "perfection"
+  ).length,
+};
 
-  const filteredRatings =
-    filter === "all" ? ratings : ratings.filter((r) => r.rating === filter);
+const mediaStats = {
+  all: ratings.length,
+  movie: ratings.filter((r) => r.mediaType === "movie").length,
+  tv: ratings.filter((r) => r.mediaType === "tv").length,
+};
+  const filteredRatings = ratings.filter((r) => {
+  const matchesMediaType = mediaFilter === "all" || r.mediaType === mediaFilter;
+  const matchesRating = filter === "all" || r.rating === filter;
+  return matchesMediaType && matchesRating;
+});
 
   const updateRating = async (ratingId: string, newRating: string) => {
     try {
@@ -236,7 +253,7 @@ export function RatingsPage() {
               handleRipple(e, "error-home");
               router.push("/");
             }}
-            className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-all duration-200 relative overflow-hidden group"
+            className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
           >
             {ripples["error-home"]?.map((ripple) => (
               <motion.span
@@ -282,11 +299,118 @@ export function RatingsPage() {
           </p>
         </motion.div>
 
-        {/* Filter Tabs */}
+        {/* Media Type Filter */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex gap-3 mb-6"
+        >
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              handleRipple(e, "media-all");
+              setMediaFilter("all");
+            }}
+            className={`relative overflow-hidden px-6 py-2.5 rounded-lg font-medium text-sm md:transition-all duration-300 ${
+              mediaFilter === "all"
+                ? "bg-[#14B8A6]/10 text-[#14B8A6] border-2 border-[#14B8A6]"
+                : "bg-[#1A1A1A]/80 text-[#A0A0A0] border-2 border-[#2A2A2A] hover:border-[#14B8A6]/30 hover:text-[#F5F5F5]"
+            } md:backdrop-blur-xl`}
+          >
+            {ripples["media-all"]?.map((ripple) => (
+              <motion.span
+                key={ripple.id}
+                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                style={{ left: ripple.x, top: ripple.y }}
+                initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                animate={{ width: 120, height: 120, opacity: 0 }}
+                transition={{ duration: 0.6 }}
+              />
+            ))}
+            {mediaFilter === "all" && (
+              <motion.div
+                layoutId="media-glow"
+                className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/20 to-[#0D9488]/20 blur-xl"
+                transition={{ type: "spring", duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10">All ({mediaStats.all})</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              handleRipple(e, "media-movie");
+              setMediaFilter("movie");
+            }}
+            className={`relative overflow-hidden px-6 py-2.5 rounded-lg font-medium text-sm md:transition-all duration-300 ${
+              mediaFilter === "movie"
+                ? "bg-[#14B8A6]/10 text-[#14B8A6] border-2 border-[#14B8A6]"
+                : "bg-[#1A1A1A]/80 text-[#A0A0A0] border-2 border-[#2A2A2A] hover:border-[#14B8A6]/30 hover:text-[#F5F5F5]"
+            } md:backdrop-blur-xl`}
+          >
+            {ripples["media-movie"]?.map((ripple) => (
+              <motion.span
+                key={ripple.id}
+                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                style={{ left: ripple.x, top: ripple.y }}
+                initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                animate={{ width: 120, height: 120, opacity: 0 }}
+                transition={{ duration: 0.6 }}
+              />
+            ))}
+            {mediaFilter === "movie" && (
+              <motion.div
+                layoutId="media-glow"
+                className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/20 to-[#0D9488]/20 blur-xl"
+                transition={{ type: "spring", duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10">Movies ({mediaStats.movie})</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              handleRipple(e, "media-tv");
+              setMediaFilter("tv");
+            }}
+            className={`relative overflow-hidden px-6 py-2.5 rounded-lg font-medium text-sm md:transition-all duration-300 ${
+              mediaFilter === "tv"
+                ? "bg-[#14B8A6]/10 text-[#14B8A6] border-2 border-[#14B8A6]"
+                : "bg-[#1A1A1A]/80 text-[#A0A0A0] border-2 border-[#2A2A2A] hover:border-[#14B8A6]/30 hover:text-[#F5F5F5]"
+            } md:backdrop-blur-xl`}
+          >
+            {ripples["media-tv"]?.map((ripple) => (
+              <motion.span
+                key={ripple.id}
+                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                style={{ left: ripple.x, top: ripple.y }}
+                initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
+                animate={{ width: 120, height: 120, opacity: 0 }}
+                transition={{ duration: 0.6 }}
+              />
+            ))}
+            {mediaFilter === "tv" && (
+              <motion.div
+                layoutId="media-glow"
+                className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/20 to-[#0D9488]/20 blur-xl"
+                transition={{ type: "spring", duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10">TV Shows ({mediaStats.tv})</span>
+          </motion.button>
+        </motion.div>
+
+        {/* Rating Filter Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
           className="flex gap-4 mb-8 border-b border-[#2A2A2A] overflow-x-auto hide-scrollbar"
         >
           <motion.button
@@ -296,7 +420,7 @@ export function RatingsPage() {
               handleRipple(e, "filter-all");
               setFilter("all");
             }}
-            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap relative overflow-hidden ${
+            className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 whitespace-nowrap relative overflow-hidden ${
               filter === "all"
                 ? "border-[#14B8A6] text-[#14B8A6]"
                 : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
@@ -312,7 +436,9 @@ export function RatingsPage() {
                 transition={{ duration: 0.6 }}
               />
             ))}
-            <span className="relative z-10">All ({ratings.length})</span>
+            <span className="relative z-10">
+              All ({filteredRatings.length})
+            </span>
           </motion.button>
 
           {Object.entries(RATING_CONFIG).map(([key, config]) => {
@@ -327,7 +453,7 @@ export function RatingsPage() {
                   handleRipple(e, `filter-${key}`);
                   setFilter(key);
                 }}
-                className={`pb-3 px-1 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap flex items-center gap-2 relative overflow-hidden ${
+                className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 whitespace-nowrap flex items-center gap-2 relative overflow-hidden ${
                   filter === key
                     ? "border-[#14B8A6] text-[#14B8A6]"
                     : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
@@ -385,7 +511,7 @@ export function RatingsPage() {
                 handleRipple(e, "browse-titles");
                 router.push("/");
               }}
-              className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-all duration-200 relative overflow-hidden group"
+              className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
             >
               {ripples["browse-titles"]?.map((ripple) => (
                 <motion.span
@@ -495,7 +621,7 @@ function RatedMovieCard({
         <motion.div
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.2 }}
-          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200 cursor-pointer"
+          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:transition-all duration-200 cursor-pointer"
         >
           {movie.poster ? (
             <img
@@ -547,7 +673,7 @@ function RatedMovieCard({
                 handleRipple(e, `edit-${movie.id}`);
                 onEditToggle();
               }}
-              className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 backdrop-blur-xl rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 relative overflow-hidden"
+              className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden"
             >
               {ripples[`edit-${movie.id}`]?.map((ripple) => (
                 <motion.span
@@ -575,7 +701,7 @@ function RatedMovieCard({
                   onRemove();
                 }
               }}
-              className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-red-500/10 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 backdrop-blur-xl rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 relative overflow-hidden"
+              className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-red-500/10 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden"
             >
               {ripples[`remove-${movie.id}`]?.map((ripple) => (
                 <motion.span
@@ -602,7 +728,7 @@ function RatedMovieCard({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="hidden md:block absolute top-0 left-0 right-0 bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] rounded-lg overflow-hidden z-30 shadow-2xl"
+            className="hidden md:block absolute top-0 left-0 right-0 bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg overflow-hidden z-30 shadow-2xl"
           >
             {ratingOptions.map((option) => {
               const optionConfig = RATING_CONFIG[option];
@@ -618,7 +744,7 @@ function RatedMovieCard({
                     handleRipple(e, `rating-option-${movie.id}-${option}`);
                     onUpdate(option);
                   }}
-                  className="w-full px-3 py-2.5 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] transition-all duration-200 text-left flex items-center gap-2 relative overflow-hidden"
+                  className="w-full px-3 py-2.5 text-sm text-[#F5F5F5] hover:bg-[#14B8A6]/10 hover:text-[#14B8A6] md:transition-all duration-200 text-left flex items-center gap-2 relative overflow-hidden"
                 >
                   {ripples[`rating-option-${movie.id}-${option}`]?.map(
                     (ripple) => (
@@ -667,7 +793,7 @@ function RatedMovieCard({
             onUpdate("perfection");
           }
         }}
-        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#14B8A6]/20 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#14B8A6]/20 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full flex items-center justify-center md:transition-all duration-200 md:backdrop-blur-sm"
       >
         <Edit3 className="w-3.5 h-3.5" />
       </motion.button>
