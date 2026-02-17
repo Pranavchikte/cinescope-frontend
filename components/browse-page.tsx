@@ -8,6 +8,7 @@ import { MovieCard } from "@/components/movie-card";
 import { MovieGrid } from "@/components/movie-grid";
 import { MovieCardSkeleton } from "@/components/movie-card-skeleton";
 import { FilterBar, FilterState } from "@/components/filter-bar";
+import { useRouter } from "next/navigation";
 
 interface TMDBMovie {
   id: number;
@@ -34,6 +35,7 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
     [key: string]: { x: number; y: number; id: number }[];
   }>({});
   const [isMobile, setIsMobile] = useState(false);
+  const router = useRouter();
 
   // Detect mobile
   useEffect(() => {
@@ -42,6 +44,13 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Handle details click - navigate to movie detail page
+  const handleDetailsClick = () => {
+    if (movie) {
+      router.push(`/movie/${movie.id}`);
+    }
+  };
 
   // Ripple effect handler - disabled on mobile
   const handleRipple = (e: React.MouseEvent, key: string) => {
@@ -140,14 +149,14 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
             className="flex items-center gap-3 pt-3"
           >
             <motion.button
-              onClick={(e) => handleRipple(e, "watch-now")}
+              onClick={handleDetailsClick}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 relative overflow-hidden group"
             >
               {/* Ripple effect - desktop only */}
               {!isMobile &&
-                ripples["watch-now"]?.map((ripple) => (
+                ripples["details"]?.map((ripple) => (
                   <motion.span
                     key={ripple.id}
                     className="absolute bg-white/30 rounded-full pointer-events-none"
@@ -169,33 +178,8 @@ function HeroBanner({ movie }: { movie: FeaturedMovie | null }) {
                 }}
               />
 
-              <Play className="w-5 h-5 sm:w-5 sm:h-5 fill-current relative z-10" />
-              <span className="relative z-10">Watch Now</span>
-            </motion.button>
-
-            <motion.button
-              onClick={(e) => handleRipple(e, "details")}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-transparent border border-[#2A2A2A] hover:border-[#14B8A6] hover:text-[#14B8A6] text-[#A0A0A0] rounded-lg text-sm sm:text-base font-medium transition-all duration-200 md:backdrop-blur-xl relative overflow-hidden group"
-            >
-              {/* Ripple effect - desktop only */}
-              {!isMobile &&
-                ripples["details"]?.map((ripple) => (
-                  <motion.span
-                    key={ripple.id}
-                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
-                    style={{ left: ripple.x, top: ripple.y }}
-                    initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
-                    animate={{ width: 100, height: 100, opacity: 0 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                ))}
-
-              <div className="absolute inset-0 bg-[#14B8A6]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-
               <Info className="w-5 h-5 sm:w-5 sm:h-5 relative z-10" />
-              <span className="relative z-10">Details</span>
+              <span className="relative z-10">View Details</span>
             </motion.button>
           </motion.div>
         </div>

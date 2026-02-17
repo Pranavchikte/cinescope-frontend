@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Loader2, Play, Info } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
 import { MovieGrid } from "@/components/movie-grid";
 import { FilterBar, FilterState } from "@/components/filter-bar";
+import { useRouter } from "next/navigation";
 
 interface TMDBShow {
   id: number;
@@ -39,6 +40,8 @@ function HeroBanner({
   handleRipple: (e: React.MouseEvent, key: string) => void;
   isMobile: boolean;
 }) {
+  const router = useRouter();
+  
   if (!show) {
     return (
       <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[75vh] bg-[#1A1A1A] animate-pulse">
@@ -113,11 +116,11 @@ function HeroBanner({
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={(e) => handleRipple(e, "watch-now")}
+              onClick={() => show && router.push(`/tv/${show.id}`)}
               className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 relative overflow-hidden group"
             >
               {/* Ripple - desktop only */}
-              {!isMobile && ripples["watch-now"]?.map((ripple) => (
+              {!isMobile && ripples["details"]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
                   className="absolute bg-white/30 rounded-full pointer-events-none"
@@ -136,29 +139,8 @@ function HeroBanner({
                     "radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)",
                 }}
               />
-              <Play className="w-5 h-5 sm:w-5 sm:h-5 fill-current relative z-10" />
-              <span className="relative z-10">Watch Now</span>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => handleRipple(e, "details")}
-              className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#1A1A1A]/50 border border-[#2A2A2A] hover:border-[#14B8A6]/50 hover:text-[#14B8A6] text-[#F5F5F5] rounded-lg text-sm sm:text-base font-medium transition-all duration-200 md:backdrop-blur-xl relative overflow-hidden hover:bg-[#14B8A6]/5"
-            >
-              {/* Ripple - desktop only */}
-              {!isMobile && ripples["details"]?.map((ripple) => (
-                <motion.span
-                  key={ripple.id}
-                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
-                  style={{ left: ripple.x, top: ripple.y }}
-                  initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
-                  animate={{ width: 200, height: 200, opacity: 0 }}
-                  transition={{ duration: 0.6 }}
-                />
-              ))}
               <Info className="w-5 h-5 sm:w-5 sm:h-5 relative z-10" />
-              <span className="relative z-10">Details</span>
+              <span className="relative z-10">View Details</span>
             </motion.button>
           </motion.div>
         </div>
