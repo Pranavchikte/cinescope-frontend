@@ -135,10 +135,10 @@ export function WatchlistPage() {
     return (
       <div className="min-h-screen bg-[#0F0F0F] pt-24">
         <div className="px-4 sm:px-6 lg:px-12">
-          <div className="h-8 bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-lg w-48 mb-8 animate-pulse" />
+          <div className="h-8 bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg w-48 mb-8 animate-pulse" />
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-lg animate-pulse" />
+              <div key={i} className="aspect-[2/3] bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg animate-pulse" />
             ))}
           </div>
         </div>
@@ -154,7 +154,7 @@ export function WatchlistPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md"
         >
-          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-full">
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-full">
             <X className="w-8 h-8 text-[#A0A0A0]" />
           </div>
           <h2 className="text-2xl font-semibold text-[#F5F5F5] mb-3">
@@ -168,7 +168,7 @@ export function WatchlistPage() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-all duration-200 relative overflow-hidden group"
+            className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
           >
             {ripples['error-home']?.map((ripple) => (
               <motion.span
@@ -220,7 +220,7 @@ export function WatchlistPage() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-all duration-200 relative overflow-hidden ${
+            className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 relative overflow-hidden ${
               filter === "all"
                 ? "border-[#14B8A6] text-[#14B8A6]"
                 : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
@@ -245,7 +245,7 @@ export function WatchlistPage() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-all duration-200 relative overflow-hidden ${
+            className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 relative overflow-hidden ${
               filter === "movie"
                 ? "border-[#14B8A6] text-[#14B8A6]"
                 : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
@@ -270,7 +270,7 @@ export function WatchlistPage() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`pb-3 px-1 text-sm font-medium border-b-2 transition-all duration-200 relative overflow-hidden ${
+            className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 relative overflow-hidden ${
               filter === "tv"
                 ? "border-[#14B8A6] text-[#14B8A6]"
                 : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
@@ -298,7 +298,7 @@ export function WatchlistPage() {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center justify-center py-24"
           >
-            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-full">
+            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-full">
               <Film className="w-8 h-8 text-[#A0A0A0]" />
             </div>
             <h2 className="text-xl font-semibold text-[#F5F5F5] mb-2">
@@ -318,7 +318,7 @@ export function WatchlistPage() {
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-all duration-200 relative overflow-hidden group"
+              className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
             >
               {ripples['empty-browse']?.map((ripple) => (
                 <motion.span
@@ -432,7 +432,7 @@ function WatchlistCard({
         <motion.div
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.2 }}
-          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-all duration-200 cursor-pointer"
+          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:transition-all duration-200 cursor-pointer"
         >
           {/* Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-50 pointer-events-none" />
@@ -453,13 +453,13 @@ function WatchlistCard({
           <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10" />
 
           {/* Rating Badge */}
-          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-[#0F0F0F]/80 backdrop-blur-xl rounded-lg border border-[#2A2A2A] z-20">
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-[#0F0F0F]/80 md:backdrop-blur-xl rounded-lg border border-[#2A2A2A] z-20">
             <Star className="w-3 h-3 fill-[#14B8A6] text-[#14B8A6]" />
             <span className="text-xs font-medium text-[#F5F5F5]">{item.rating.toFixed(1)}</span>
           </div>
 
           {/* Media Type Badge */}
-          <div className="absolute top-2 right-2 px-2 py-1 bg-[#0F0F0F]/80 backdrop-blur-xl rounded-lg border border-[#2A2A2A] z-20">
+          <div className="absolute top-2 right-2 px-2 py-1 bg-[#0F0F0F]/80 md:backdrop-blur-xl rounded-lg border border-[#2A2A2A] z-20">
             {item.mediaType === "movie" ? (
               <Film className="w-3 h-3 text-[#F5F5F5]" />
             ) : (
@@ -492,7 +492,7 @@ function WatchlistCard({
                 disabled={isRemoving}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-[#1A1A1A]/80 hover:bg-red-500/10 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 backdrop-blur-xl rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 flex items-center gap-2 relative overflow-hidden group"
+                className="px-4 py-2 bg-[#1A1A1A]/80 hover:bg-red-500/10 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 disabled:opacity-50 flex items-center gap-2 relative overflow-hidden group"
               >
                 {ripples['remove-btn']?.map((ripple) => (
                   <motion.span
@@ -523,7 +523,7 @@ function WatchlistCard({
                   onClick={confirmRemove}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-3 py-2 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
+                  className="px-3 py-2 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
                 >
                   {ripples['confirm-yes']?.map((ripple) => (
                     <motion.span
@@ -543,7 +543,7 @@ function WatchlistCard({
                   onClick={cancelRemove}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-[#2A2A2A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 backdrop-blur-xl rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
+                  className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-[#2A2A2A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
                 >
                   {ripples['confirm-no']?.map((ripple) => (
                     <motion.span
@@ -577,7 +577,7 @@ function WatchlistCard({
         disabled={isRemoving}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-red-500/20 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 backdrop-blur-xl rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-red-500/20 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 md:backdrop-blur-xl rounded-full flex items-center justify-center md:transition-all duration-200 disabled:opacity-50"
       >
         {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
       </motion.button>

@@ -92,7 +92,7 @@ export function VerificationBanner() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50"
         >
-          <div className="bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] rounded-lg shadow-2xl">
+          <div className="bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg shadow-2xl">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-start justify-between gap-3 mb-3">

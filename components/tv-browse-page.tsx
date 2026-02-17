@@ -580,7 +580,7 @@ export function TVBrowsePage() {
         />
       )}
 
-      <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 backdrop-blur-md border-b border-[#2A2A2A]">
+      <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 border-b border-[#2A2A2A]">
         <FilterBar
           onFilterChange={handleFilterChange}
           mediaType="tv"

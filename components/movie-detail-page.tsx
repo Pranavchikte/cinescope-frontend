@@ -276,7 +276,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   const trailerUrl = trailer
     ? `https://www.youtube.com/embed/${trailer.key}?autoplay=0&rel=0`
     : null;
-  const rating = Math.round((movie.vote_average / 10) * 100);
+  const rating = movie.vote_average ? Math.round((movie.vote_average / 10) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">
@@ -290,7 +290,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed top-20 left-4 z-50 w-11 h-11 bg-[#1A1A1A]/70 backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200 relative overflow-hidden group"
+        className="fixed top-20 left-4 z-50 w-11 h-11 bg-[#1A1A1A]/70 md:backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200 relative overflow-hidden group"
       >
         {/* Ripple effect */}
         {ripples["back-btn"]?.map((ripple) => (
@@ -315,7 +315,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             alt={movie.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 backdrop-blur-sm bg-[#0F0F0F]/30" />
+          <div className="absolute inset-0 md:backdrop-blur-sm bg-[#0F0F0F]/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/95 via-[#0F0F0F]/40 to-transparent" />
         </div>
@@ -417,7 +417,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                   {movie.genres?.slice(0, 3).map((genre) => (
                     <span
                       key={genre.id}
-                      className="px-3 py-1.5 rounded-lg bg-[#14B8A6]/10 backdrop-blur-md text-xs md:text-sm text-[#14B8A6] border border-[#14B8A6]/30 font-medium"
+                      className="px-3 py-1.5 rounded-lg bg-[#14B8A6]/10 md:backdrop-blur-md text-xs md:text-sm text-[#14B8A6] border border-[#14B8A6]/30 font-medium"
                     >
                       {genre.name}
                     </span>
@@ -460,7 +460,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
 
                   <Button
                     onClick={() => setShowRatingSheet(true)}
-                    className="h-10 md:h-12 px-4 md:px-6 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 backdrop-blur-md font-semibold rounded-lg transition-all text-sm md:text-base duration-200"
+                    className="h-10 md:h-12 px-4 md:px-6 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-md font-semibold rounded-lg transition-all text-sm md:text-base duration-200"
                   >
                     <Star className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                     Rate
@@ -478,7 +478,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
                           showNotification("Link copied!", "success");
                         });
                     }}
-                    className="h-10 md:h-12 w-10 md:w-12 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 backdrop-blur-md rounded-lg transition-all duration-200"
+                    className="h-10 md:h-12 w-10 md:w-12 bg-[#1A1A1A]/60 hover:bg-[#14B8A6]/10 text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-md rounded-lg transition-all duration-200"
                   >
                     <Share2 className="w-4 h-4 md:w-5 md:h-5" />
                   </Button>
@@ -552,7 +552,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
-            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 md:w-16 md:h-16 bg-[#14B8A6] backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/60 hover:bg-[#14B8A6]/90 hover:scale-110 hover:shadow-lg transition-all group shadow-lg text-[#0F0F0F]"
+            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 md:w-16 md:h-16 bg-[#14B8A6] md:backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/60 hover:bg-[#14B8A6]/90 hover:scale-110 hover:shadow-lg transition-all group shadow-lg text-[#0F0F0F]"
           >
             <Play
               className="w-5 h-5 md:w-6 md:h-6 ml-0.5"
@@ -827,7 +827,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowRatingSheet(false)}
-              className="fixed inset-0 bg-[#0F0F0F]/80 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-[#0F0F0F]/80 md:backdrop-blur-sm z-[100]"
             />
 
             {/* Modal */}
@@ -898,7 +898,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg shadow-lg backdrop-blur-md border ${
+            className={`fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg shadow-lg md:backdrop-blur-md border ${
               showToast.type === "success"
                 ? "bg-[#14B8A6]/10 border-[#14B8A6]/30 text-[#14B8A6]"
                 : "bg-red-500/10 border-red-500/30 text-red-300"

@@ -88,7 +88,7 @@ export function ChatModal({ onClose }: ChatModalProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-[#0F0F0F]/80 backdrop-blur-md flex items-end md:items-center justify-end md:justify-end"
+      className="fixed inset-0 z-50 bg-[#0F0F0F]/80 md:backdrop-blur-md flex items-end md:items-center justify-end md:justify-end"
       onClick={onClose}
     >
       {/* Modal Container */}
@@ -98,10 +98,10 @@ export function ChatModal({ onClose }: ChatModalProps) {
         exit={{ opacity: 0, y: 100, x: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full h-[85vh] md:w-[420px] md:h-[600px] md:m-6 bg-[#1A1A1A]/95 backdrop-blur-xl border border-[#2A2A2A] md:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+        className="w-full h-[85vh] md:w-[420px] md:h-[600px] md:m-6 bg-[#1A1A1A]/95 md:backdrop-blur-xl border border-[#2A2A2A] md:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A] bg-[#1A1A1A]/50 backdrop-blur-xl">
+        <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A] bg-[#1A1A1A]/50 md:backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-[#14B8A6] to-[#0D9488] rounded-full flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-[#0F0F0F]" />
@@ -147,7 +147,7 @@ export function ChatModal({ onClose }: ChatModalProps) {
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t border-[#2A2A2A] bg-[#1A1A1A]/50 backdrop-blur-xl">
+        <form onSubmit={handleSubmit} className="p-4 border-t border-[#2A2A2A] bg-[#1A1A1A]/50 md:backdrop-blur-xl">
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}

@@ -247,11 +247,11 @@ export function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-4 left-4 right-4 z-50 transition-all duration-500 rounded-xl mx-auto md:left-6 md:right-6 lg:left-8 lg:right-8 ${
+        className={`fixed top-4 left-4 right-4 z-50 rounded-xl mx-auto md:left-6 md:right-6 lg:left-8 lg:right-8 ${
           isScrolled
             ? `bg-[#1A1A1A]/90 ${!isMobile ? "backdrop-blur-xl" : ""} border border-[#2A2A2A] shadow-2xl`
-            : `bg-[#1A1A1A]/80 ${!isMobile ? "backdrop-blur-xl" : ""} border border-[#2A2A2A] shadow-xl`
-        }`}
+            : `bg-[#1A1A1A]/80 border border-[#2A2A2A] shadow-xl`
+        } ${!isMobile ? "transition-all duration-500" : ""}`}
       >
         <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -281,10 +281,10 @@ export function Navbar() {
           {/* Mobile TV Shows Button */}
           <button
             onClick={() => router.push("/tv")}
-            className={`lg:hidden px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+            className={`lg:hidden px-3 py-1.5 text-sm font-medium rounded-lg ${
               isActive("/tv")
                 ? "text-[#14B8A6] bg-[#14B8A6]/10"
-                : "text-[#A0A0A0] hover:text-[#F5F5F5]"
+                : "text-[#A0A0A0]"
             }`}
           >
             TV Shows
@@ -696,7 +696,7 @@ export function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
 transition={{ duration: 0.2 }}
-className="absolute top-full right-0 mt-2 w-[200px] bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl overflow-hidden rounded-lg lg:hidden"
+className="absolute top-full right-0 mt-2 w-[200px] bg-[#1A1A1A]/90 border border-[#2A2A2A] shadow-2xl overflow-hidden rounded-lg lg:hidden"
 >
 <div className="py-1">
 <button
