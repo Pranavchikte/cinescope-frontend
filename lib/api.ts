@@ -131,6 +131,8 @@ type MediaTypeKey = 'movie' | 'tv'
 type MediaIdSets = { movie: Set<number>; tv: Set<number> }
 type MediaIdMaps = { movie: Map<number, string>; tv: Map<number, string> }
 
+const createEmptyMediaIdSets = (): MediaIdSets => ({ movie: new Set<number>(), tv: new Set<number>() })
+
 const buildMediaIdSets = (items: Array<{ tmdb_id: number; media_type: MediaTypeKey }>): MediaIdSets => {
     const sets: MediaIdSets = { movie: new Set(), tv: new Set() }
     for (const item of items) {
@@ -158,7 +160,7 @@ let ratingIdsCache: MediaIdSets | null = null
 let ratingIdsPromise: Promise<MediaIdSets> | null = null
 
 export const getCachedWatchlistIds = async (): Promise<MediaIdSets> => {
-    if (!getAccessToken()) return { movie: new Set(), tv: new Set() }
+    if (!getAccessToken()) return createEmptyMediaIdSets()
     if (watchlistIdsCache) return watchlistIdsCache
     if (watchlistIdsPromise) return watchlistIdsPromise
 
@@ -169,7 +171,7 @@ export const getCachedWatchlistIds = async (): Promise<MediaIdSets> => {
         watchlistIdsCache = sets
         return sets
     })()
-        .catch(() => ({ movie: new Set(), tv: new Set() }))
+        .catch(() => createEmptyMediaIdSets())
         .finally(() => {
             watchlistIdsPromise = null
         })
@@ -186,7 +188,7 @@ export const getCachedWatchlistItemId = async (tmdbId: number, mediaType: MediaT
 }
 
 export const getCachedRatingIds = async (): Promise<MediaIdSets> => {
-    if (!getAccessToken()) return { movie: new Set(), tv: new Set() }
+    if (!getAccessToken()) return createEmptyMediaIdSets()
     if (ratingIdsCache) return ratingIdsCache
     if (ratingIdsPromise) return ratingIdsPromise
 
@@ -196,7 +198,7 @@ export const getCachedRatingIds = async (): Promise<MediaIdSets> => {
         ratingIdsCache = sets
         return sets
     })()
-        .catch(() => ({ movie: new Set(), tv: new Set() }))
+        .catch(() => createEmptyMediaIdSets())
         .finally(() => {
             ratingIdsPromise = null
         })
