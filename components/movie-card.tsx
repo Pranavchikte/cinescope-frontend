@@ -301,6 +301,26 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
                       <Star className="w-4 h-4 text-[#F5F5F5]" />
                     </motion.button>
                   </div>
+
+                  {/* Quick Rate - One Tap (Desktop Only) */}
+                  {!isMobile && (
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {ratingOptions.map((option) => (
+                        <motion.button
+                          key={`quick-${option.value}`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={(e) => handleRating(option.value, e)}
+                          disabled={isLoading}
+                          className={`px-2 py-1.5 text-xs rounded-md border transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-[#1A1A1A]/70 border-[#2A2A2A] hover:border-[#14B8A6]/50 hover:bg-[#14B8A6]/10 ${
+                            option.value === "perfection" ? "border-[#14B8A6]/30" : ""
+                          }`}
+                        >
+                          <span className={`font-medium ${option.color}`}>{option.label}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

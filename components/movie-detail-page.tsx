@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
-import { moviesAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds } from "@/lib/api";
+import { moviesAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds, authAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   Sheet,
@@ -137,8 +137,8 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
           ) || fullData.videos.results?.[0];
         setTrailer(trailerVideo || null);
 
-        const inProviders = fullData.providers.results?.IN?.flatrate || [];
-        setProviders(inProviders);
+        const usProviders = fullData.providers.results?.US?.flatrate || [];
+        setProviders(usProviders);
 
         setImages({
           backdrops: fullData.images.backdrops?.slice(0, 12) || [],
@@ -178,6 +178,21 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
     };
 
     fetchMovieData();
+  }, [movieId]);
+
+  useEffect(() => {
+    const updateLastViewed = async () => {
+      try {
+        await authAPI.updateLastViewed({
+          tmdb_id: parseInt(movieId),
+          media_type: "movie",
+        });
+      } catch {
+        // Ignore if user is not logged in
+      }
+    };
+
+    updateLastViewed();
   }, [movieId]);
 
   useEffect(() => {
@@ -322,6 +337,8 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
     ? `https://www.youtube.com/embed/${trailer.key}?autoplay=0&rel=0`
     : null;
   const rating = movie.vote_average ? Math.round((movie.vote_average / 10) * 100) : 0;
+  const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : null;
+  const runtimeMinutes = typeof movie.runtime === "number" ? movie.runtime : null;
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">
@@ -436,17 +453,22 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               >
                 <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm text-[#A0A0A0] mb-3 md:mb-4">
                   <span className="font-medium text-[#F5F5F5]">
-                    {new Date(movie.release_date).getFullYear()}
+                    {releaseYear ?? "N/A"}
                   </span>
                   <span className="text-[#2A2A2A]">•</span>
                   <span>
-                    {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
+                    {runtimeMinutes !== null
+                      ? `${Math.floor(runtimeMinutes / 60)}h ${runtimeMinutes % 60}m`
+                      : "N/A"}
                   </span>
                   <span className="text-[#2A2A2A]">•</span>
                   <div className="flex items-center gap-1.5">
                     <Star className="w-4 h-4 fill-[#14B8A6] text-[#14B8A6]" />
                     <span className="font-semibold text-[#F5F5F5]">
-                      {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}/10
+                      {typeof movie.vote_average === "number"
+                        ? movie.vote_average.toFixed(1)
+                        : "N/A"}
+                      /10
                     </span>
                   </div>
                 </div>

@@ -300,6 +300,30 @@ export const authAPI = {
         if (!res.ok) throw new Error(await res.text())
         return res.json()
     },
+
+    updateLastViewed: async (data: { tmdb_id: number; media_type: 'movie' | 'tv' }) => {
+        const res = await authFetch(`${API_BASE_URL}/auth/last-viewed`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+
+    updateTasteProfile: async (data: {
+        preferred_movie_genres?: number[]
+        preferred_tv_genres?: number[]
+        preferred_languages?: string[]
+    }) => {
+        const res = await authFetch(`${API_BASE_URL}/auth/taste-profile`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
 }
 
 // Movies API
@@ -382,7 +406,7 @@ export const moviesAPI = {
         return res.json()
     },
 
-    getProviders: async (region: string = "IN") => {
+    getProviders: async (region: string = "US") => {
         const res = await fetch(`${API_BASE_URL}/movies/providers?region=${region}`)
         return res.json()
     },
@@ -485,7 +509,7 @@ export const tvAPI = {
         return res.json()
     },
 
-    getProviders: async (region: string = "IN") => {
+    getProviders: async (region: string = "US") => {
         const res = await fetch(`${API_BASE_URL}/tv/providers?region=${region}`)
         return res.json()
     },

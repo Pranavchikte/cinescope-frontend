@@ -1,9 +1,9 @@
 "use client";
 
-import { moviesAPI, getAccessToken } from "@/lib/api";
-import { useState, useRef, useEffect } from "react";
+import { moviesAPI, getAccessToken, authAPI, tvAPI } from "@/lib/api";
+import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Loader2, Info, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Info, Sparkles } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
 import { MovieGrid } from "@/components/movie-grid";
 import { MovieCardSkeleton } from "@/components/movie-card-skeleton";
@@ -405,6 +405,15 @@ export function BrowsePage() {
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
   const [personalizedMovies, setPersonalizedMovies] = useState<any[]>([]);
+  const [continueItem, setContinueItem] = useState<any | null>(null);
+  const [tvGenres, setTvGenres] = useState<{ id: number; name: string }[]>([]);
+  const [showTasteModal, setShowTasteModal] = useState(false);
+  const [tasteMovieGenres, setTasteMovieGenres] = useState<number[]>([]);
+  const [tasteTvGenres, setTasteTvGenres] = useState<number[]>([]);
+  const [tasteLanguages, setTasteLanguages] = useState<string[]>([]);
+  const [isSavingTaste, setIsSavingTaste] = useState(false);
+  const [tasteError, setTasteError] = useState<string | null>(null);
+  const [tasteHint, setTasteHint] = useState<string | null>(null);
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
   const [providers, setProviders] = useState<
     {
@@ -504,10 +513,12 @@ export function BrowsePage() {
             const [genresData, popular, providersData] = await Promise.all([
               moviesAPI.getGenres().catch(() => ({ genres: [] })),
               moviesAPI.getPopular().catch(() => ({ results: [] })),
-              moviesAPI.getProviders("IN").catch(() => ({ results: [] })),
+              moviesAPI.getProviders("US").catch(() => ({ results: [] })),
             ]);
 
             setGenres(genresData.genres || []);
+            const tvGenresData = await tvAPI.getGenres().catch(() => ({ genres: [] }));
+            setTvGenres(tvGenresData.genres || []);
 
             if (popular.results) {
               const popularTransformed = popular.results.map(transformMovie);
@@ -534,6 +545,45 @@ export function BrowsePage() {
               console.error("Failed to load personalized:", error);
             }
           }, 500);
+
+          setTimeout(async () => {
+            try {
+              const user = await authAPI.getCurrentUser();
+              if (user?.last_viewed_tmdb_id && user?.last_viewed_media_type) {
+                const details =
+                  user.last_viewed_media_type === "tv"
+                    ? await tvAPI.getDetails(user.last_viewed_tmdb_id)
+                    : await moviesAPI.getDetails(user.last_viewed_tmdb_id);
+                setContinueItem({
+                  id: details.id,
+                  title: details.title || details.name,
+                  poster: details.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${details.poster_path}`
+                    : "",
+                  year: details.release_date || details.first_air_date
+                    ? new Date(details.release_date || details.first_air_date).getFullYear()
+                    : 2024,
+                  mediaType: user.last_viewed_media_type,
+                });
+              }
+
+              if (user?.preferred_movie_genres?.length) {
+                setTasteMovieGenres(user.preferred_movie_genres);
+              }
+              if (user?.preferred_tv_genres?.length) {
+                setTasteTvGenres(user.preferred_tv_genres);
+              }
+              if (user?.preferred_languages?.length) {
+                setTasteLanguages(user.preferred_languages);
+              }
+
+              if (!user?.taste_onboarded) {
+                setShowTasteModal(true);
+              }
+            } catch (error) {
+              console.error("Failed to load continue item:", error);
+            }
+          }, 650);
         }
       } catch (error) {
         console.error("Critical fetch error:", error);
@@ -585,6 +635,47 @@ export function BrowsePage() {
     setCurrentFilters(filters);
   };
 
+  const toggleTasteSelection = (
+    list: number[],
+    setList: Dispatch<SetStateAction<number[]>>,
+    id: number,
+    limit: number
+  ) => {
+    setList((prev) => {
+      if (prev.includes(id)) return prev.filter((g) => g !== id);
+      if (prev.length >= limit) {
+        setTasteHint(`You can pick up to ${limit}.`);
+        setTimeout(() => setTasteHint(null), 2000);
+        return prev;
+      }
+      return [...prev, id];
+    });
+  };
+
+  const toggleLanguage = (code: string) => {
+    setTasteLanguages((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
+  };
+
+  const handleSaveTaste = async () => {
+    setIsSavingTaste(true);
+    setTasteError(null);
+    try {
+      await authAPI.updateTasteProfile({
+        preferred_movie_genres: tasteMovieGenres,
+        preferred_tv_genres: tasteTvGenres,
+        preferred_languages: tasteLanguages,
+      });
+      setShowTasteModal(false);
+    } catch (error) {
+      console.error("Failed to save taste profile:", error);
+      setTasteError("Couldn't save your preferences. Please try again.");
+    } finally {
+      setIsSavingTaste(false);
+    }
+  };
+
   const hasActiveFilters =
     currentFilters.genre ||
     currentFilters.year ||
@@ -599,6 +690,164 @@ export function BrowsePage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">
+      <AnimatePresence>
+        {showTasteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[120] bg-black/70 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.98 }}
+              transition={{ type: "spring", damping: 25, stiffness: 280 }}
+              className="w-full max-w-2xl bg-[#1A1A1A]/90 border border-[#2A2A2A] rounded-2xl p-6 sm:p-8 shadow-2xl"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-[#14B8A6]/10 border border-[#14B8A6]/30 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-[#14B8A6]" />
+                </div>
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-[#F5F5F5]">
+                    Build Your Taste Profile
+                  </h3>
+                  <p className="text-sm text-[#A0A0A0]">
+                    Pick a few genres and languages so recommendations feel personal.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <p className="text-sm font-medium text-[#F5F5F5] mb-2">Movies (up to 3)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {genres.map((g) => {
+                      const active = tasteMovieGenres.includes(g.id);
+                      return (
+                        <button
+                          key={`movie-${g.id}`}
+                          onClick={() =>
+                            toggleTasteSelection(
+                              tasteMovieGenres,
+                              setTasteMovieGenres,
+                              g.id,
+                              3
+                            )
+                          }
+                          className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                            active
+                              ? "bg-[#14B8A6]/15 text-[#14B8A6] border-[#14B8A6]/40"
+                              : "bg-[#2A2A2A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/40"
+                          }`}
+                        >
+                          {g.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-[#F5F5F5] mb-2">TV (up to 3)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {tvGenres.map((g) => {
+                      const active = tasteTvGenres.includes(g.id);
+                      return (
+                        <button
+                          key={`tv-${g.id}`}
+                          onClick={() =>
+                            toggleTasteSelection(
+                              tasteTvGenres,
+                              setTasteTvGenres,
+                              g.id,
+                              3
+                            )
+                          }
+                          className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                            active
+                              ? "bg-[#14B8A6]/15 text-[#14B8A6] border-[#14B8A6]/40"
+                              : "bg-[#2A2A2A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/40"
+                          }`}
+                        >
+                          {g.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-[#F5F5F5] mb-2">Languages</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { code: "en", label: "English" },
+                      { code: "hi", label: "Hindi" },
+                      { code: "ta", label: "Tamil" },
+                      { code: "te", label: "Telugu" },
+                      { code: "ml", label: "Malayalam" },
+                      { code: "mr", label: "Marathi" },
+                      { code: "pa", label: "Punjabi" },
+                      { code: "ko", label: "Korean" },
+                    ].map((lang) => {
+                      const active = tasteLanguages.includes(lang.code);
+                      return (
+                        <button
+                          key={lang.code}
+                          onClick={() => toggleLanguage(lang.code)}
+                          className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                            active
+                              ? "bg-[#14B8A6]/15 text-[#14B8A6] border-[#14B8A6]/40"
+                              : "bg-[#2A2A2A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/40"
+                          }`}
+                        >
+                          {lang.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex items-center justify-end gap-3">
+                <button
+                  onClick={async () => {
+                    setTasteError(null);
+                    try {
+                      await authAPI.updateTasteProfile({
+                        preferred_movie_genres: tasteMovieGenres,
+                        preferred_tv_genres: tasteTvGenres,
+                        preferred_languages: tasteLanguages,
+                      });
+                      setShowTasteModal(false);
+                    } catch {
+                      setTasteError("Couldn't save your preferences. Please try again.");
+                    }
+                  }}
+                  className="h-10 px-4 rounded-lg text-sm text-[#F5F5F5] bg-[#2A2A2A] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors"
+                >
+                  Skip
+                </button>
+                <button
+                  onClick={handleSaveTaste}
+                  disabled={isSavingTaste}
+                  className="h-10 px-5 rounded-lg text-sm font-semibold text-[#0F0F0F] bg-[#14B8A6] hover:bg-[#14B8A6]/90 transition-colors disabled:opacity-60"
+                >
+                  {isSavingTaste ? "Saving..." : "Save Taste Profile"}
+                </button>
+              </div>
+              {(tasteHint || tasteError) && (
+                <div className="mt-3 text-xs">
+                  {tasteHint && <p className="text-[#A0A0A0]">{tasteHint}</p>}
+                  {tasteError && <p className="text-red-400">{tasteError}</p>}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {!hasActiveFilters && <HeroBanner movie={featuredMovie} />}
 
       <div className="sticky top-0 z-40 bg-[#0F0F0F]/98 border-b border-[#2A2A2A] md:backdrop-blur-md">
@@ -611,6 +860,53 @@ export function BrowsePage() {
       </div>
 
       <div className="pt-8 pb-24">
+        {continueItem && (
+          <div className="px-6 sm:px-8 lg:px-16 mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl md:text-2xl font-semibold text-[#F5F5F5]">
+                Continue
+              </h2>
+              <span className="text-xs sm:text-sm text-[#A0A0A0]">
+                Last viewed
+              </span>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-4 bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-xl p-3 md:p-4"
+            >
+              <div className="w-16 sm:w-20 aspect-[2/3] rounded-lg overflow-hidden bg-[#0F0F0F] border border-[#2A2A2A] flex-shrink-0">
+                {continueItem.poster ? (
+                  <img
+                    src={continueItem.poster}
+                    alt={continueItem.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : null}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[#F5F5F5] font-medium line-clamp-1">
+                  {continueItem.title}
+                </p>
+                <p className="text-xs sm:text-sm text-[#A0A0A0] mt-1">
+                  {continueItem.mediaType === "tv" ? "TV Show" : "Movie"} · {continueItem.year}
+                </p>
+              </div>
+              <motion.button
+                onClick={() =>
+                  window.location.href = `/${continueItem.mediaType}/${continueItem.id}`
+                }
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="h-10 px-4 bg-[#14B8A6] text-[#0F0F0F] font-semibold rounded-lg text-sm"
+              >
+                Resume
+              </motion.button>
+            </motion.div>
+          </div>
+        )}
+
         {!hasActiveFilters && (
           <div className="space-y-16">
             {isAuthenticated && personalizedMovies.length > 0 && (

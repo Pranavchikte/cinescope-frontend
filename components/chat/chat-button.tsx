@@ -3,12 +3,19 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
-import { ChatModal } from "./chat-modal";
+import { ChatModal, Message } from "./chat-modal";
 
 
 export function ChatButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content:
+        "Hi! I'm your movie assistant. Ask me for recommendations, suggestions, or anything about movies!",
+    },
+  ]);
 
   // Detect mobile
   useEffect(() => {
@@ -17,6 +24,26 @@ export function ChatButton() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = sessionStorage.getItem("chat_messages");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    sessionStorage.setItem("chat_messages", JSON.stringify(messages));
+  }, [messages]);
 
   return (
     <>
@@ -37,7 +64,13 @@ export function ChatButton() {
 
       {/* Chat Modal */}
       <AnimatePresence>
-        {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
+        {isOpen && (
+          <ChatModal
+            onClose={() => setIsOpen(false)}
+            messages={messages}
+            setMessages={setMessages}
+          />
+        )}
       </AnimatePresence>
     </>
   );

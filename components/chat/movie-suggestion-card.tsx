@@ -15,17 +15,19 @@ interface MovieSuggestionCardProps {
     year: number;
     media_type: 'movie' | 'tv';
   };
+  onSelect?: () => void;
 }
 
-export function MovieSuggestionCard({ movie }: MovieSuggestionCardProps) {
+export function MovieSuggestionCard({ movie, onSelect }: MovieSuggestionCardProps) {
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
   const hasPoster = movie.poster && !imageError;
 
   const handleClick = () => {
-  const mediaType = movie.media_type || 'movie'; // Default to 'movie' if undefined
-  router.push(`/${mediaType}/${movie.id}`);
-};
+    const mediaType = movie.media_type || 'movie';
+    if (onSelect) onSelect();
+    router.push(`/${mediaType}/${movie.id}`);
+  };
 
   return (
     <motion.button
