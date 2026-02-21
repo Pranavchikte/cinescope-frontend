@@ -9,6 +9,7 @@ import {
   Film,
   Tv,
   Sparkles,
+  Share2,
   AlertCircle,
   CheckCircle,
 } from 'lucide-react'
@@ -217,6 +218,29 @@ export default function CreatorProfilePage({
     return selectedMediaType === 'movie' ? 'Movies' : 'TV Shows'
   }
 
+  const handleShareProfile = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : ''
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${username}'s Picks on CineScope`,
+          text: `Check out ${username}'s curated ratings on CineScope`,
+          url,
+        })
+      } else {
+        await navigator.clipboard.writeText(url)
+        showToast('success', 'Profile link copied!')
+      }
+    } catch {
+      if (url) {
+        await navigator.clipboard.writeText(url)
+        showToast('success', 'Profile link copied!')
+      } else {
+        showToast('error', 'Unable to share right now')
+      }
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
@@ -296,7 +320,7 @@ export default function CreatorProfilePage({
 
         {/* Creator Header */}
         <div className="mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
             {/* Avatar */}
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
@@ -345,6 +369,32 @@ export default function CreatorProfilePage({
                 </motion.div>
               </div>
             </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <motion.button
+              onClick={(e) => {
+                handleRipple(e, 'share-profile')
+                handleShareProfile()
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
+            >
+              {ripples['share-profile']?.map((ripple) => (
+                <motion.span
+                  key={ripple.id}
+                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  style={{ left: ripple.x, top: ripple.y }}
+                  initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
+                  animate={{ width: 100, height: 100, opacity: 0 }}
+                  transition={{ duration: 0.6 }}
+                />
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Share2 className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Share Profile</span>
+            </motion.button>
           </div>
         </div>
 

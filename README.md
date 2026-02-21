@@ -22,7 +22,9 @@
 | Feature | Technical Implementation |
 |---------|--------------------------|
 | **Mobile-First Design** | Optimized for 60fps scrolling, zero lag |
-| **AI Chat Interface** | Conversational movie recommendations |
+| **AI Chat Interface** | Conversational recommendations with fast caching |
+| **Taste Profile** | Onboarding for personalized discovery |
+| **Continue Watching** | Last-viewed resume across devices |
 | **Real-time Updates** | Instant watchlist & rating sync |
 | **Rich Media** | Trailers, cast info, high-res posters |
 | **Creator Profiles** | Public rating pages for influencers |
@@ -40,7 +42,7 @@
 | **Animations** | Framer Motion | Smooth, complex animations |
 | **UI Components** | Radix UI + shadcn/ui | Accessible, customizable |
 | **State** | React Hooks + Context | Simple, effective |
-| **API Client** | Axios + TanStack Query | Caching, error handling |
+| **API Client** | Fetch + lightweight utilities | Caching, error handling |
 | **Images** | Next.js Image | Optimization, lazy loading |
 
 ---
@@ -88,7 +90,7 @@ frontend/
 │   └── use-auth.ts             # Authentication state
 │
 ├── lib/                        # Utilities
-│   ├── api.ts                  # API client (Axios)
+│   ├── api.ts                  # API client (fetch)
 │   └── utils.ts                # Helper functions
 │
 ├── public/                     # Static assets
@@ -120,7 +122,7 @@ frontend/
 - ✅ **Component Design** - Reusable, composable components
 
 ### State & Data Management
-- ✅ **Server State** - TanStack Query for API caching
+- ✅ **Server State** - Lightweight in-component fetching
 - ✅ **Client State** - React Context for auth/theme
 - ✅ **Form Handling** - Controlled components, validation
 
@@ -218,10 +220,7 @@ The frontend communicates with the backend REST API:
 
 ```typescript
 // Example: Fetch trending movies
-const { data, isLoading } = useQuery({
-  queryKey: ['trending', 'movie'],
-  queryFn: () => moviesAPI.getTrending(),
-});
+const data = await moviesAPI.getTrending();
 ```
 
 ### Key Endpoints Used
@@ -229,7 +228,7 @@ const { data, isLoading } = useQuery({
 - `GET /movies/personalized` - AI recommendations
 - `GET /watchlist` - User's watchlist
 - `POST /ratings` - Rate a movie/TV show
-- `POST /chat/message` - AI chat
+- `POST /chat/ask` - AI chat
 
 ---
 

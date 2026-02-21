@@ -7,7 +7,7 @@ import { chatAPI } from "@/lib/chat-api";
 import { ChatMessage } from "./chat-message";
 import { MovieSuggestionCard } from "./movie-suggestion-card";
 
-interface Message {
+export interface Message {
   role: "user" | "assistant";
   content: string;
   movies?: Array<{
@@ -22,15 +22,11 @@ interface Message {
 
 interface ChatModalProps {
   onClose: () => void;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
-export function ChatModal({ onClose }: ChatModalProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hi! I'm your movie assistant. Ask me for recommendations, suggestions, or anything about movies!",
-    },
-  ]);
+export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -129,7 +125,11 @@ export function ChatModal({ onClose }: ChatModalProps) {
               {message.movies && message.movies.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {message.movies.map((movie) => (
-                    <MovieSuggestionCard key={movie.id} movie={movie} />
+                    <MovieSuggestionCard
+                      key={movie.id}
+                      movie={movie}
+                      onSelect={onClose}
+                    />
                   ))}
                 </div>
               )}

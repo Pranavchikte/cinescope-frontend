@@ -47,6 +47,8 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
     runtime_max: null,
   });
 
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [ripples, setRipples] = useState<{ [key: string]: { x: number; y: number; id: number }[] }>({})
 
@@ -75,10 +77,12 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
   }, [filters]);
 
   const updateFilter = (key: keyof FilterState, value: any) => {
+    setActivePreset(null);
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const resetFilters = () => {
+    setActivePreset(null);
     setFilters({
       genre: "",
       year: null,
@@ -100,7 +104,18 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
     setActiveDropdown(activeDropdown === name ? null : name);
   };
 
-  const hasActiveFilters = filters.genre || filters.provider || filters.sort_by !== "popularity.desc";
+  const hasActiveFilters =
+    filters.genre ||
+    filters.year ||
+    filters.language ||
+    filters.country ||
+    filters.provider ||
+    filters.sort_by !== "popularity.desc" ||
+    filters.vote_count_min !== 100 ||
+    filters.vote_average_min !== null ||
+    filters.vote_average_max !== null ||
+    filters.runtime_min !== null ||
+    filters.runtime_max !== null;
 
   const getGenreName = () => {
     if (!filters.genre) return "Genres";
@@ -114,10 +129,115 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
     return provider?.provider_name || "Platforms";
   };
 
+  const allowedProviders = [
+    { key: "netflix", label: "Netflix", match: ["netflix"] },
+    { key: "prime", label: "Amazon Prime Video", match: ["amazon prime video", "prime video", "amazon prime"] },
+    { key: "apple", label: "Apple TV", match: ["apple tv"] },
+  ];
+
+  const filteredProviders = (() => {
+    const seen = new Set<string>();
+    const result: { provider_id: number; provider_name: string; logo_path: string }[] = [];
+
+    for (const p of providers) {
+      const name = p.provider_name.toLowerCase();
+      const match = allowedProviders.find((ap) => ap.match.some((m) => name.includes(m)));
+      if (!match) continue;
+      if (seen.has(match.key)) continue;
+      seen.add(match.key);
+      result.push(p);
+    }
+
+    return result;
+  })();
+
   const getSortName = () => {
     const sort = SORT_OPTIONS.find((s) => s.value === filters.sort_by);
     return sort?.label || "Sort";
   };
+
+  const resolveGenreId = (candidates: string[]) => {
+    for (const name of candidates) {
+      const match = genres.find((g) => g.name.toLowerCase() === name.toLowerCase());
+      if (match) return match.id.toString();
+    }
+    return "";
+  };
+
+  const applyPreset = (presetId: string, patch: Partial<FilterState>) => {
+    setActivePreset(presetId);
+    setFilters((prev) => ({
+      ...prev,
+      ...patch,
+      year: null,
+      language: "",
+      country: "",
+      provider: "",
+      sort_by: patch.sort_by ?? "popularity.desc",
+      vote_count_min: patch.vote_count_min ?? 200,
+      vote_average_min: patch.vote_average_min ?? null,
+      vote_average_max: patch.vote_average_max ?? null,
+      runtime_min: patch.runtime_min ?? null,
+      runtime_max: patch.runtime_max ?? null,
+    }));
+  };
+
+  const moodPresets = [
+    {
+      id: "feel-good",
+      label: "Feel Good",
+      genreCandidates: mediaType === "tv" ? ["Comedy", "Family"] : ["Comedy", "Family"],
+      vote_average_min: 6.5,
+    },
+    {
+      id: "thriller-night",
+      label: "Thriller Night",
+      genreCandidates: ["Thriller", "Mystery", "Crime"],
+      vote_average_min: 6.5,
+    },
+    {
+      id: "action-rush",
+      label: "Action Rush",
+      genreCandidates: ["Action", "Adventure"],
+      vote_average_min: 6.0,
+    },
+    {
+      id: "romance",
+      label: "Romance",
+      genreCandidates: ["Romance"],
+      vote_average_min: 6.0,
+    },
+    {
+      id: "mind-bending",
+      label: "Mind-Bending",
+      genreCandidates: mediaType === "tv" ? ["Sci-Fi & Fantasy", "Mystery"] : ["Science Fiction", "Mystery"],
+      vote_average_min: 6.5,
+    },
+  ];
+
+  const timePresets = mediaType === "movie" ? [
+    {
+      id: "quick-30",
+      label: "Quick 30",
+      runtime_min: 20,
+      runtime_max: 45,
+      vote_average_min: 6.0,
+    },
+    {
+      id: "movie-night",
+      label: "Movie Night",
+      runtime_min: 80,
+      runtime_max: 120,
+      vote_average_min: 6.5,
+    },
+    {
+      id: "epic-2h",
+      label: "Epic 2h+",
+      runtime_min: 140,
+      runtime_max: null,
+      vote_average_min: 7.0,
+    },
+  ] : [];
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-12 py-4">
@@ -319,7 +439,7 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
                     <span className="relative z-10">All Platforms</span>
                   </motion.button>
                   <div className="h-px bg-[#2A2A2A]" />
-                  {providers.map((provider) => (
+                  {filteredProviders.map((provider) => (
                     <motion.button
                       key={provider.provider_id}
                       onClick={(e) => {
@@ -476,6 +596,58 @@ export function FilterBar({ onFilterChange, mediaType, genres, providers }: Filt
             </motion.button>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Quick Picks */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className="text-xs text-[#A0A0A0] self-center mr-2">Quick Picks</span>
+        {moodPresets.map((preset) => {
+          const genreId = resolveGenreId(preset.genreCandidates);
+          const isActive = activePreset === preset.id;
+          return (
+            <button
+              key={preset.id}
+              onClick={() =>
+                applyPreset(preset.id, {
+                  genre: genreId,
+                  vote_average_min: preset.vote_average_min,
+                  runtime_min: null,
+                  runtime_max: null,
+                })
+              }
+              className={`h-8 px-3 rounded-full text-xs font-medium border transition-colors ${
+                isActive
+                  ? "bg-[#14B8A6]/15 text-[#14B8A6] border-[#14B8A6]/50"
+                  : "bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50"
+              }`}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
+        {timePresets.map((preset) => {
+          const isActive = activePreset === preset.id;
+          return (
+            <button
+              key={preset.id}
+              onClick={() =>
+                applyPreset(preset.id, {
+                  genre: "",
+                  vote_average_min: preset.vote_average_min,
+                  runtime_min: preset.runtime_min,
+                  runtime_max: preset.runtime_max,
+                })
+              }
+              className={`h-8 px-3 rounded-full text-xs font-medium border transition-colors ${
+                isActive
+                  ? "bg-[#14B8A6]/15 text-[#14B8A6] border-[#14B8A6]/50"
+                  : "bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50"
+              }`}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Custom Scrollbar Styles for Dropdowns */}

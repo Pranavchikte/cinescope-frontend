@@ -1,6 +1,6 @@
 "use client";
 
-import { tvAPI, getAccessToken } from "@/lib/api";
+import { tvAPI, getAccessToken, authAPI, moviesAPI } from "@/lib/api";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Loader2, Play, Info } from "lucide-react";
@@ -331,6 +331,7 @@ export function TVBrowsePage() {
   const [popularShows, setPopularShows] = useState<any[]>([]);
   const [filteredShows, setFilteredShows] = useState<any[]>([]);
   const [personalizedShows, setPersonalizedShows] = useState<any[]>([]);
+  const [continueItem, setContinueItem] = useState<any | null>(null);
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
   const [providers, setProviders] = useState<
     { provider_id: number; provider_name: string; logo_path: string }[]
@@ -461,7 +462,7 @@ export function TVBrowsePage() {
             const [genresData, popular, providersData] = await Promise.all([
               tvAPI.getGenres().catch(() => ({ genres: [] })),
               tvAPI.getPopular().catch(() => ({ results: [] })),
-              tvAPI.getProviders("IN").catch(() => ({ results: [] })),
+              tvAPI.getProviders("US").catch(() => ({ results: [] })),
             ]);
 
             setGenres(genresData.genres || []);
@@ -491,6 +492,31 @@ export function TVBrowsePage() {
               console.error("Failed to load personalized:", error);
             }
           }, 500);
+
+          setTimeout(async () => {
+            try {
+              const user = await authAPI.getCurrentUser();
+              if (user?.last_viewed_tmdb_id && user?.last_viewed_media_type) {
+                const details =
+                  user.last_viewed_media_type === "movie"
+                    ? await moviesAPI.getDetails(user.last_viewed_tmdb_id)
+                    : await tvAPI.getDetails(user.last_viewed_tmdb_id);
+                setContinueItem({
+                  id: details.id,
+                  title: details.title || details.name,
+                  poster: details.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${details.poster_path}`
+                    : "",
+                  year: details.release_date || details.first_air_date
+                    ? new Date(details.release_date || details.first_air_date).getFullYear()
+                    : 2024,
+                  mediaType: user.last_viewed_media_type,
+                });
+              }
+            } catch (error) {
+              console.error("Failed to load continue item:", error);
+            }
+          }, 650);
         }
       } catch (error) {
         console.error("Critical TV fetch error:", error);
@@ -572,6 +598,53 @@ export function TVBrowsePage() {
       </div>
 
       <div className="pt-8 pb-24">
+        {continueItem && (
+          <div className="px-6 sm:px-8 lg:px-16 mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl md:text-2xl font-semibold text-[#F5F5F5]">
+                Continue
+              </h2>
+              <span className="text-xs sm:text-sm text-[#A0A0A0]">
+                Last viewed
+              </span>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-4 bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-xl p-3 md:p-4"
+            >
+              <div className="w-16 sm:w-20 aspect-[2/3] rounded-lg overflow-hidden bg-[#0F0F0F] border border-[#2A2A2A] flex-shrink-0">
+                {continueItem.poster ? (
+                  <img
+                    src={continueItem.poster}
+                    alt={continueItem.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : null}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[#F5F5F5] font-medium line-clamp-1">
+                  {continueItem.title}
+                </p>
+                <p className="text-xs sm:text-sm text-[#A0A0A0] mt-1">
+                  {continueItem.mediaType === "tv" ? "TV Show" : "Movie"} · {continueItem.year}
+                </p>
+              </div>
+              <motion.button
+                onClick={() =>
+                  window.location.href = `/${continueItem.mediaType}/${continueItem.id}`
+                }
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="h-10 px-4 bg-[#14B8A6] text-[#0F0F0F] font-semibold rounded-lg text-sm"
+              >
+                Resume
+              </motion.button>
+            </motion.div>
+          </div>
+        )}
+
         {!hasActiveFilters && (
           <div className="space-y-16">
             {isAuthenticated && personalizedShows.length > 0 && (

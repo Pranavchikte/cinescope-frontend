@@ -20,6 +20,7 @@ interface WatchlistItem {
 interface EnrichedWatchlistItem {
   id: string
   tmdb_id: number
+  added_at: string
   title: string
   rating: number
   poster: string
@@ -78,6 +79,7 @@ export function WatchlistPage() {
               return {
                 id: item.id,
                 tmdb_id: item.tmdb_id,
+                added_at: item.added_at,
                 title: tmdbData.title || tmdbData.name,
                 rating: tmdbData.vote_average || 0,
                 poster: tmdbData.poster_path
@@ -125,6 +127,18 @@ export function WatchlistPage() {
   const filteredWatchlist = filter === "all"
     ? watchlist
     : watchlist.filter((item) => item.mediaType === filter)
+
+  const nowThresholdMs = 7 * 24 * 60 * 60 * 1000
+  const nowItems = filteredWatchlist.filter((item) => {
+    const addedAt = new Date(item.added_at ?? Date.now()).getTime()
+    const safeAddedAt = Number.isNaN(addedAt) ? Date.now() : addedAt
+    return Date.now() - safeAddedAt <= nowThresholdMs
+  })
+  const nextItems = filteredWatchlist.filter((item) => {
+    const addedAt = new Date(item.added_at ?? Date.now()).getTime()
+    const safeAddedAt = Number.isNaN(addedAt) ? Date.now() : addedAt
+    return Date.now() - safeAddedAt > nowThresholdMs
+  })
 
   const stats = {
     all: watchlist.length,
@@ -336,24 +350,91 @@ export function WatchlistPage() {
             </motion.button>
           </motion.div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredWatchlist.map((item, index) => (
-                <WatchlistCard
-                  key={item.id}
-                  item={item}
-                  onRemove={() => removeFromWatchlist(item.id)}
-                  isRemoving={removingId === item.id}
-                  delay={index * 0.03}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <div className="space-y-10">
+            {/* Now Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold text-[#F5F5F5]">Now</h2>
+                  <p className="text-xs sm:text-sm text-[#A0A0A0]">
+                    Recently added
+                  </p>
+                </div>
+                <span className="text-xs sm:text-sm text-[#A0A0A0]">{nowItems.length}</span>
+              </div>
+              {nowItems.length === 0 ? (
+                <div className="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-lg p-4 text-sm text-[#A0A0A0]">
+                  Nothing new yet. Add a few titles to see them here.
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2"
+                >
+                  <AnimatePresence mode="popLayout">
+                    {nowItems.map((item, index) => (
+                      <WatchlistCard
+                        key={item.id}
+                        item={item}
+                        onRemove={() => removeFromWatchlist(item.id)}
+                        isRemoving={removingId === item.id}
+                        delay={index * 0.03}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Next Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold text-[#F5F5F5]">Next</h2>
+                  <p className="text-xs sm:text-sm text-[#A0A0A0]">
+                    Older items to catch up on
+                  </p>
+                </div>
+                <span className="text-xs sm:text-sm text-[#A0A0A0]">{nextItems.length}</span>
+              </div>
+              {nextItems.length === 0 ? (
+                <div className="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-lg p-4 text-sm text-[#A0A0A0]">
+                  Your backlog is clear. Nice work.
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2"
+                >
+                  <AnimatePresence mode="popLayout">
+                    {nextItems.map((item, index) => (
+                      <WatchlistCard
+                        key={item.id}
+                        item={item}
+                        onRemove={() => removeFromWatchlist(item.id)}
+                        isRemoving={removingId === item.id}
+                        delay={index * 0.03}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
         )}
       </div>
     </div>

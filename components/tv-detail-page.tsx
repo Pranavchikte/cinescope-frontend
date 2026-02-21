@@ -14,7 +14,7 @@ import {
   Tv,
 } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
-import { tvAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds } from "@/lib/api";
+import { tvAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds, authAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   Sheet,
@@ -122,8 +122,8 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           ) || fullData.videos.results?.[0];
         setTrailer(trailerVideo || null);
 
-        const inProviders = fullData.providers.results?.IN?.flatrate || [];
-        setProviders(inProviders);
+        const usProviders = fullData.providers.results?.US?.flatrate || [];
+        setProviders(usProviders);
 
         setImages({
           backdrops: fullData.images.backdrops?.slice(0, 12) || [],
@@ -172,6 +172,21 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
     };
 
     fetchShowData();
+  }, [tvId]);
+
+  useEffect(() => {
+    const updateLastViewed = async () => {
+      try {
+        await authAPI.updateLastViewed({
+          tmdb_id: parseInt(tvId),
+          media_type: "tv",
+        });
+      } catch {
+        // Ignore if user is not logged in
+      }
+    };
+
+    updateLastViewed();
   }, [tvId]);
 
   useEffect(() => {
@@ -459,14 +474,16 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 ))}
               </div>
               <span className="text-lg font-semibold text-[#F5F5F5]">
-                {show.vote_average.toFixed(1)}
+                {typeof show.vote_average === "number"
+                  ? show.vote_average.toFixed(1)
+                  : "N/A"}
                 <span className="text-[#A0A0A0]">/10</span>
               </span>
             </div>
 
             {/* Genres */}
             <div className="flex flex-wrap gap-2">
-              {show.genres.slice(0, 4).map((genre) => (
+              {(show.genres || []).slice(0, 4).map((genre) => (
                 <span
                   key={genre.id}
                   className="px-3 py-1.5 rounded-full bg-[#1A1A1A] md:backdrop-blur-sm text-sm text-[#F5F5F5] border border-[#2A2A2A]"
@@ -481,11 +498,13 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               <div>
                 <p className="text-sm text-[#A0A0A0] mb-1">First Air Date</p>
                 <p className="text-base font-medium text-[#F5F5F5]">
-                  {new Date(show.first_air_date).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {show.first_air_date
+                    ? new Date(show.first_air_date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "N/A"}
                 </p>
               </div>
               <div>
@@ -853,7 +872,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                                   <h4 className="text-white font-semibold">
                                     {episode.episode_number}. {episode.name}
                                   </h4>
-                                  {episode.vote_average > 0 && (
+                                  {typeof episode.vote_average === "number" && episode.vote_average > 0 && (
                                     <div className="flex items-center gap-1 ml-4">
                                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                                       <span className="text-sm text-zinc-400">
