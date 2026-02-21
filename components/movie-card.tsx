@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { watchlistAPI, ratingsAPI } from "@/lib/api";
+import { watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds, getCachedWatchlistItemId, removeFromWatchlistCache } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 interface Movie {
@@ -35,6 +35,7 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [showRatingMenu, setShowRatingMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRated, setIsRated] = useState(false);
   const [showToast, setShowToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -81,6 +82,28 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  useEffect(() => {
+    let isCancelled = false;
+    const syncUserLists = async () => {
+      try {
+        const [watchlistIds, ratingIds] = await Promise.all([
+          getCachedWatchlistIds(),
+          getCachedRatingIds(),
+        ]);
+        if (isCancelled) return;
+        setIsInWatchlist(watchlistIds[mediaType].has(movie.id));
+        setIsRated(ratingIds[mediaType].has(movie.id));
+      } catch {
+        // Ignore if user is logged out or request fails
+      }
+    };
+
+    syncUserLists();
+    return () => {
+      isCancelled = true;
+    };
+  }, [movie.id, mediaType]);
+
   const showNotification = (message: string, type: "success" | "error") => {
     setShowToast({ message, type });
     setTimeout(() => setShowToast(null), 3000);
@@ -93,6 +116,13 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
     setIsLoading(true);
     try {
       if (isInWatchlist) {
+        const watchlistItemId = await getCachedWatchlistItemId(movie.id, mediaType);
+        if (!watchlistItemId) {
+          showNotification("Couldn't find watchlist item", "error");
+          return;
+        }
+        await watchlistAPI.remove(watchlistItemId);
+        removeFromWatchlistCache(movie.id, mediaType);
         setIsInWatchlist(false);
         showNotification("Removed from watchlist", "success");
       } else {
@@ -101,8 +131,11 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
         showNotification("Added to watchlist", "success");
       }
     } catch (error: any) {
-      const errorText = error.message || "";
-      if (errorText.includes("verify your email")) {
+      const errorText = (error.message || "").toLowerCase();
+      if (errorText.includes("already in watchlist")) {
+        setIsInWatchlist(true);
+        showNotification("Already in watchlist", "error");
+      } else if (errorText.includes("verify your email")) {
         showNotification("Please verify your email first", "error");
       } else {
         showNotification("Please login first", "error");
@@ -116,6 +149,12 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
     e?.preventDefault();
     e?.stopPropagation();
 
+    if (isRated) {
+      setShowRatingMenu(false);
+      showNotification("Already rated. Update it from Ratings page.", "error");
+      return;
+    }
+
     setIsLoading(true);
     try {
       await ratingsAPI.create({
@@ -124,13 +163,18 @@ export const MovieCard = React.memo(function MovieCard({ movie, mediaType = "mov
         rating: ratingValue,
       });
       setShowRatingMenu(false);
+      setIsRated(true);
       showNotification(
         `Rated as ${ratingOptions.find((r) => r.value === ratingValue)?.label}`,
         "success",
       );
     } catch (error: any) {
-      const errorText = error.message || "";
-      if (errorText.includes("verify your email")) {
+      const errorText = (error.message || "").toLowerCase();
+      if (errorText.includes("already rated")) {
+        setShowRatingMenu(false);
+        setIsRated(true);
+        showNotification("Already rated. Update it from Ratings page.", "error");
+      } else if (errorText.includes("verify your email")) {
         showNotification("Please verify your email first", "error");
       } else {
         showNotification("Please login first", "error");

@@ -4,23 +4,28 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/a
 // Token management (localStorage + cookies for middleware)
 export const getAccessToken = () => {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('access_token');
+    return sessionStorage.getItem('access_token') || localStorage.getItem('access_token');
 };
 
 export const getRefreshToken = () => {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('refresh_token');
+    return sessionStorage.getItem('refresh_token') || localStorage.getItem('refresh_token');
 };
 
-export const setTokens = (accessToken: string, refreshToken: string) => {
+export const setTokens = (accessToken: string, refreshToken: string, remember: boolean = true) => {
     if (typeof window === 'undefined') return;
 
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem('access_token', accessToken);
+    storage.setItem('refresh_token', refreshToken);
 
-    // Also set as cookie for middleware
-    document.cookie = `access_token=${accessToken}; path=/; max-age=${60 * 60}`; // 1 hour
-    document.cookie = `refresh_token=${refreshToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+    if (remember) {
+        document.cookie = `access_token=${accessToken}; path=/; max-age=${60 * 60}`; // 1 hour
+        document.cookie = `refresh_token=${refreshToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+    } else {
+        document.cookie = `access_token=${accessToken}; path=/`;
+        document.cookie = `refresh_token=${refreshToken}; path=/`;
+    }
 };
 
 export const clearTokens = () => {
@@ -28,6 +33,8 @@ export const clearTokens = () => {
 
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
 
     // Clear cookies
     document.cookie = 'access_token=; path=/; max-age=0';
@@ -104,6 +111,117 @@ const authFetch = async (url: string, options: RequestInit = {}): Promise<Respon
     return res
 }
 
+const getErrorMessageFromResponse = async (res: Response): Promise<string> => {
+    const rawText = await res.text()
+    if (!rawText) return res.statusText || 'Request failed'
+
+    try {
+        const data = JSON.parse(rawText)
+        if (typeof data.detail === 'string') return data.detail
+        if (Array.isArray(data.detail)) return data.detail.join(', ')
+        if (typeof data.message === 'string') return data.message
+    } catch {
+        // Fall through to rawText
+    }
+
+    return rawText
+}
+
+type MediaTypeKey = 'movie' | 'tv'
+type MediaIdSets = { movie: Set<number>; tv: Set<number> }
+type MediaIdMaps = { movie: Map<number, string>; tv: Map<number, string> }
+
+const buildMediaIdSets = (items: Array<{ tmdb_id: number; media_type: MediaTypeKey }>): MediaIdSets => {
+    const sets: MediaIdSets = { movie: new Set(), tv: new Set() }
+    for (const item of items) {
+        if (item.media_type === 'movie' || item.media_type === 'tv') {
+            sets[item.media_type].add(item.tmdb_id)
+        }
+    }
+    return sets
+}
+
+const buildWatchlistIdMap = (items: Array<{ id: string; tmdb_id: number; media_type: MediaTypeKey }>): MediaIdMaps => {
+    const maps: MediaIdMaps = { movie: new Map(), tv: new Map() }
+    for (const item of items) {
+        if (item.media_type === 'movie' || item.media_type === 'tv') {
+            maps[item.media_type].set(item.tmdb_id, item.id)
+        }
+    }
+    return maps
+}
+
+let watchlistIdsCache: MediaIdSets | null = null
+let watchlistIdsPromise: Promise<MediaIdSets> | null = null
+let watchlistItemIdCache: MediaIdMaps | null = null
+let ratingIdsCache: MediaIdSets | null = null
+let ratingIdsPromise: Promise<MediaIdSets> | null = null
+
+export const getCachedWatchlistIds = async (): Promise<MediaIdSets> => {
+    if (!getAccessToken()) return { movie: new Set(), tv: new Set() }
+    if (watchlistIdsCache) return watchlistIdsCache
+    if (watchlistIdsPromise) return watchlistIdsPromise
+
+    watchlistIdsPromise = (async () => {
+        const items = await watchlistAPI.get()
+        const sets = buildMediaIdSets(items)
+        watchlistItemIdCache = buildWatchlistIdMap(items)
+        watchlistIdsCache = sets
+        return sets
+    })()
+        .catch(() => ({ movie: new Set(), tv: new Set() }))
+        .finally(() => {
+            watchlistIdsPromise = null
+        })
+
+    return watchlistIdsPromise
+}
+
+export const getCachedWatchlistItemId = async (tmdbId: number, mediaType: MediaTypeKey): Promise<string | null> => {
+    if (!getAccessToken()) return null
+    if (!watchlistIdsCache || !watchlistItemIdCache) {
+        await getCachedWatchlistIds()
+    }
+    return watchlistItemIdCache?.[mediaType].get(tmdbId) ?? null
+}
+
+export const getCachedRatingIds = async (): Promise<MediaIdSets> => {
+    if (!getAccessToken()) return { movie: new Set(), tv: new Set() }
+    if (ratingIdsCache) return ratingIdsCache
+    if (ratingIdsPromise) return ratingIdsPromise
+
+    ratingIdsPromise = (async () => {
+        const items = await ratingsAPI.get()
+        const sets = buildMediaIdSets(items)
+        ratingIdsCache = sets
+        return sets
+    })()
+        .catch(() => ({ movie: new Set(), tv: new Set() }))
+        .finally(() => {
+            ratingIdsPromise = null
+        })
+
+    return ratingIdsPromise
+}
+
+const addToWatchlistCache = (tmdbId: number, mediaType: MediaTypeKey) => {
+    if (!watchlistIdsCache) return
+    watchlistIdsCache[mediaType].add(tmdbId)
+}
+
+export const removeFromWatchlistCache = (tmdbId: number, mediaType: MediaTypeKey) => {
+    if (!watchlistIdsCache) return
+    watchlistIdsCache[mediaType].delete(tmdbId)
+    if (watchlistItemIdCache) {
+        watchlistItemIdCache[mediaType].delete(tmdbId)
+    }
+}
+
+const addToRatingsCache = (tmdbId: number, mediaType: MediaTypeKey) => {
+    if (!ratingIdsCache) return
+    ratingIdsCache[mediaType].add(tmdbId)
+}
+
 // Auth API
 // Auth API
 export const authAPI = {
@@ -120,7 +238,7 @@ export const authAPI = {
         return res.json()
     },
 
-    login: async (data: { email: string; password: string }) => {
+    login: async (data: { email: string; password: string; remember?: boolean }) => {
         const res = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -131,7 +249,7 @@ export const authAPI = {
             throw new Error(error.detail || 'Login failed')
         }
         const tokens = await res.json()
-        setTokens(tokens.access_token, tokens.refresh_token)
+        setTokens(tokens.access_token, tokens.refresh_token, data.remember !== false)
         return tokens
     },
 
@@ -410,14 +528,21 @@ export const watchlistAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
-        if (!res.ok) throw new Error(await res.text())
-        return res.json()
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
+        const created = await res.json()
+        addToWatchlistCache(data.tmdb_id, data.media_type)
+        if (!watchlistItemIdCache) {
+            watchlistItemIdCache = { movie: new Map(), tv: new Map() }
+        }
+        watchlistItemIdCache[data.media_type].set(data.tmdb_id, created.id)
+        return created
     },
 
     remove: async (id: string) => {
         const res = await authFetch(`${API_BASE_URL}/watchlist/${id}`, {
             method: 'DELETE',
         })
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
         return res.json()
     },
 }
@@ -437,8 +562,10 @@ export const ratingsAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
-        if (!res.ok) throw new Error(await res.text())
-        return res.json()
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
+        const created = await res.json()
+        addToRatingsCache(data.tmdb_id, data.media_type)
+        return created
     },
 
     update: async (id: string, rating: string) => {
@@ -447,6 +574,7 @@ export const ratingsAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ rating }),
         })
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
         return res.json()
     },
 
@@ -454,6 +582,7 @@ export const ratingsAPI = {
         const res = await authFetch(`${API_BASE_URL}/ratings/${id}`, {
             method: 'DELETE',
         })
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
         return res.json()
     },
 }
