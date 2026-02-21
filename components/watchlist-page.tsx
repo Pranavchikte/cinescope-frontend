@@ -4,10 +4,11 @@ import React from "react"
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, X, Film, Tv, Star, Trash2, Check } from "lucide-react"
+import { Loader2, X, Film, Tv, Star, Trash2, Check, MoreVertical } from "lucide-react"
 import { watchlistAPI, moviesAPI, tvAPI } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
 interface WatchlistItem {
   id: string
@@ -372,6 +373,7 @@ function WatchlistCard({
 }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [showActions, setShowActions] = useState(false)
   const [ripples, setRipples] = useState<{ [key: string]: { x: number; y: number; id: number }[] }>({})
 
   const handleRipple = (e: React.MouseEvent, key: string) => {
@@ -565,22 +567,71 @@ function WatchlistCard({
         )}
       </AnimatePresence>
 
-      {/* Remove Button - Mobile */}
+      {/* Mobile: Quick Manage Button on Poster */}
       <motion.button
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          if (window.confirm(`Remove "${item.title}" from your list?`)) {
-            onRemove()
-          }
+          setShowActions(true)
         }}
         disabled={isRemoving}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-red-500/20 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 md:backdrop-blur-xl rounded-full flex items-center justify-center md:transition-all duration-200 disabled:opacity-50"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#2A2A2A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-xl rounded-full flex items-center justify-center md:transition-all duration-200 disabled:opacity-50"
       >
-        {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+        {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <MoreVertical className="w-3 h-3" />}
       </motion.button>
+
+      {/* Mobile: Action Row */}
+      <div className="md:hidden mt-2 flex gap-2">
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setShowActions(true)
+          }}
+          className="flex-1 h-10 rounded-lg bg-[#1A1A1A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors text-sm font-medium"
+        >
+          Manage
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setShowActions(true)
+          }}
+          className="h-10 px-4 rounded-lg bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors text-sm font-medium"
+        >
+          Remove
+        </button>
+      </div>
+
+      {/* Mobile Actions Sheet */}
+      <Sheet open={showActions} onOpenChange={setShowActions}>
+        <SheetContent side="bottom" className="bg-[#0F0F0F] border-t border-[#2A2A2A]">
+          <SheetHeader>
+            <SheetTitle className="text-[#F5F5F5]">Manage</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 space-y-2">
+            <div className="text-sm text-[#A0A0A0] truncate">{item.title}</div>
+            <button
+              onClick={() => {
+                onRemove()
+                setShowActions(false)
+              }}
+              className="w-full h-12 rounded-lg bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors"
+            >
+              Remove from Watchlist
+            </button>
+            <button
+              onClick={() => setShowActions(false)}
+              className="w-full h-12 rounded-lg bg-[#1A1A1A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </motion.div>
   )
 }

@@ -11,10 +11,12 @@ import {
   XCircle,
   Trash2,
   Edit3,
+  MoreVertical,
 } from "lucide-react";
 import { ratingsAPI, moviesAPI, tvAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface RatingItem {
   id: string;
@@ -602,6 +604,7 @@ function RatedMovieCard({
     "perfection",
   ] as const;
   const [isHovered, setIsHovered] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const config = RATING_CONFIG[movie.rating];
   const Icon = config.icon;
 
@@ -776,27 +779,61 @@ function RatedMovieCard({
         whileTap={{ scale: 0.9 }}
         onClick={(e) => {
           e.preventDefault();
-          const newRating = prompt(
-            `Current rating: ${config.label}\n\nSelect new rating:\n1 - Skip\n2 - Timepass\n3 - Go For It\n4 - Perfection\n\nOr press Cancel to delete`,
-          );
-          if (newRating === null) {
-            if (window.confirm(`Remove "${movie.title}" from your ratings?`)) {
-              onRemove();
-            }
-          } else if (newRating === "1") {
-            onUpdate("skip");
-          } else if (newRating === "2") {
-            onUpdate("timepass");
-          } else if (newRating === "3") {
-            onUpdate("go_for_it");
-          } else if (newRating === "4") {
-            onUpdate("perfection");
-          }
+          setShowActions(true);
         }}
-        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#14B8A6]/20 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full flex items-center justify-center md:transition-all duration-200 md:backdrop-blur-sm"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#2A2A2A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-full flex items-center justify-center md:transition-all duration-200 md:backdrop-blur-sm"
       >
-        <Edit3 className="w-3.5 h-3.5" />
+        <MoreVertical className="w-3.5 h-3.5" />
       </motion.button>
+
+      {/* Mobile Actions Sheet */}
+      <Sheet open={showActions} onOpenChange={setShowActions}>
+        <SheetContent side="bottom" className="bg-[#0F0F0F] border-t border-[#2A2A2A]">
+          <SheetHeader>
+            <SheetTitle className="text-[#F5F5F5]">Edit Rating</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 space-y-2">
+            <div className="text-sm text-[#A0A0A0] truncate">{movie.title}</div>
+            {ratingOptions.map((option) => {
+              const optionConfig = RATING_CONFIG[option];
+              const OptionIcon = optionConfig.icon;
+              const isActive = option === movie.rating;
+              return (
+                <button
+                  key={option}
+                  onClick={() => {
+                    onUpdate(option);
+                    setShowActions(false);
+                  }}
+                  className={`w-full h-12 rounded-lg border transition-colors flex items-center gap-3 px-4 ${
+                    isActive
+                      ? "bg-[#14B8A6]/10 border-[#14B8A6]/40 text-[#14B8A6]"
+                      : "bg-[#1A1A1A] border-[#2A2A2A] text-[#F5F5F5] hover:border-[#14B8A6]/40"
+                  }`}
+                >
+                  <OptionIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">{optionConfig.label}</span>
+                </button>
+              );
+            })}
+            <button
+              onClick={() => {
+                onRemove();
+                setShowActions(false);
+              }}
+              className="w-full h-12 rounded-lg bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors"
+            >
+              Remove Rating
+            </button>
+            <button
+              onClick={() => setShowActions(false)}
+              className="w-full h-12 rounded-lg bg-[#1A1A1A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </motion.div>
   );
 }

@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
-import { moviesAPI, watchlistAPI, ratingsAPI } from "@/lib/api";
+import { moviesAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   Sheet,
@@ -70,6 +70,8 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [showRatingSheet, setShowRatingSheet] = useState(false);
   const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [isRated, setIsRated] = useState(false);
   const [ripples, setRipples] = useState<{
     [key: string]: { x: number; y: number; id: number }[];
   }>({});
@@ -178,17 +180,49 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
     fetchMovieData();
   }, [movieId]);
 
+  useEffect(() => {
+    let isCancelled = false;
+    const syncUserLists = async () => {
+      try {
+        const [watchlistIds, ratingIds] = await Promise.all([
+          getCachedWatchlistIds(),
+          getCachedRatingIds(),
+        ]);
+        if (isCancelled) return;
+        const id = parseInt(movieId);
+        setIsInWatchlist(watchlistIds.movie.has(id));
+        setIsRated(ratingIds.movie.has(id));
+      } catch {
+        // Ignore if user is logged out or request fails
+      }
+    };
+
+    syncUserLists();
+    return () => {
+      isCancelled = true;
+    };
+  }, [movieId]);
+
   const handleAddToWatchlist = async () => {
+    if (isInWatchlist) {
+      showNotification("Already in watchlist", "error");
+      return;
+    }
+
     setIsAddingToWatchlist(true);
     try {
       await watchlistAPI.add({
         tmdb_id: parseInt(movieId),
         media_type: "movie",
       });
+      setIsInWatchlist(true);
       showNotification("Added to watchlist!", "success");
     } catch (error: any) {
-      const errorText = error.message || "";
-      if (errorText.includes("verify your email")) {
+      const errorText = (error.message || "").toLowerCase();
+      if (errorText.includes("already in watchlist")) {
+        setIsInWatchlist(true);
+        showNotification("Already in watchlist", "error");
+      } else if (errorText.includes("verify your email")) {
         showNotification("Please verify your email first", "error");
       } else {
         showNotification("Failed. Please login first.", "error");
@@ -199,6 +233,12 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   };
 
   const handleRating = async (ratingValue: string) => {
+    if (isRated) {
+      setShowRatingSheet(false);
+      showNotification("Already rated. Update it from Ratings page.", "error");
+      return;
+    }
+
     try {
       await ratingsAPI.create({
         tmdb_id: parseInt(movieId),
@@ -206,13 +246,18 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
         rating: ratingValue,
       });
       setShowRatingSheet(false);
+      setIsRated(true);
       showNotification(
         `Rated as ${ratingOptions.find((r) => r.value === ratingValue)?.label}!`,
         "success",
       );
     } catch (error: any) {
-      const errorText = error.message || "";
-      if (errorText.includes("verify your email")) {
+      const errorText = (error.message || "").toLowerCase();
+      if (errorText.includes("already rated")) {
+        setShowRatingSheet(false);
+        setIsRated(true);
+        showNotification("Already rated. Update it from Ratings page.", "error");
+      } else if (errorText.includes("verify your email")) {
         showNotification("Please verify your email first", "error");
       } else {
         showNotification("Failed to rate. Please login first.", "error");

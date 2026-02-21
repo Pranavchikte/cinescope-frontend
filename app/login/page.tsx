@@ -13,10 +13,12 @@ import { toast } from 'sonner'
 interface LoginFormData {
   email: string
   password: string
+  remember: boolean
 }
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [remember, setRemember] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [ripples, setRipples] = useState<{ [key: string]: { x: number; y: number; id: number }[] }>({})
   const router = useRouter()
@@ -27,7 +29,7 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>({
     mode: 'onBlur',
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', remember: true },
   })
 
   // Ripple effect handler
@@ -53,7 +55,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true)
     try {
-      await authAPI.login(data)
+      await authAPI.login({ email: data.email, password: data.password, remember })
       toast.success('Welcome back!', {
         description: 'You have successfully signed in.',
       })
@@ -242,6 +244,8 @@ export default function LoginPage() {
                   <div className="relative">
                     <input
                       type="checkbox"
+                      checked={remember}
+                      onChange={(e) => setRemember(e.target.checked)}
                       className="w-4 h-4 rounded accent-[#14B8A6] bg-[#2A2A2A] border-[#2A2A2A] cursor-pointer peer"
                     />
                     <div className="absolute inset-0 rounded opacity-0 peer-checked:opacity-100 transition-opacity duration-200 pointer-events-none" style={{ boxShadow: '0 0 10px rgba(20, 184, 166, 0.5)' }} />
