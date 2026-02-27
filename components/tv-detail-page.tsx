@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
 import { tvAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds, authAPI } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import {
   Sheet,
@@ -86,6 +87,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   const [showAllCast, setShowAllCast] = useState(false);
   const castScrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const ratingOptions = [
     { value: "skip", label: "Skip", icon: "⏭️", color: "text-zinc-400" },
@@ -537,9 +539,27 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-6">
               <Button
+                onClick={() => {
+                  // Check if user is authenticated
+                  if (!isAuthenticated) {
+                    // Redirect to login
+                    router.push(`/login?redirect=${encodeURIComponent(window.location.href)}`);
+                    return;
+                  }
+                  
+                  // Navigate to watch page - start from season 1 episode 1
+                  router.push(`/watch/tv/${tvId}/1/1`);
+                }}
+                className="flex-1 sm:flex-none h-12 px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold rounded-lg transition-all"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Watch Now
+              </Button>
+
+              <Button
                 onClick={handleAddToWatchlist}
                 disabled={isAddingToWatchlist}
-                className="flex-1 sm:flex-none h-12 px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold rounded-lg transition-all disabled:opacity-50"
+                className="flex-1 sm:flex-none h-12 px-6 bg-[#1A1A1A] hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 font-semibold rounded-lg transition-all duration-200"
               >
                 {isAddingToWatchlist ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

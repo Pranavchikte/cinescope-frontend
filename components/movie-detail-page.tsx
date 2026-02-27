@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
 import { moviesAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds, authAPI } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import {
   Sheet,
@@ -81,6 +82,7 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
   } | null>(null);
   const castScrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const ratingOptions = [
     { value: "skip", label: "Skip", icon: "⏭️", color: "text-zinc-400" },
@@ -511,18 +513,21 @@ export function MovieDetailPage({ movieId }: { movieId: string }) {
               >
                 <div className="flex flex-wrap gap-2 md:gap-3">
                   <Button
-                    onClick={handleAddToWatchlist}
-                    disabled={isAddingToWatchlist}
+                    onClick={() => {
+                      // Check if user is authenticated
+                      if (!isAuthenticated) {
+                        // Redirect to login
+                        router.push(`/login?redirect=${encodeURIComponent(window.location.href)}`);
+                        return;
+                      }
+                      
+                      // Navigate to watch page
+                      router.push(`/watch/movie/${movieId}`);
+                    }}
                     className="h-10 md:h-12 px-4 md:px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl text-sm md:text-base duration-200"
                   >
-                    {isAddingToWatchlist ? (
-                      <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
-                    ) : (
-                      <>
-                        <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                        Add to Watchlist
-                      </>
-                    )}
+                    <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                    Watch Now
                   </Button>
 
                   <Button

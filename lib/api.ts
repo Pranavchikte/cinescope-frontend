@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
 
 // Token management
 // Token management (localStorage + cookies for middleware)
@@ -705,6 +705,47 @@ export const profileAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+}
+
+// Watch History API
+export const watchHistoryAPI = {
+    create: async (data: {
+        movie_id?: number;
+        tv_show_id?: number;
+        season_number?: number;
+        episode_number?: number;
+        progress?: number;
+        quality?: string;
+    }) => {
+        const res = await authFetch(`${API_BASE_URL}/watch-history`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+    
+    getAll: async () => {
+        const res = await authFetch(`${API_BASE_URL}/watch-history`)
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+    
+    getByMovie: async (movieId: number) => {
+        const res = await authFetch(`${API_BASE_URL}/watch-history/movie/${movieId}`)
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+    
+    getByTV: async (tvId: number, season?: number, episode?: number) => {
+        let url = `${API_BASE_URL}/watch-history/tv/${tvId}`
+        if (season) url += `?season=${season}`
+        if (episode) url += `&episode=${episode}`
+        const res = await authFetch(url)
         if (!res.ok) throw new Error(await res.text())
         return res.json()
     },
