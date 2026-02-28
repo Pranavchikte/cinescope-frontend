@@ -132,24 +132,24 @@ export default function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] blur-xl opacity-50 animate-pulse" />
-            <Loader2 className="w-10 h-10 text-[#14B8A6] animate-spin relative z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-xl opacity-50 animate-pulse" />
+            <Loader2 className="w-10 h-10 text-primary animate-spin relative z-10" />
           </div>
-          <p className="text-sm text-[#A0A0A0] animate-pulse">Loading dashboard...</p>
+          <p className="text-sm text-muted-foreground animate-pulse">Loading dashboard...</p>
         </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-24 pb-12 relative">
+    <div className="min-h-screen bg-background pt-24 pb-12 relative">
       {/* Toast Container */}
       <div className="fixed top-20 right-4 z-50 space-y-2">
         <AnimatePresence>
@@ -162,8 +162,8 @@ export default function AdminDashboard() {
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className={`px-4 py-3 rounded-lg border backdrop-blur-xl shadow-2xl flex items-center gap-3 min-w-[300px] ${
                 toast.type === 'success'
-                  ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]'
-                  : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  : 'bg-destructive/10 border-destructive/30 text-destructive'
               }`}
             >
               {toast.type === 'success' ? (
@@ -189,16 +189,16 @@ export default function AdminDashboard() {
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 bg-[#14B8A6]/10 rounded-lg flex items-center justify-center border border-[#14B8A6]/30 backdrop-blur-xl relative overflow-hidden group cursor-pointer"
+              className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/30 backdrop-blur-xl relative overflow-hidden group cursor-pointer"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <Shield className="w-6 h-6 text-[#14B8A6] relative z-10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Shield className="w-6 h-6 text-primary relative z-10" />
             </motion.div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#F5F5F5]">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Admin Dashboard
               </h1>
-              <p className="text-base text-[#A0A0A0] mt-1">
+              <p className="text-base text-muted-foreground mt-1">
                 Manage creator access requests
               </p>
             </div>
@@ -207,9 +207,9 @@ export default function AdminDashboard() {
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { icon: Clock, label: 'Pending', count: statusCounts.pending, color: '#F59E0B', gradient: 'from-[#F59E0B]' },
-              { icon: CheckCircle, label: 'Approved', count: statusCounts.approved, color: '#10B981', gradient: 'from-[#10B981]' },
-              { icon: XCircle, label: 'Rejected', count: statusCounts.rejected, color: '#EF4444', gradient: 'from-[#EF4444]' },
+              { icon: Clock, label: 'Pending', count: statusCounts.pending, colorClass: 'text-amber-400', gradient: 'from-amber-500' },
+              { icon: CheckCircle, label: 'Approved', count: statusCounts.approved, colorClass: 'text-emerald-400', gradient: 'from-emerald-500' },
+              { icon: XCircle, label: 'Rejected', count: statusCounts.rejected, colorClass: 'text-destructive', gradient: 'from-destructive' },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -218,16 +218,16 @@ export default function AdminDashboard() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="bg-[#1A1A1A]/50 border border-[#2A2A2A] rounded-lg p-4 backdrop-blur-xl relative overflow-hidden group cursor-pointer"
+                className="bg-card/50 border border-border rounded-lg p-4 backdrop-blur-xl relative overflow-hidden group cursor-pointer"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
                 <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bg-gradient-to-r ${stat.gradient} to-transparent`} style={{ filter: 'blur(20px)' }} />
                 
                 <div className="flex items-center gap-2 mb-2 relative z-10">
-                  <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
-                  <span className="text-sm text-[#A0A0A0] group-hover:text-[#F5F5F5] transition-colors duration-200">{stat.label}</span>
+                  <stat.icon className={`w-4 h-4 ${stat.colorClass}`} />
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-200">{stat.label}</span>
                 </div>
-                <p className="text-2xl font-semibold text-[#F5F5F5] relative z-10">{stat.count}</p>
+                <p className="text-2xl font-semibold text-foreground relative z-10">{stat.count}</p>
               </motion.div>
             ))}
           </div>
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex gap-4 mb-8 border-b border-[#2A2A2A] relative"
+          className="flex gap-4 mb-8 border-b border-border relative"
         >
           {[
             { key: 'pending', icon: Clock, label: 'Pending' },
@@ -253,15 +253,15 @@ export default function AdminDashboard() {
               }}
               className={`pb-3 px-1 text-sm font-medium border-b-2 transition-all duration-300 flex items-center gap-2 relative overflow-hidden group ${
                 filter === tab.key
-                  ? 'border-[#14B8A6] text-[#14B8A6]'
-                  : 'border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {/* Ripple effect */}
               {ripples[`tab-${tab.key}`]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
-                  className="absolute bg-[#14B8A6]/30 rounded-full"
+                  className="absolute bg-primary/30 rounded-full"
                   style={{ left: ripple.x, top: ripple.y }}
                   initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                   animate={{ width: 100, height: 100, opacity: 0 }}
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
               ))}
               
               {/* Gradient underline on hover */}
-              <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${filter === tab.key ? 'opacity-100' : ''}`} />
+              <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${filter === tab.key ? 'opacity-100' : ''}`} />
               
               <tab.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
               {tab.label}
@@ -291,15 +291,15 @@ export default function AdminDashboard() {
             >
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 10 }}
-                className="w-16 h-16 mb-6 flex items-center justify-center bg-[#1A1A1A]/50 border border-[#2A2A2A] rounded-full backdrop-blur-xl relative overflow-hidden group"
+                className="w-16 h-16 mb-6 flex items-center justify-center bg-card/50 border border-border rounded-full backdrop-blur-xl relative overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <Users className="w-8 h-8 text-[#A0A0A0] relative z-10" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <Users className="w-8 h-8 text-muted-foreground relative z-10" />
               </motion.div>
-              <h2 className="text-xl font-medium text-[#F5F5F5] mb-2">
+              <h2 className="text-xl font-medium text-foreground mb-2">
                 No {filter} requests
               </h2>
-              <p className="text-[#A0A0A0] text-center max-w-md">
+              <p className="text-muted-foreground text-center max-w-md">
                 {filter === 'pending' && 'All creator requests have been processed'}
                 {filter === 'approved' && 'No approved requests yet'}
                 {filter === 'rejected' && 'No rejected requests yet'}
@@ -321,10 +321,10 @@ export default function AdminDashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   whileHover={{ scale: 1.01, y: -2 }}
-                  className="bg-[#1A1A1A]/50 border border-[#2A2A2A] rounded-lg p-4 backdrop-blur-xl relative overflow-hidden group transition-all duration-300"
+                  className="bg-card/50 border border-border rounded-lg p-4 backdrop-blur-xl relative overflow-hidden group transition-all duration-300"
                 >
                   {/* Gradient glow on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ boxShadow: '0 0 20px rgba(20, 184, 166, 0.1)' }} />
                   
                   <div className="flex items-start justify-between gap-4 relative z-10">
@@ -333,18 +333,18 @@ export default function AdminDashboard() {
                       <div className="flex items-center gap-3 mb-2">
                         <motion.div
                           whileHover={{ scale: 1.1, rotate: 5 }}
-                          className="w-10 h-10 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-xl relative overflow-hidden group/avatar"
+                          className="w-10 h-10 bg-primary/10 border border-primary/30 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-xl relative overflow-hidden group/avatar"
                         >
-                          <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/30 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
-                          <span className="text-sm font-semibold text-[#14B8A6] relative z-10">
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
+                          <span className="text-sm font-semibold text-primary relative z-10">
                             {request.username?.charAt(0).toUpperCase() || 'U'}
                           </span>
                         </motion.div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-medium text-[#F5F5F5] truncate group-hover:text-[#14B8A6] transition-colors duration-200">
+                          <h3 className="text-base font-medium text-foreground truncate group-hover:text-primary transition-colors duration-200">
                             @{request.username}
                           </h3>
-                          <p className="text-xs text-[#A0A0A0]">
+                          <p className="text-xs text-muted-foreground">
                             {new Date(request.created_at).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -355,8 +355,8 @@ export default function AdminDashboard() {
                       </div>
 
                       {request.message && (
-                        <div className="bg-[#0F0F0F]/50 border border-[#2A2A2A] rounded p-3 mb-3 backdrop-blur-xl">
-                          <p className="text-sm text-[#A0A0A0] line-clamp-2">
+                        <div className="bg-background/50 border border-border rounded p-3 mb-3 backdrop-blur-xl">
+                          <p className="text-sm text-muted-foreground line-clamp-2">
                             "{request.message}"
                           </p>
                         </div>
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
                             disabled={processingId === request.id}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="px-4 py-2 bg-[#10B981] hover:bg-[#10B981]/90 disabled:bg-[#2A2A2A] disabled:text-[#A0A0A0] text-[#0F0F0F] rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group/btn"
+                            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-500/90 disabled:bg-secondary disabled:text-muted-foreground text-primary-foreground rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group/btn"
                           >
                             {/* Ripple effect */}
                             {ripples[`approve-${request.id}`]?.map((ripple) => (
@@ -390,7 +390,7 @@ export default function AdminDashboard() {
                             ))}
                             
                             {/* Gradient glow */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#10B981] to-[#059669] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                             <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, transparent 70%)' }} />
                             
                             {processingId === request.id ? (
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
                             disabled={processingId === request.id}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="px-4 py-2 bg-[#EF4444] hover:bg-[#EF4444]/90 disabled:bg-[#2A2A2A] disabled:text-[#A0A0A0] text-white rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group/btn"
+                            className="px-4 py-2 bg-destructive hover:bg-destructive/90 disabled:bg-secondary disabled:text-muted-foreground text-white rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group/btn"
                           >
                             {/* Ripple effect */}
                             {ripples[`reject-${request.id}`]?.map((ripple) => (
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
                             ))}
                             
                             {/* Gradient glow */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#EF4444] to-[#DC2626] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-destructive to-red-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                             <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%)' }} />
                             
                             {processingId === request.id ? (
@@ -442,14 +442,14 @@ export default function AdminDashboard() {
                       )}
 
                       {request.status === 'approved' && (
-                        <div className="px-4 py-2 bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] rounded-lg text-sm font-medium flex items-center gap-2 backdrop-blur-xl">
+                        <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm font-medium flex items-center gap-2 backdrop-blur-xl">
                           <CheckCircle className="w-4 h-4" />
                           Approved
                         </div>
                       )}
 
                       {request.status === 'rejected' && (
-                        <div className="px-4 py-2 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-lg text-sm font-medium flex items-center gap-2 backdrop-blur-xl">
+                        <div className="px-4 py-2 bg-destructive/10 border border-destructive/30 text-destructive rounded-lg text-sm font-medium flex items-center gap-2 backdrop-blur-xl">
                           <XCircle className="w-4 h-4" />
                           Rejected
                         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { getAccessToken } from "./api";
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -26,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+            const token = getAccessToken();
             setIsAuthenticated(!!token);
             setIsLoading(false);
         };

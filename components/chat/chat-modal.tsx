@@ -84,7 +84,7 @@ export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-[#0F0F0F]/80 md:backdrop-blur-md flex items-end md:items-center justify-end md:justify-end"
+      className="fixed inset-0 z-50 bg-background/80 md:backdrop-blur-md flex items-end md:items-center justify-end md:justify-end"
       onClick={onClose}
     >
       {/* Modal Container */}
@@ -94,26 +94,26 @@ export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
         exit={{ opacity: 0, y: 100, x: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full h-[85vh] md:w-[420px] md:h-[600px] md:m-6 bg-[#1A1A1A]/95 md:backdrop-blur-xl border border-[#2A2A2A] md:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+        className="w-full h-[85vh] md:w-[420px] md:h-[600px] md:m-6 bg-card/95 md:backdrop-blur-xl border border-border/70 md:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A] bg-[#1A1A1A]/50 md:backdrop-blur-xl">
+        <div className="flex items-center justify-between p-4 border-b border-border/70 bg-card/70 md:backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#14B8A6] to-[#0D9488] rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#0F0F0F]" />
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-[#F5F5F5]">Movie Assistant</h2>
-              <p className="text-xs text-[#A0A0A0]">Powered by AI</p>
+              <h2 className="text-base font-semibold text-foreground">Movie Assistant</h2>
+              <p className="text-xs text-muted-foreground">Powered by AI</p>
             </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center hover:bg-[#14B8A6]/20 rounded-full transition-colors duration-200"
+            className="w-9 h-9 flex items-center justify-center hover:bg-primary/20 rounded-full transition-colors duration-200"
           >
-            <X className="w-5 h-5 text-[#A0A0A0] hover:text-[#14B8A6]" />
+            <X className="w-5 h-5 text-muted-foreground hover:text-primary" />
           </motion.button>
         </div>
 
@@ -137,7 +137,7 @@ export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
           ))}
           
           {isLoading && (
-            <div className="flex items-center gap-2 text-[#A0A0A0] text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Thinking...</span>
             </div>
@@ -147,7 +147,7 @@ export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t border-[#2A2A2A] bg-[#1A1A1A]/50 md:backdrop-blur-xl">
+        <form onSubmit={handleSubmit} className="p-4 border-t border-border/70 bg-card/70 md:backdrop-blur-xl">
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}
@@ -156,14 +156,14 @@ export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about movies..."
               disabled={isLoading}
-              className="flex-1 h-11 px-4 bg-[#2A2A2A] border border-[#2A2A2A] focus:border-[#14B8A6]/50 rounded-lg text-sm text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-all duration-200 disabled:opacity-50"
+              className="flex-1 h-11 px-4 bg-card/60 border border-border/70 focus:border-primary/50 rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-all duration-200 disabled:opacity-50"
             />
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="h-11 px-4 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#2A2A2A] disabled:text-[#808080] text-[#0F0F0F] rounded-lg font-medium transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center"
+              className="h-11 px-4 bg-primary hover:bg-primary/90 disabled:bg-card/60 disabled:text-muted-foreground text-primary-foreground rounded-lg font-medium transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -177,3 +177,4 @@ export function ChatModal({ onClose, messages, setMessages }: ChatModalProps) {
     </motion.div>
   );
 }
+

@@ -13,20 +13,22 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   const isAuthPage = pathname?.startsWith('/login') || 
                      pathname?.startsWith('/signup') || 
                      pathname?.startsWith('/forgot-password')
+  const isWatchPage = pathname?.startsWith('/watch/')
+  const hasChrome = !isAuthPage && !isWatchPage
   
   const [queryClient] = useState(() => new QueryClient())
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {!isAuthPage && (
+        {hasChrome && (
           <>
             <Navbar />
             <VerificationBanner />
           </>
         )}
-        <main className={!isAuthPage ? "pt-16" : ""}>{children}</main>
-        {!isAuthPage && <ChatButton />}
+        <main className={hasChrome ? "pt-24 md:pt-28 pb-24 md:pb-10" : ""}>{children}</main>
+        {hasChrome && <ChatButton />}
       </AuthProvider>
     </QueryClientProvider>
   )

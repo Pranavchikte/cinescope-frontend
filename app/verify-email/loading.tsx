@@ -6,7 +6,7 @@ import { AuthBackground } from '@/components/auth-background'
 
 export default function Loading() {
   return (
-    <div className="relative min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+    <div className="relative min-h-screen bg-background flex items-center justify-center">
       <AuthBackground />
       
       <motion.div
@@ -16,13 +16,13 @@ export default function Loading() {
       >
         <div className="relative">
           {/* Gradient glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] blur-xl opacity-50 animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-xl opacity-50 animate-pulse" />
           
           {/* Spinner */}
-          <Loader2 className="w-10 h-10 text-[#14B8A6] animate-spin relative z-10" />
+          <Loader2 className="w-10 h-10 text-primary animate-spin relative z-10" />
         </div>
         
-        <p className="text-sm text-[#A0A0A0] animate-pulse">Loading...</p>
+        <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
       </motion.div>
     </div>
   )

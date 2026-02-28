@@ -108,17 +108,17 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] blur-xl opacity-50 animate-pulse" />
-            <Loader2 className="w-10 h-10 text-[#14B8A6] animate-spin relative z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-xl opacity-50 animate-pulse" />
+            <Loader2 className="w-10 h-10 text-primary animate-spin relative z-10" />
           </div>
-          <p className="text-sm text-[#A0A0A0] animate-pulse">Loading...</p>
+          <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
         </motion.div>
       </div>
     )
@@ -126,7 +126,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
   if (error || !person) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -136,12 +136,12 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="w-16 h-16 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl"
+            className="w-16 h-16 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl"
           >
-            <AlertCircle className="w-8 h-8 text-[#EF4444]" />
+            <AlertCircle className="w-8 h-8 text-destructive" />
           </motion.div>
-          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">Person not found</h2>
-          <p className="text-base text-[#A0A0A0] mb-8">{error}</p>
+          <h2 className="text-2xl font-bold text-foreground mb-3">Person not found</h2>
+          <p className="text-base text-muted-foreground mb-8">{error}</p>
           <motion.button
             onClick={(e) => {
               handleRipple(e, 'go-back')
@@ -149,7 +149,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="h-10 px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] text-sm font-semibold rounded-lg transition-all relative overflow-hidden group"
+            className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-lg transition-all relative overflow-hidden group"
           >
             {/* Ripple effect */}
             {ripples['go-back']?.map((ripple) => (
@@ -164,7 +164,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             ))}
             
             {/* Gradient glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
             
             <span className="relative z-10">Go Back</span>
@@ -196,7 +196,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
   })
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F]">
+    <div className="min-h-screen bg-background">
       {/* Back Button */}
       <motion.button
         onClick={(e) => {
@@ -220,9 +220,9 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         ))}
         
         {/* Gradient glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        <ArrowLeft className="w-5 h-5 text-[#F5F5F5] relative z-10 group-hover:scale-110 transition-transform duration-200" />
+        <ArrowLeft className="w-5 h-5 text-foreground relative z-10 group-hover:scale-110 transition-transform duration-200" />
       </motion.button>
 
       <div className="pt-32 pb-20">
@@ -240,14 +240,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 whileHover={{ scale: 1.02, y: -4 }}
                 className="w-full max-w-[280px]"
               >
-                <div className="aspect-[2/3] bg-[#1A1A1A] overflow-hidden rounded-lg border border-[#2A2A2A] shadow-xl relative group">
+                <div className="aspect-[2/3] bg-card overflow-hidden rounded-lg border border-border shadow-xl relative group">
                   <img
                     src={profileUrl || "/placeholder.svg"}
                     alt={person.name}
                     className="w-full h-full object-cover"
                   />
                   {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </motion.div>
             </div>
@@ -261,7 +261,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             >
               {/* Name & Department */}
               <div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#F5F5F5] mb-3">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-3">
                   {person.name}
                 </h1>
                 <motion.div
@@ -271,16 +271,16 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                   <motion.div
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-2 h-2 bg-[#14B8A6] rounded-full"
+                    className="w-2 h-2 bg-primary rounded-full"
                   />
-                  <p className="text-lg text-[#14B8A6] font-medium">
+                  <p className="text-lg text-primary font-medium">
                     {person.known_for_department}
                   </p>
                 </motion.div>
               </div>
 
               {/* Personal Info */}
-              <div className="space-y-4 pt-4 border-t border-[#2A2A2A]">
+              <div className="space-y-4 pt-4 border-t border-border">
                 {person.birthday && (
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
@@ -291,14 +291,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                   >
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="w-10 h-10 rounded-lg bg-[#14B8A6]/10 flex items-center justify-center border border-[#14B8A6]/30 backdrop-blur-xl relative overflow-hidden"
+                      className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/30 backdrop-blur-xl relative overflow-hidden"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <Calendar className="w-5 h-5 text-[#14B8A6] relative z-10" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <Calendar className="w-5 h-5 text-primary relative z-10" />
                     </motion.div>
                     <div>
-                      <p className="text-xs text-[#A0A0A0] group-hover:text-[#F5F5F5] transition-colors">Born</p>
-                      <span className="text-sm text-[#F5F5F5]">
+                      <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">Born</p>
+                      <span className="text-sm text-foreground">
                         {new Date(person.birthday).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
@@ -318,14 +318,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                   >
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="w-10 h-10 rounded-lg bg-[#14B8A6]/10 flex items-center justify-center border border-[#14B8A6]/30 backdrop-blur-xl relative overflow-hidden"
+                      className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/30 backdrop-blur-xl relative overflow-hidden"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <MapPin className="w-5 h-5 text-[#14B8A6] relative z-10" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <MapPin className="w-5 h-5 text-primary relative z-10" />
                     </motion.div>
                     <div>
-                      <p className="text-xs text-[#A0A0A0] group-hover:text-[#F5F5F5] transition-colors">Place of Birth</p>
-                      <span className="text-sm text-[#F5F5F5]">{person.place_of_birth}</span>
+                      <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">Place of Birth</p>
+                      <span className="text-sm text-foreground">{person.place_of_birth}</span>
                     </div>
                   </motion.div>
                 )}
@@ -337,10 +337,10 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="pt-4 border-t border-[#2A2A2A]"
+                  className="pt-4 border-t border-border"
                 >
-                  <h3 className="text-lg font-semibold text-[#F5F5F5] mb-4">Biography</h3>
-                  <div className="text-sm text-[#A0A0A0] leading-relaxed space-y-3">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Biography</h3>
+                  <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
                     {person.biography.split('\n\n').map((paragraph, idx) => (
                       <p key={idx} className="text-balance">
                         {paragraph}
@@ -361,8 +361,8 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             {/* Section Header with Tabs */}
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">Known For</h2>
-                <p className="text-sm text-[#A0A0A0] mt-1">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Known For</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                   {filteredCredits.length} {filteredCredits.length === 1 ? 'credit' : 'credits'}
                 </p>
               </div>
@@ -378,8 +378,8 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                     whileTap={{ scale: 0.95 }}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all relative overflow-hidden group ${
                       activeTab === tab
-                        ? 'bg-[#14B8A6] text-[#0F0F0F]'
-                        : 'bg-[#1A1A1A]/50 text-[#A0A0A0] border border-[#2A2A2A] hover:border-[#14B8A6]/30 hover:text-[#F5F5F5] backdrop-blur-xl'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card/50 text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground backdrop-blur-xl'
                     }`}
                   >
                     {/* Ripple effect */}
@@ -397,14 +397,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                     {/* Gradient glow for active tab */}
                     {activeTab === tab && (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.3) 0%, transparent 70%)' }} />
                       </>
                     )}
                     
                     {/* Gradient glow for inactive tabs */}
                     {activeTab !== tab && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     )}
                     
                     <span className="relative z-10">
@@ -443,7 +443,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-20"
                 >
-                  <p className="text-base text-[#A0A0A0]">
+                  <p className="text-base text-muted-foreground">
                     No {activeTab === 'all' ? 'credits' : activeTab} found
                   </p>
                 </motion.div>

@@ -92,19 +92,19 @@ export function VerificationBanner() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50"
         >
-          <div className="bg-[#1A1A1A]/90 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg shadow-2xl">
+          <div className="bg-card/90 md:backdrop-blur-xl border border-border/70 rounded-lg shadow-2xl">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#14B8A6]/10 rounded-lg flex items-center justify-center shrink-0 border border-[#14B8A6]/30">
-                    <Mail className="w-5 h-5 text-[#14B8A6]" />
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 border border-primary/30">
+                    <Mail className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-[#F5F5F5]">
+                    <h3 className="text-sm font-semibold text-foreground">
                       Verify your email
                     </h3>
-                    <p className="text-xs text-[#A0A0A0] mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Get full access to all features
                     </p>
                   </div>
@@ -117,24 +117,24 @@ export function VerificationBanner() {
                     handleRipple(e, "dismiss");
                     handleDismiss();
                   }}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-[#14B8A6]/10 rounded-lg transition-colors duration-200 shrink-0 relative overflow-hidden"
+                  className="w-7 h-7 flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors duration-200 shrink-0 relative overflow-hidden"
                 >
                   {ripples["dismiss"]?.map((ripple) => (
                     <motion.span
                       key={ripple.id}
-                      className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                      className="absolute bg-primary/30 rounded-full pointer-events-none"
                       style={{ left: ripple.x, top: ripple.y }}
                       initial={{ width: 0, height: 0, x: "-50%", y: "-50%" }}
                       animate={{ width: 50, height: 50, opacity: 0 }}
                       transition={{ duration: 0.6 }}
                     />
                   ))}
-                  <X className="w-4 h-4 text-[#A0A0A0] hover:text-[#14B8A6] relative z-10" />
+                  <X className="w-4 h-4 text-muted-foreground hover:text-primary relative z-10" />
                 </motion.button>
               </div>
 
               {/* Body */}
-              <p className="text-xs text-[#A0A0A0] mb-4">
+              <p className="text-xs text-muted-foreground mb-4">
                 Check your inbox for the verification link. Didn't receive it?
               </p>
 
@@ -144,7 +144,7 @@ export function VerificationBanner() {
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="flex items-center gap-2 text-sm text-[#14B8A6] font-medium"
+                    className="flex items-center gap-2 text-sm text-primary font-medium"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     Email sent successfully
@@ -158,7 +158,7 @@ export function VerificationBanner() {
                       handleResend();
                     }}
                     disabled={isResending}
-                    className="h-9 px-4 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#1A1A1A] disabled:border disabled:border-[#2A2A2A] disabled:cursor-not-allowed text-[#0F0F0F] disabled:text-[#A0A0A0] rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
+                    className="h-9 px-4 bg-primary hover:bg-primary/90 disabled:bg-card/70 disabled:border disabled:border-border/70 disabled:cursor-not-allowed text-primary-foreground disabled:text-muted-foreground rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
                   >
                     {ripples["resend"]?.map((ripple) => (
                       <motion.span
@@ -173,7 +173,7 @@ export function VerificationBanner() {
                     {/* Gradient glow */}
                     {!isResending && (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div
                           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
                           style={{
@@ -201,3 +201,4 @@ export function VerificationBanner() {
     </AnimatePresence>
   );
 }
+

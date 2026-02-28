@@ -148,12 +148,12 @@ export function WatchlistPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] pt-24">
+      <div className="min-h-screen bg-background pt-24">
         <div className="px-4 sm:px-6 lg:px-12">
-          <div className="h-8 bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg w-48 mb-8 animate-pulse" />
+          <div className="h-8 bg-card/80 md:backdrop-blur-xl border border-border/70 rounded-lg w-48 mb-8 animate-pulse" />
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-lg animate-pulse" />
+              <div key={i} className="aspect-[2/3] bg-card/80 md:backdrop-blur-xl border border-border/70 rounded-lg animate-pulse" />
             ))}
           </div>
         </div>
@@ -163,19 +163,19 @@ export function WatchlistPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md"
         >
-          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-full">
-            <X className="w-8 h-8 text-[#A0A0A0]" />
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-card/80 md:backdrop-blur-xl border border-border/70 rounded-full">
+            <X className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h2 className="text-2xl font-semibold text-[#F5F5F5] mb-3">
+          <h2 className="text-2xl font-semibold text-foreground mb-3">
             Something went wrong
           </h2>
-          <p className="text-[#A0A0A0] mb-8">{error}</p>
+          <p className="text-muted-foreground mb-8">{error}</p>
           <motion.button
             onClick={(e) => {
               handleRipple(e, 'error-home')
@@ -183,19 +183,19 @@ export function WatchlistPage() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
+            className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
           >
             {ripples['error-home']?.map((ripple) => (
               <motion.span
                 key={ripple.id}
-                className="absolute bg-[#0F0F0F]/30 rounded-full pointer-events-none"
+                className="absolute bg-background/30 rounded-full pointer-events-none"
                 style={{ left: ripple.x, top: ripple.y }}
                 initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                 animate={{ width: 100, height: 100, opacity: 0 }}
                 transition={{ duration: 0.6 }}
               />
             ))}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0D9488] to-[#14B8A6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <span className="relative z-10">Go Home</span>
           </motion.button>
         </motion.div>
@@ -204,7 +204,7 @@ export function WatchlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-24 pb-12">
+    <div className="min-h-screen bg-background pt-24 pb-12">
       <div className="px-4 sm:px-6 lg:px-12">
         {/* Header */}
         <motion.div
@@ -213,20 +213,20 @@ export function WatchlistPage() {
           transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <h1 className="text-3xl sm:text-4xl font-semibold text-[#F5F5F5] mb-2">
-            My List
+          <h1 className="text-3xl sm:text-4xl font-semibold text-foreground mb-2">
+            Watch Later
           </h1>
-          <p className="text-base text-[#A0A0A0]">
-            {stats.all} {stats.all === 1 ? "title" : "titles"}
-          </p>
-        </motion.div>
+            <p className="text-base text-muted-foreground">
+              {stats.all} {stats.all === 1 ? "title" : "titles"}
+            </p>
+          </motion.div>
 
         {/* Filter Tabs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex gap-4 mb-8 border-b border-[#2A2A2A]"
+          className="flex gap-4 mb-8 border-b border-border/70"
         >
           <motion.button
             onClick={(e) => {
@@ -237,14 +237,14 @@ export function WatchlistPage() {
             whileTap={{ scale: 0.95 }}
             className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 relative overflow-hidden ${
               filter === "all"
-                ? "border-[#14B8A6] text-[#14B8A6]"
-                : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {ripples['filter-all']?.map((ripple) => (
               <motion.span
                 key={ripple.id}
-                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                className="absolute bg-primary/30 rounded-full pointer-events-none"
                 style={{ left: ripple.x, top: ripple.y }}
                 initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                 animate={{ width: 80, height: 80, opacity: 0 }}
@@ -262,14 +262,14 @@ export function WatchlistPage() {
             whileTap={{ scale: 0.95 }}
             className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 relative overflow-hidden ${
               filter === "movie"
-                ? "border-[#14B8A6] text-[#14B8A6]"
-                : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {ripples['filter-movie']?.map((ripple) => (
               <motion.span
                 key={ripple.id}
-                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                className="absolute bg-primary/30 rounded-full pointer-events-none"
                 style={{ left: ripple.x, top: ripple.y }}
                 initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                 animate={{ width: 80, height: 80, opacity: 0 }}
@@ -287,21 +287,21 @@ export function WatchlistPage() {
             whileTap={{ scale: 0.95 }}
             className={`pb-3 px-1 text-sm font-medium border-b-2 md:transition-all duration-200 relative overflow-hidden ${
               filter === "tv"
-                ? "border-[#14B8A6] text-[#14B8A6]"
-                : "border-transparent text-[#A0A0A0] hover:text-[#F5F5F5]"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {ripples['filter-tv']?.map((ripple) => (
               <motion.span
                 key={ripple.id}
-                className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                className="absolute bg-primary/30 rounded-full pointer-events-none"
                 style={{ left: ripple.x, top: ripple.y }}
                 initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                 animate={{ width: 80, height: 80, opacity: 0 }}
                 transition={{ duration: 0.6 }}
               />
             ))}
-            <span className="relative z-10">TV Shows</span>
+            <span className="relative z-10">TV</span>
           </motion.button>
         </motion.div>
 
@@ -313,17 +313,17 @@ export function WatchlistPage() {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center justify-center py-24"
           >
-            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] rounded-full">
-              <Film className="w-8 h-8 text-[#A0A0A0]" />
+            <div className="w-16 h-16 mb-6 flex items-center justify-center bg-card/80 md:backdrop-blur-xl border border-border/70 rounded-full">
+              <Film className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold text-[#F5F5F5] mb-2">
+            <h2 className="text-xl font-semibold text-foreground mb-2">
               {filter === "all"
-                ? "Your list is empty"
+                ? "Your Watch Later list is empty"
                 : `No ${filter === "movie" ? "movies" : "TV shows"} in your list`}
             </h2>
-            <p className="text-[#A0A0A0] text-center max-w-md mb-8">
+            <p className="text-muted-foreground text-center max-w-md mb-8">
               {filter === "all"
-                ? "Titles you add to your list will appear here"
+                ? "Save a title to watch later and it will appear here"
                 : `Add some ${filter === "movie" ? "movies" : "TV shows"} to your list`}
             </p>
             <motion.button
@@ -333,20 +333,20 @@ export function WatchlistPage() {
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-2.5 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
+              className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold md:transition-all duration-200 relative overflow-hidden group"
             >
               {ripples['empty-browse']?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
-                  className="absolute bg-[#0F0F0F]/30 rounded-full pointer-events-none"
+                  className="absolute bg-background/30 rounded-full pointer-events-none"
                   style={{ left: ripple.x, top: ripple.y }}
                   initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                   animate={{ width: 100, height: 100, opacity: 0 }}
                   transition={{ duration: 0.6 }}
                 />
               ))}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0D9488] to-[#14B8A6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <span className="relative z-10">Find Something to Watch</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <span className="relative z-10">Start Watching</span>
             </motion.button>
           </motion.div>
         ) : (
@@ -360,15 +360,15 @@ export function WatchlistPage() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-semibold text-[#F5F5F5]">Now</h2>
-                  <p className="text-xs sm:text-sm text-[#A0A0A0]">
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground">Now</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Recently added
                   </p>
                 </div>
-                <span className="text-xs sm:text-sm text-[#A0A0A0]">{nowItems.length}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">{nowItems.length}</span>
               </div>
               {nowItems.length === 0 ? (
-                <div className="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-lg p-4 text-sm text-[#A0A0A0]">
+                <div className="bg-card/70 border border-border/70 rounded-lg p-4 text-sm text-muted-foreground">
                   Nothing new yet. Add a few titles to see them here.
                 </div>
               ) : (
@@ -402,15 +402,15 @@ export function WatchlistPage() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-semibold text-[#F5F5F5]">Next</h2>
-                  <p className="text-xs sm:text-sm text-[#A0A0A0]">
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground">Next</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Older items to catch up on
                   </p>
                 </div>
-                <span className="text-xs sm:text-sm text-[#A0A0A0]">{nextItems.length}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">{nextItems.length}</span>
               </div>
               {nextItems.length === 0 ? (
-                <div className="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-lg p-4 text-sm text-[#A0A0A0]">
+                <div className="bg-card/70 border border-border/70 rounded-lg p-4 text-sm text-muted-foreground">
                   Your backlog is clear. Nice work.
                 </div>
               ) : (
@@ -515,10 +515,10 @@ function WatchlistCard({
         <motion.div
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.2 }}
-          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A]/80 md:backdrop-blur-xl border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:transition-all duration-200 cursor-pointer"
+          className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card/80 md:backdrop-blur-xl border border-border/70 hover:border-primary/50 md:transition-all duration-200 cursor-pointer"
         >
           {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-50 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
 
           {item.poster ? (
             <img
@@ -528,34 +528,34 @@ function WatchlistCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center relative z-0">
-              <Film className="w-12 h-12 text-[#404040]" />
+              <Film className="w-12 h-12 text-muted-foreground/60" />
             </div>
           )}
 
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10" />
 
           {/* Rating Badge */}
-          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-[#0F0F0F]/80 md:backdrop-blur-xl rounded-lg border border-[#2A2A2A] z-20">
-            <Star className="w-3 h-3 fill-[#14B8A6] text-[#14B8A6]" />
-            <span className="text-xs font-medium text-[#F5F5F5]">{item.rating.toFixed(1)}</span>
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-background/80 md:backdrop-blur-xl rounded-lg border border-border/70 z-20">
+            <Star className="w-3 h-3 fill-primary text-primary" />
+            <span className="text-xs font-medium text-foreground">{item.rating.toFixed(1)}</span>
           </div>
 
           {/* Media Type Badge */}
-          <div className="absolute top-2 right-2 px-2 py-1 bg-[#0F0F0F]/80 md:backdrop-blur-xl rounded-lg border border-[#2A2A2A] z-20">
+          <div className="absolute top-2 right-2 px-2 py-1 bg-background/80 md:backdrop-blur-xl rounded-lg border border-border/70 z-20">
             {item.mediaType === "movie" ? (
-              <Film className="w-3 h-3 text-[#F5F5F5]" />
+              <Film className="w-3 h-3 text-foreground" />
             ) : (
-              <Tv className="w-3 h-3 text-[#F5F5F5]" />
+              <Tv className="w-3 h-3 text-foreground" />
             )}
           </div>
 
           {/* Title Info */}
           <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
-            <h3 className="text-sm font-medium text-[#F5F5F5] line-clamp-2 mb-1">
+            <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
               {item.title}
             </h3>
-            <p className="text-xs text-[#A0A0A0]">{item.year}</p>
+            <p className="text-xs text-muted-foreground">{item.year}</p>
           </div>
         </motion.div>
       </Link>
@@ -575,7 +575,7 @@ function WatchlistCard({
                 disabled={isRemoving}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-[#1A1A1A]/80 hover:bg-red-500/10 text-[#F5F5F5] hover:text-red-400 border border-[#2A2A2A] hover:border-red-500/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 disabled:opacity-50 flex items-center gap-2 relative overflow-hidden group"
+                className="px-4 py-2 bg-card/80 hover:bg-red-500/10 text-foreground hover:text-red-400 border border-border/70 hover:border-red-500/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 disabled:opacity-50 flex items-center gap-2 relative overflow-hidden group"
               >
                 {ripples['remove-btn']?.map((ripple) => (
                   <motion.span
@@ -606,19 +606,19 @@ function WatchlistCard({
                   onClick={confirmRemove}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-3 py-2 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
+                  className="px-3 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
                 >
                   {ripples['confirm-yes']?.map((ripple) => (
                     <motion.span
                       key={ripple.id}
-                      className="absolute bg-[#0F0F0F]/30 rounded-full pointer-events-none"
+                      className="absolute bg-background/30 rounded-full pointer-events-none"
                       style={{ left: ripple.x, top: ripple.y }}
                       initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                       animate={{ width: 80, height: 80, opacity: 0 }}
                       transition={{ duration: 0.6 }}
                     />
                   ))}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0D9488] to-[#14B8A6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <Check className="w-4 h-4 relative z-10" />
                   <span className="relative z-10">Yes</span>
                 </motion.button>
@@ -626,19 +626,19 @@ function WatchlistCard({
                   onClick={cancelRemove}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-3 py-2 bg-[#1A1A1A]/80 hover:bg-[#2A2A2A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
+                  className="px-3 py-2 bg-card/80 hover:bg-card/60 text-foreground border border-border/70 hover:border-primary/50 md:backdrop-blur-xl rounded-lg text-sm font-medium md:transition-all duration-200 flex items-center gap-2 relative overflow-hidden group"
                 >
                   {ripples['confirm-no']?.map((ripple) => (
                     <motion.span
                       key={ripple.id}
-                      className="absolute bg-[#14B8A6]/20 rounded-full pointer-events-none"
+                      className="absolute bg-primary/20 rounded-full pointer-events-none"
                       style={{ left: ripple.x, top: ripple.y }}
                       initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                       animate={{ width: 80, height: 80, opacity: 0 }}
                       transition={{ duration: 0.6 }}
                     />
                   ))}
-                  <div className="absolute inset-0 bg-[#2A2A2A]/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-card/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <X className="w-4 h-4 relative z-10" />
                   <span className="relative z-10">No</span>
                 </motion.button>
@@ -658,7 +658,7 @@ function WatchlistCard({
         disabled={isRemoving}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-[#0F0F0F]/80 hover:bg-[#2A2A2A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:backdrop-blur-xl rounded-full flex items-center justify-center md:transition-all duration-200 disabled:opacity-50"
+        className="md:hidden absolute top-2 right-2 z-10 w-8 h-8 bg-background/80 hover:bg-card/60 text-foreground border border-border/70 hover:border-primary/50 md:backdrop-blur-xl rounded-full flex items-center justify-center md:transition-all duration-200 disabled:opacity-50"
       >
         {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <MoreVertical className="w-3 h-3" />}
       </motion.button>
@@ -671,7 +671,7 @@ function WatchlistCard({
             e.stopPropagation()
             setShowActions(true)
           }}
-          className="flex-1 h-10 rounded-lg bg-[#1A1A1A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors text-sm font-medium"
+          className="flex-1 h-10 rounded-lg bg-card text-foreground border border-border/70 hover:border-primary/50 transition-colors text-sm font-medium"
         >
           Manage
         </button>
@@ -689,12 +689,12 @@ function WatchlistCard({
 
       {/* Mobile Actions Sheet */}
       <Sheet open={showActions} onOpenChange={setShowActions}>
-        <SheetContent side="bottom" className="bg-[#0F0F0F] border-t border-[#2A2A2A]">
+        <SheetContent side="bottom" className="bg-background border-t border-border/70">
           <SheetHeader>
-            <SheetTitle className="text-[#F5F5F5]">Manage</SheetTitle>
+            <SheetTitle className="text-foreground">Manage</SheetTitle>
           </SheetHeader>
           <div className="mt-4 space-y-2">
-            <div className="text-sm text-[#A0A0A0] truncate">{item.title}</div>
+            <div className="text-sm text-muted-foreground truncate">{item.title}</div>
             <button
               onClick={() => {
                 onRemove()
@@ -706,7 +706,7 @@ function WatchlistCard({
             </button>
             <button
               onClick={() => setShowActions(false)}
-              className="w-full h-12 rounded-lg bg-[#1A1A1A] text-[#F5F5F5] border border-[#2A2A2A] hover:border-[#14B8A6]/50 transition-colors"
+              className="w-full h-12 rounded-lg bg-card text-foreground border border-border/70 hover:border-primary/50 transition-colors"
             >
               Cancel
             </button>
@@ -716,3 +716,4 @@ function WatchlistCard({
     </motion.div>
   )
 }
+

@@ -49,10 +49,10 @@ const RATING_CONFIG = {
   },
   go_for_it: {
     label: 'Go For It',
-    color: 'text-[#14B8A6]',
-    bg: 'bg-[#14B8A6]/10',
-    border: 'border-[#14B8A6]/30',
-    gradient: 'from-[#14B8A6]',
+    color: 'text-primary',
+    bg: 'bg-primary/10',
+    border: 'border-primary/30',
+    gradient: 'from-primary',
   },
   timepass: {
     label: 'Timepass',
@@ -63,10 +63,10 @@ const RATING_CONFIG = {
   },
   skip: {
     label: 'Skip',
-    color: 'text-[#A0A0A0]',
-    bg: 'bg-[#A0A0A0]/10',
-    border: 'border-[#A0A0A0]/30',
-    gradient: 'from-[#A0A0A0]',
+    color: 'text-muted-foreground',
+    bg: 'bg-muted-foreground/10',
+    border: 'border-muted-foreground/30',
+    gradient: 'from-muted-foreground',
   },
 }
 
@@ -243,24 +243,24 @@ export default function CreatorProfilePage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] blur-xl opacity-50 animate-pulse" />
-            <Loader2 className="w-10 h-10 text-[#14B8A6] animate-spin relative z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-xl opacity-50 animate-pulse" />
+            <Loader2 className="w-10 h-10 text-primary animate-spin relative z-10" />
           </div>
-          <p className="text-[#A0A0A0] animate-pulse">Loading profile...</p>
+          <p className="text-muted-foreground animate-pulse">Loading profile...</p>
         </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-24 relative">
+    <div className="min-h-screen bg-background pt-24 relative">
       {/* Toast Container */}
       <div className="fixed top-20 right-4 z-50 space-y-2">
         <AnimatePresence>
@@ -273,8 +273,8 @@ export default function CreatorProfilePage({
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className={`px-4 py-3 rounded-lg border backdrop-blur-xl shadow-2xl flex items-center gap-3 min-w-[300px] ${
                 toast.type === 'success'
-                  ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]'
-                  : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  : 'bg-destructive/10 border-destructive/30 text-destructive'
               }`}
             >
               {toast.type === 'success' ? (
@@ -297,13 +297,13 @@ export default function CreatorProfilePage({
           }}
           whileHover={{ x: -4 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 text-[#A0A0A0] hover:text-[#14B8A6] transition-all mb-8 group relative overflow-hidden px-4 py-2 rounded-lg"
+          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-all mb-8 group relative overflow-hidden px-4 py-2 rounded-lg"
         >
           {/* Ripple effect */}
           {ripples['back-button']?.map((ripple) => (
             <motion.span
               key={ripple.id}
-              className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+              className="absolute bg-primary/30 rounded-full pointer-events-none"
               style={{ left: ripple.x, top: ripple.y }}
               initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
               animate={{ width: 100, height: 100, opacity: 0 }}
@@ -312,7 +312,7 @@ export default function CreatorProfilePage({
           ))}
           
           {/* Gradient glow on hover */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
           
           <ArrowLeft className="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform duration-200" />
           <span className="text-sm font-medium relative z-10">Back to Creators</span>
@@ -325,27 +325,27 @@ export default function CreatorProfilePage({
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              className="w-24 h-24 sm:w-28 sm:h-28 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#14B8A6]/20 backdrop-blur-xl relative overflow-hidden group cursor-pointer"
+              className="w-24 h-24 sm:w-28 sm:h-28 bg-primary/10 border border-primary/30 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20 backdrop-blur-xl relative overflow-hidden group cursor-pointer"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bg-gradient-to-r from-[#14B8A6] to-[#0D9488]" style={{ filter: 'blur(20px)' }} />
-              <span className="text-4xl sm:text-5xl font-bold text-[#14B8A6] relative z-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bg-gradient-to-r from-primary to-accent" style={{ filter: 'blur(20px)' }} />
+              <span className="text-4xl sm:text-5xl font-bold text-primary relative z-10">
                 {username.charAt(0).toUpperCase()}
               </span>
             </motion.div>
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#F5F5F5] mb-3">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
                 {username}
               </h1>
-              <div className="flex flex-wrap gap-4 sm:gap-6 text-sm sm:text-base text-[#A0A0A0]">
+              <div className="flex flex-wrap gap-4 sm:gap-6 text-sm sm:text-base text-muted-foreground">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   className="flex items-center gap-2 group cursor-default"
                 >
-                  <Sparkles className="w-4 h-4 text-[#14B8A6] group-hover:scale-110 transition-transform duration-200" />
-                  <span className="group-hover:text-[#F5F5F5] transition-colors duration-200">
+                  <Sparkles className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-200" />
+                  <span className="group-hover:text-foreground transition-colors duration-200">
                     {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
                   </span>
                 </motion.div>
@@ -353,8 +353,8 @@ export default function CreatorProfilePage({
                   whileHover={{ scale: 1.05 }}
                   className="flex items-center gap-2 group cursor-default"
                 >
-                  <Film className="w-4 h-4 text-[#14B8A6] group-hover:scale-110 transition-transform duration-200" />
-                  <span className="group-hover:text-[#F5F5F5] transition-colors duration-200">
+                  <Film className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-200" />
+                  <span className="group-hover:text-foreground transition-colors duration-200">
                     {movieCount} {movieCount === 1 ? 'movie' : 'movies'}
                   </span>
                 </motion.div>
@@ -362,8 +362,8 @@ export default function CreatorProfilePage({
                   whileHover={{ scale: 1.05 }}
                   className="flex items-center gap-2 group cursor-default"
                 >
-                  <Tv className="w-4 h-4 text-[#14B8A6] group-hover:scale-110 transition-transform duration-200" />
-                  <span className="group-hover:text-[#F5F5F5] transition-colors duration-200">
+                  <Tv className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-200" />
+                  <span className="group-hover:text-foreground transition-colors duration-200">
                     {tvCount} {tvCount === 1 ? 'show' : 'shows'}
                   </span>
                 </motion.div>
@@ -379,19 +379,19 @@ export default function CreatorProfilePage({
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
+              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-card/50 text-foreground border-border hover:border-primary/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
             >
               {ripples['share-profile']?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
-                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  className="absolute bg-primary/30 rounded-full pointer-events-none"
                   style={{ left: ripple.x, top: ripple.y }}
                   initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                   animate={{ width: 100, height: 100, opacity: 0 }}
                   transition={{ duration: 0.6 }}
                 />
               ))}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <Share2 className="w-4 h-4 relative z-10" />
               <span className="relative z-10">Share Profile</span>
             </motion.button>
@@ -410,13 +410,13 @@ export default function CreatorProfilePage({
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
+              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-card/50 text-foreground border-border hover:border-primary/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
             >
               {/* Ripple effect */}
               {ripples['rating-filter']?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
-                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  className="absolute bg-primary/30 rounded-full pointer-events-none"
                   style={{ left: ripple.x, top: ripple.y }}
                   initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                   animate={{ width: 100, height: 100, opacity: 0 }}
@@ -425,7 +425,7 @@ export default function CreatorProfilePage({
               ))}
               
               {/* Gradient glow on hover */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               <span className="relative z-10">{getRatingLabel()}</span>
               <ChevronDown
@@ -447,7 +447,7 @@ export default function CreatorProfilePage({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    className="absolute top-full mt-2 left-0 bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl z-50 min-w-[200px] rounded-lg overflow-hidden"
+                    className="absolute top-full mt-2 left-0 bg-card/90 backdrop-blur-xl border border-border shadow-2xl z-50 min-w-[200px] rounded-lg overflow-hidden"
                   >
                     <motion.button
                       onClick={(e) => {
@@ -458,15 +458,15 @@ export default function CreatorProfilePage({
                       whileHover={{ x: 4 }}
                       className={`w-full px-4 py-2.5 text-left text-sm transition-all relative overflow-hidden group ${
                         selectedRating === 'all'
-                          ? 'bg-[#14B8A6]/10 text-[#14B8A6]'
-                          : 'text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]'
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                       }`}
                     >
                       {/* Ripple effect */}
                       {ripples['filter-all-ratings']?.map((ripple) => (
                         <motion.span
                           key={ripple.id}
-                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          className="absolute bg-primary/30 rounded-full pointer-events-none"
                           style={{ left: ripple.x, top: ripple.y }}
                           initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                           animate={{ width: 100, height: 100, opacity: 0 }}
@@ -474,10 +474,10 @@ export default function CreatorProfilePage({
                         />
                       ))}
                       
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                       <span className="relative z-10">All Ratings</span>
                     </motion.button>
-                    <div className="h-px bg-[#2A2A2A]" />
+                    <div className="h-px bg-secondary" />
                     {Object.entries(RATING_CONFIG).map(([key, config]) => {
                       const count =
                         groupedRatings[key as keyof typeof groupedRatings].length
@@ -492,15 +492,15 @@ export default function CreatorProfilePage({
                           whileHover={{ x: 4 }}
                           className={`w-full px-4 py-2.5 text-left text-sm transition-all flex items-center justify-between relative overflow-hidden group ${
                             selectedRating === key
-                              ? 'bg-[#14B8A6]/10 text-[#14B8A6]'
-                              : 'text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]'
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                           }`}
                         >
                           {/* Ripple effect */}
                           {ripples[`filter-${key}`]?.map((ripple) => (
                             <motion.span
                               key={ripple.id}
-                              className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                              className="absolute bg-primary/30 rounded-full pointer-events-none"
                               style={{ left: ripple.x, top: ripple.y }}
                               initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                               animate={{ width: 100, height: 100, opacity: 0 }}
@@ -510,7 +510,7 @@ export default function CreatorProfilePage({
                           
                           <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient} to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-200`} />
                           <span className={`${config.color} relative z-10`}>{config.label}</span>
-                          <span className="text-xs text-[#A0A0A0] relative z-10">{count}</span>
+                          <span className="text-xs text-muted-foreground relative z-10">{count}</span>
                         </motion.button>
                       )
                     })}
@@ -530,13 +530,13 @@ export default function CreatorProfilePage({
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-[#1A1A1A]/50 text-[#F5F5F5] border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
+              className="h-10 px-4 text-sm font-medium transition-all flex items-center gap-2 border bg-card/50 text-foreground border-border hover:border-primary/50 rounded-lg whitespace-nowrap backdrop-blur-xl relative overflow-hidden group"
             >
               {/* Ripple effect */}
               {ripples['media-filter']?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
-                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  className="absolute bg-primary/30 rounded-full pointer-events-none"
                   style={{ left: ripple.x, top: ripple.y }}
                   initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                   animate={{ width: 100, height: 100, opacity: 0 }}
@@ -545,7 +545,7 @@ export default function CreatorProfilePage({
               ))}
               
               {/* Gradient glow on hover */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               <span className="relative z-10">{getMediaLabel()}</span>
               <ChevronDown
@@ -567,7 +567,7 @@ export default function CreatorProfilePage({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    className="absolute top-full mt-2 left-0 bg-[#1A1A1A]/90 backdrop-blur-xl border border-[#2A2A2A] shadow-2xl z-50 min-w-[180px] rounded-lg overflow-hidden"
+                    className="absolute top-full mt-2 left-0 bg-card/90 backdrop-blur-xl border border-border shadow-2xl z-50 min-w-[180px] rounded-lg overflow-hidden"
                   >
                     <motion.button
                       onClick={(e) => {
@@ -578,15 +578,15 @@ export default function CreatorProfilePage({
                       whileHover={{ x: 4 }}
                       className={`w-full px-4 py-2.5 text-left text-sm transition-all relative overflow-hidden group ${
                         selectedMediaType === 'all'
-                          ? 'bg-[#14B8A6]/10 text-[#14B8A6]'
-                          : 'text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]'
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                       }`}
                     >
                       {/* Ripple effect */}
                       {ripples['media-all']?.map((ripple) => (
                         <motion.span
                           key={ripple.id}
-                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          className="absolute bg-primary/30 rounded-full pointer-events-none"
                           style={{ left: ripple.x, top: ripple.y }}
                           initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                           animate={{ width: 100, height: 100, opacity: 0 }}
@@ -594,10 +594,10 @@ export default function CreatorProfilePage({
                         />
                       ))}
                       
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                       <span className="relative z-10">All Types</span>
                     </motion.button>
-                    <div className="h-px bg-[#2A2A2A]" />
+                    <div className="h-px bg-secondary" />
                     <motion.button
                       onClick={(e) => {
                         handleRipple(e, 'media-movie')
@@ -607,15 +607,15 @@ export default function CreatorProfilePage({
                       whileHover={{ x: 4 }}
                       className={`w-full px-4 py-2.5 text-left text-sm transition-all flex items-center justify-between relative overflow-hidden group ${
                         selectedMediaType === 'movie'
-                          ? 'bg-[#14B8A6]/10 text-[#14B8A6]'
-                          : 'text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]'
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                       }`}
                     >
                       {/* Ripple effect */}
                       {ripples['media-movie']?.map((ripple) => (
                         <motion.span
                           key={ripple.id}
-                          className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                          className="absolute bg-primary/30 rounded-full pointer-events-none"
                           style={{ left: ripple.x, top: ripple.y }}
                           initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                           animate={{ width: 100, height: 100, opacity: 0 }}
@@ -623,9 +623,9 @@ export default function CreatorProfilePage({
                         />
                       ))}
                       
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                       <span className="relative z-10">Movies</span>
-                      <span className="text-xs text-[#A0A0A0] relative z-10">{movieCount}</span>
+                      <span className="text-xs text-muted-foreground relative z-10">{movieCount}</span>
                     </motion.button>
                     <motion.button
                       onClick={(e) => {
@@ -636,15 +636,15 @@ export default function CreatorProfilePage({
                       whileHover={{ x: 4 }}
                       className={`w-full px-4 py-2.5 text-left text-sm transition-all flex items-center justify-between relative overflow-hidden group ${
                         selectedMediaType === 'tv'
-                          ? 'bg-[#14B8A6]/10 text-[#14B8A6]'
-                          : 'text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#F5F5F5]'
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                       }`}
                     >
                       {/* Ripple effect */}
                   {ripples['media-tv']?.map((ripple) => (
                     <motion.span
                       key={ripple.id}
-                      className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                      className="absolute bg-primary/30 rounded-full pointer-events-none"
                       style={{ left: ripple.x, top: ripple.y }}
                       initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                       animate={{ width: 100, height: 100, opacity: 0 }}
@@ -652,9 +652,9 @@ export default function CreatorProfilePage({
                     />
                   ))}
                   
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                   <span className="relative z-10">TV Shows</span>
-                  <span className="text-xs text-[#A0A0A0] relative z-10">{tvCount}</span>
+                  <span className="text-xs text-muted-foreground relative z-10">{tvCount}</span>
                 </motion.button>
               </motion.div>
             </>
@@ -672,10 +672,10 @@ export default function CreatorProfilePage({
           exit={{ opacity: 0, scale: 0.95 }}
           className="flex flex-col items-center justify-center py-32"
         >
-          <h3 className="text-2xl font-semibold text-[#F5F5F5] mb-2">
+          <h3 className="text-2xl font-semibold text-foreground mb-2">
             No titles found
           </h3>
-          <p className="text-[#A0A0A0]">
+          <p className="text-muted-foreground">
             {selectedRating !== 'all' || selectedMediaType !== 'all'
               ? 'Try adjusting your filters'
               : "This creator hasn't rated anything yet"}
@@ -710,7 +710,7 @@ export default function CreatorProfilePage({
                       {config.label}
                     </h2>
                   </motion.div>
-                  <span className="text-sm text-[#A0A0A0]">
+                  <span className="text-sm text-muted-foreground">
                     {items.length} {items.length === 1 ? 'title' : 'titles'}
                   </span>
                 </div>
