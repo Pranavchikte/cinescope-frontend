@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Star,
   Plus,
+  Check,
   Loader2,
   ArrowLeft,
   Share2,
@@ -15,13 +16,8 @@ import {
 } from "lucide-react";
 import { MovieCard } from "@/components/movie-card";
 import { tvAPI, watchlistAPI, ratingsAPI, getCachedRatingIds, getCachedWatchlistIds, authAPI } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -86,16 +82,17 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   const [showAllCast, setShowAllCast] = useState(false);
   const castScrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const ratingOptions = [
-    { value: "skip", label: "Skip", icon: "⏭️", color: "text-zinc-400" },
-    { value: "timepass", label: "Timepass", icon: "⏱️", color: "text-white" },
-    { value: "go_for_it", label: "Go for it", icon: "👍", color: "text-white" },
+    { value: "skip", label: "Skip", icon: "⏭️", color: "text-muted-foreground" },
+    { value: "timepass", label: "Timepass", icon: "⏱️", color: "text-foreground" },
+    { value: "go_for_it", label: "Go for it", icon: "👍", color: "text-foreground" },
     {
       value: "perfection",
       label: "Perfection",
       icon: "✨",
-      color: "text-yellow-400",
+      color: "text-primary",
     },
   ];
 
@@ -303,20 +300,20 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   // Loading Skeleton
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F]">
-        <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] bg-[#1A1A1A] animate-pulse">
+      <div className="min-h-screen bg-background">
+        <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] bg-card animate-pulse">
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="aspect-[2/3] bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse" />
+            <div className="aspect-[2/3] bg-card border border-border/70 rounded-lg animate-pulse" />
             <div className="md:col-span-2 space-y-6">
-              <div className="h-12 bg-[#1A1A1A] rounded-lg w-3/4 animate-pulse" />
-              <div className="h-6 bg-[#1A1A1A] rounded-lg w-1/2 animate-pulse" />
+              <div className="h-12 bg-card rounded-lg w-3/4 animate-pulse" />
+              <div className="h-6 bg-card rounded-lg w-1/2 animate-pulse" />
               <div className="space-y-2">
-                <div className="h-4 bg-[#1A1A1A] rounded animate-pulse" />
-                <div className="h-4 bg-[#1A1A1A] rounded w-5/6 animate-pulse" />
+                <div className="h-4 bg-card rounded animate-pulse" />
+                <div className="h-4 bg-card rounded w-5/6 animate-pulse" />
               </div>
             </div>
           </div>
@@ -328,7 +325,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   // Error State
   if (error || !show) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -337,13 +334,13 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
             <div className="text-4xl">😕</div>
           </div>
-          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">
+          <h2 className="text-2xl font-bold text-foreground mb-3">
             Oops! Something went wrong
           </h2>
-          <p className="text-[#A0A0A0] mb-8">{error || "TV show not found"}</p>
+          <p className="text-muted-foreground mb-8">{error || "TV show not found"}</p>
           <Button
             onClick={() => router.push("/tv")}
-            className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go to TV Shows
@@ -365,15 +362,15 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
   const avgRuntime = show.episode_run_time?.[0] || 45;
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F]">
+    <div className="min-h-screen bg-background">
       {/* Back Button */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         onClick={() => router.back()}
-        className="fixed top-20 left-4 z-50 w-10 h-10 bg-[#1A1A1A]/80 md:backdrop-blur-md rounded-full flex items-center justify-center border border-[#2A2A2A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6]/50 transition-all duration-200"
+        className="fixed top-20 left-4 z-50 w-10 h-10 bg-card/80 md:backdrop-blur-md rounded-full flex items-center justify-center border border-border/70 hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
       >
-        <ArrowLeft className="w-5 h-5 text-[#F5F5F5]" />
+        <ArrowLeft className="w-5 h-5 text-foreground" />
       </motion.button>
 
       {/* Hero Section */}
@@ -387,8 +384,8 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           alt={show.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent" />
 
         {trailerUrl && (
           <motion.button
@@ -404,9 +401,9 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute bottom-8 right-8 w-16 h-16 bg-[#14B8A6]/20 md:backdrop-blur-md rounded-full flex items-center justify-center border border-[#14B8A6]/50 hover:bg-[#14B8A6]/30 transition-all duration-200 group"
+            className="absolute bottom-8 right-8 w-16 h-16 bg-primary/20 md:backdrop-blur-md rounded-full flex items-center justify-center border border-primary/50 hover:bg-primary/30 transition-all duration-200 group"
           >
-            <Play className="w-6 h-6 text-[#14B8A6] ml-1 group-hover:scale-110 transition-transform" />
+            <Play className="w-6 h-6 text-primary ml-1 group-hover:scale-110 transition-transform" />
           </motion.button>
         )}
       </motion.div>
@@ -422,7 +419,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             className="flex justify-center md:justify-start"
           >
             <div className="w-full max-w-[280px] md:max-w-none">
-              <div className="relative aspect-[2/3] rounded-xl overflow-hidden border-2 border-white/10 shadow-2xl">
+              <div className="relative aspect-[2/3] rounded-xl overflow-hidden border-2 border-border/70 shadow-2xl">
                 <img
                   src={posterUrl || "/placeholder.svg"}
                   alt={show.name}
@@ -442,18 +439,18 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             {/* Title & Tagline */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-[#14B8A6]/10 rounded-lg flex items-center justify-center border border-[#14B8A6]/30">
-                  <Tv className="w-5 h-5 text-[#14B8A6]" />
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/30">
+                  <Tv className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm font-semibold text-[#14B8A6] uppercase tracking-wide">
+                <span className="text-sm font-semibold text-primary uppercase tracking-wide">
                   TV Series
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#F5F5F5] mb-2 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2 leading-tight">
                 {show.name}
               </h1>
               {show.tagline && (
-                <p className="text-base md:text-lg text-[#A0A0A0] italic">
+                <p className="text-base md:text-lg text-muted-foreground italic">
                   {show.tagline}
                 </p>
               )}
@@ -467,17 +464,17 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                     key={i}
                     className={`w-5 h-5 ${
                       i < Math.floor(show.vote_average / 2)
-                        ? "fill-[#14B8A6] text-[#14B8A6]"
-                        : "text-[#2A2A2A]"
+                        ? "fill-primary text-primary"
+                        : "text-muted-foreground/60"
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-lg font-semibold text-[#F5F5F5]">
+              <span className="text-lg font-semibold text-foreground">
                 {typeof show.vote_average === "number"
                   ? show.vote_average.toFixed(1)
                   : "N/A"}
-                <span className="text-[#A0A0A0]">/10</span>
+                <span className="text-muted-foreground">/10</span>
               </span>
             </div>
 
@@ -486,7 +483,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               {(show.genres || []).slice(0, 4).map((genre) => (
                 <span
                   key={genre.id}
-                  className="px-3 py-1.5 rounded-full bg-[#1A1A1A] md:backdrop-blur-sm text-sm text-[#F5F5F5] border border-[#2A2A2A]"
+                  className="px-3 py-1.5 rounded-full bg-card md:backdrop-blur-sm text-sm text-foreground border border-border/70"
                 >
                   {genre.name}
                 </span>
@@ -496,8 +493,8 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             {/* Details Grid - TV Specific */}
             <div className="grid grid-cols-2 gap-4 pt-4">
               <div>
-                <p className="text-sm text-[#A0A0A0] mb-1">First Air Date</p>
-                <p className="text-base font-medium text-[#F5F5F5]">
+                <p className="text-sm text-muted-foreground mb-1">First Air Date</p>
+                <p className="text-base font-medium text-foreground">
                   {show.first_air_date
                     ? new Date(show.first_air_date).toLocaleDateString("en-US", {
                         year: "numeric",
@@ -508,27 +505,27 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[#A0A0A0] mb-1">Status</p>
-                <p className="text-base font-medium text-[#F5F5F5] capitalize">
+                <p className="text-sm text-muted-foreground mb-1">Status</p>
+                <p className="text-base font-medium text-foreground capitalize">
                   {show.status || "Unknown"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[#A0A0A0] mb-1">Seasons</p>
-                <p className="text-base font-medium text-[#F5F5F5]">
+                <p className="text-sm text-muted-foreground mb-1">Seasons</p>
+                <p className="text-base font-medium text-foreground">
                   {show.number_of_seasons} Season
                   {show.number_of_seasons !== 1 ? "s" : ""}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[#A0A0A0] mb-1">Episodes</p>
-                <p className="text-base font-medium text-[#F5F5F5]">
+                <p className="text-sm text-muted-foreground mb-1">Episodes</p>
+                <p className="text-base font-medium text-foreground">
                   {show.number_of_episodes} Episodes
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[#A0A0A0] mb-1">Episode Runtime</p>
-                <p className="text-base font-medium text-[#F5F5F5]">
+                <p className="text-sm text-muted-foreground mb-1">Episode Runtime</p>
+                <p className="text-base font-medium text-foreground">
                   {avgRuntime} min
                 </p>
               </div>
@@ -537,12 +534,41 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-6">
               <Button
-                onClick={handleAddToWatchlist}
-                disabled={isAddingToWatchlist}
-                className="flex-1 sm:flex-none h-12 px-6 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] font-semibold rounded-lg transition-all disabled:opacity-50"
+                onClick={() => {
+                  // Check if user is authenticated
+                  if (!isAuthenticated) {
+                    // Redirect to login
+                    router.push(`/login?redirect=${encodeURIComponent(window.location.href)}`);
+                    return;
+                  }
+                  
+                  // Navigate to season/episode picker
+                  router.push(`/watch/tv/${tvId}`);
+                }}
+                className="flex-1 sm:flex-none h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Watch Now
+              </Button>
+
+              <Button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    router.push(`/login?redirect=${encodeURIComponent(window.location.href)}`);
+                    return;
+                  }
+                  handleAddToWatchlist();
+                }}
+                disabled={isAddingToWatchlist || isInWatchlist}
+                className="flex-1 sm:flex-none h-12 px-6 bg-card hover:bg-primary/10 text-foreground hover:text-primary border border-border/70 hover:border-primary/50 font-semibold rounded-lg transition-all duration-200"
               >
                 {isAddingToWatchlist ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
+                ) : isInWatchlist ? (
+                  <>
+                    <Check className="w-5 h-5 mr-2 text-primary" />
+                    In Watchlist
+                  </>
                 ) : (
                   <>
                     <Plus className="w-5 h-5 mr-2" />
@@ -553,7 +579,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
 
               <Button
                 onClick={() => setShowRatingSheet(true)}
-                className="flex-1 sm:flex-none h-12 px-6 bg-[#1A1A1A] hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 font-semibold rounded-lg transition-all duration-200"
+                className="flex-1 sm:flex-none h-12 px-6 bg-card hover:bg-primary/10 text-foreground hover:text-primary border border-border/70 hover:border-primary/50 font-semibold rounded-lg transition-all duration-200"
               >
                 <Star className="w-5 h-5 mr-2" />
                 Rate
@@ -572,18 +598,18 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                       showNotification("Link copied!", "success");
                     });
                 }}
-                className="h-12 w-12 sm:w-auto sm:px-4 bg-[#1A1A1A] hover:bg-[#14B8A6]/10 text-[#F5F5F5] hover:text-[#14B8A6] border border-[#2A2A2A] hover:border-[#14B8A6]/50 rounded-lg transition-all duration-200"
+                className="h-12 w-12 sm:w-auto sm:px-4 bg-card hover:bg-primary/10 text-foreground hover:text-primary border border-border/70 hover:border-primary/50 rounded-lg transition-all duration-200"
               >
                 <Share2 className="w-5 h-5" />
               </Button>
             </div>
 
             {/* Overview */}
-            <div className="pt-8 border-t border-[#2A2A2A]">
-              <h3 className="text-lg font-semibold text-[#F5F5F5] mb-3">
+            <div className="pt-8 border-t border-border/70">
+              <h3 className="text-lg font-semibold text-foreground mb-3">
                 Overview
               </h3>
-              <p className="text-[#A0A0A0] leading-relaxed text-sm md:text-base">
+              <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
                 {show.overview}
               </p>
             </div>
@@ -598,21 +624,21 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
               Available On
             </h2>
             <div className="flex flex-wrap gap-4">
               {providers.map((provider) => (
                 <div
                   key={provider.provider_id}
-                  className="flex items-center gap-3 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg hover:border-[#14B8A6]/50 hover:bg-[#14B8A6]/5 transition-all duration-200"
+                  className="flex items-center gap-3 px-4 py-3 bg-card border border-border/70 rounded-lg hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
                 >
                   <img
                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-10 h-10 rounded-lg"
                   />
-                  <span className="text-[#F5F5F5] font-medium text-sm">
+                  <span className="text-foreground font-medium text-sm">
                     {provider.provider_name}
                   </span>
                 </div>
@@ -630,8 +656,8 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-6">Trailer</h2>
-            <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[#2A2A2A] bg-[#1A1A1A]">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Trailer</h2>
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-border/70 bg-card">
               <iframe
                 width="100%"
                 height="100%"
@@ -656,14 +682,14 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
           >
             <h2 className="text-2xl font-bold text-white mb-6">Media</h2>
 
-            <div className="flex gap-2 mb-6 border-b border-white/10">
+            <div className="flex gap-2 mb-6 border-b border-border/70">
               {trailer && (
                 <button
                   onClick={() => setActiveMediaTab("videos")}
                   className={`px-4 py-2 font-medium transition-all ${
                     activeMediaTab === "videos"
                       ? "text-white border-b-2 border-white"
-                      : "text-zinc-400 hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   Videos
@@ -675,7 +701,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                   className={`px-4 py-2 font-medium transition-all ${
                     activeMediaTab === "backdrops"
                       ? "text-white border-b-2 border-white"
-                      : "text-zinc-400 hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   Backdrops {images.backdrops.length}
@@ -687,7 +713,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                   className={`px-4 py-2 font-medium transition-all ${
                     activeMediaTab === "posters"
                       ? "text-white border-b-2 border-white"
-                      : "text-zinc-400 hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   Posters {images.posters.length}
@@ -696,7 +722,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             </div>
 
             {activeMediaTab === "videos" && trailer && (
-              <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+              <div className="aspect-video rounded-xl overflow-hidden border border-border/70 bg-card">
                 <iframe
                   width="100%"
                   height="100%"
@@ -713,7 +739,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 {images.backdrops.map((image, index) => (
                   <div
                     key={index}
-                    className="aspect-video rounded-lg overflow-hidden border border-white/10"
+                    className="aspect-video rounded-lg overflow-hidden border border-border/70"
                   >
                     <img
                       src={`https://image.tmdb.org/t/p/w780${image.file_path}`}
@@ -730,7 +756,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 {images.posters.map((image, index) => (
                   <div
                     key={index}
-                    className="aspect-[2/3] rounded-lg overflow-hidden border border-white/10"
+                    className="aspect-[2/3] rounded-lg overflow-hidden border border-border/70"
                   >
                     <img
                       src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
@@ -757,13 +783,13 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               <div className="flex gap-2">
                 <button
                   onClick={() => scrollCast("left")}
-                  className="w-9 h-9 bg-white/10 hover:bg-white/15 rounded-full flex items-center justify-center border border-white/20 transition-all"
+                  className="w-9 h-9 bg-card/60 hover:bg-card/70 rounded-full flex items-center justify-center border border-border/70 transition-all"
                 >
                   <ChevronLeft className="w-5 h-5 text-white" />
                 </button>
                 <button
                   onClick={() => scrollCast("right")}
-                  className="w-9 h-9 bg-white/10 hover:bg-white/15 rounded-full flex items-center justify-center border border-white/20 transition-all"
+                  className="w-9 h-9 bg-card/60 hover:bg-card/70 rounded-full flex items-center justify-center border border-border/70 transition-all"
                 >
                   <ChevronRight className="w-5 h-5 text-white" />
                 </button>
@@ -781,7 +807,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                   href={`/people/${member.id}`}
                   className="shrink-0 w-28 snap-start group cursor-pointer"
                 >
-                  <div className="relative w-28 h-28 rounded-full overflow-hidden bg-zinc-800 mb-3 border-2 border-white/10 group-hover:border-white/30 transition-all">
+                  <div className="relative w-28 h-28 rounded-full overflow-hidden bg-card/70 mb-3 border-2 border-border/70 group-hover:border-primary/40 transition-all">
                     <img
                       src={
                         member.profile_path
@@ -795,7 +821,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                   <h4 className="text-sm font-semibold text-white text-center line-clamp-1">
                     {member.name}
                   </h4>
-                  <p className="text-xs text-zinc-500 text-center line-clamp-1">
+                  <p className="text-xs text-muted-foreground text-center line-clamp-1">
                     {member.character}
                   </p>
                 </Link>
@@ -805,7 +831,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             {cast.length > 8 && !showAllCast && (
               <button
                 onClick={() => setShowAllCast(true)}
-                className="mt-4 text-sm text-violet-400 hover:text-violet-300 font-medium"
+                className="mt-4 text-sm text-accent hover:text-accent font-medium"
               >
                 View all {cast.length} cast members →
               </button>
@@ -826,11 +852,11 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
               {seasons.map((season) => (
                 <div
                   key={season.season_number}
-                  className="border border-white/10 rounded-xl overflow-hidden bg-white/5"
+                  className="border border-border/70 rounded-xl overflow-hidden bg-card/50"
                 >
                   <button
                     onClick={() => handleSeasonToggle(season.season_number)}
-                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-all"
+                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-card/50 transition-all"
                   >
                     <span className="text-white font-semibold">
                       {season.name}
@@ -846,14 +872,14 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
 
                   {expandedSeason === season.season_number &&
                     seasonData[season.season_number] && (
-                      <div className="border-t border-white/10 p-4 space-y-4">
+                      <div className="border-t border-border/70 p-4 space-y-4">
                         {seasonData[season.season_number].episodes?.map(
                           (episode: any) => (
                             <div
                               key={episode.episode_number}
-                              className="flex gap-4 p-3 rounded-lg hover:bg-white/5 transition-all"
+                              className="flex gap-4 p-3 rounded-lg hover:bg-card/50 transition-all group"
                             >
-                              <div className="flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden bg-zinc-800">
+                              <div className="flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden bg-card/70 relative">
                                 {episode.still_path ? (
                                   <img
                                     src={`https://image.tmdb.org/t/p/w300${episode.still_path}`}
@@ -862,9 +888,24 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                                   />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center">
-                                    <Play className="w-8 h-8 text-zinc-600" />
+                                    <Play className="w-8 h-8 text-muted-foreground" />
                                   </div>
                                 )}
+                                {/* Watch Button Overlay */}
+                                <button
+                                  onClick={() => {
+                                    if (!isAuthenticated) {
+                                      router.push(`/login?redirect=${encodeURIComponent(window.location.href)}`);
+                                      return;
+                                    }
+                                    router.push(`/watch/tv/${tvId}/${season.season_number}/${episode.episode_number}`);
+                                  }}
+                                  className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                                >
+                                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                                    <Play className="w-6 h-6 text-black fill-black" />
+                                  </div>
+                                </button>
                               </div>
 
                               <div className="flex-1">
@@ -875,7 +916,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                                   {typeof episode.vote_average === "number" && episode.vote_average > 0 && (
                                     <div className="flex items-center gap-1 ml-4">
                                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                      <span className="text-sm text-zinc-400">
+                                      <span className="text-sm text-muted-foreground">
                                         {episode.vote_average.toFixed(1)}
                                       </span>
                                     </div>
@@ -883,7 +924,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                                 </div>
 
                                 {episode.air_date && (
-                                  <p className="text-sm text-zinc-500 mb-2">
+                                  <p className="text-sm text-muted-foreground mb-2">
                                     {new Date(
                                       episode.air_date,
                                     ).toLocaleDateString("en-US", {
@@ -895,7 +936,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                                 )}
 
                                 {episode.overview && (
-                                  <p className="text-sm text-zinc-300 line-clamp-2">
+                                  <p className="text-sm text-foreground/80 line-clamp-2">
                                     {episode.overview}
                                   </p>
                                 )}
@@ -920,7 +961,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             className="mb-16"
           >
             <h2 className="text-2xl font-bold text-white mb-6">
-              Recommended for You
+              Up Next
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {recommendations.map((show, index) => (
@@ -946,7 +987,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             className="mb-16"
           >
             <h2 className="text-2xl font-bold text-white mb-6">
-              More Like This
+              Keep Watching
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {similarShows.map((show, index) => (
@@ -984,13 +1025,13 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative w-full max-w-md bg-[#181818] rounded p-8"
+                className="relative w-full max-w-md bg-card rounded p-8"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Close Button */}
                 <button
                   onClick={() => setShowRatingSheet(false)}
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-card/60 rounded-full transition-colors"
                 >
                   <svg
                     className="w-5 h-5 text-white"
@@ -1020,9 +1061,9 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleRating(option.value)}
-                      className={`w-full px-5 py-4 text-left rounded bg-[#2a2a2a] hover:bg-[#333333] border border-[#404040] hover:border-[#808080] transition-all ${
+                      className={`w-full px-5 py-4 text-left rounded bg-card/60 hover:bg-card/80 border border-border/70 hover:border-border/80 transition-all ${
                         option.value === "perfection"
-                          ? "border-[#46d369]/30 hover:border-[#46d369]/50"
+                          ? "border-emerald-400/30 hover:border-emerald-400/50"
                           : ""
                       }`}
                     >
@@ -1048,7 +1089,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
             transition={{ type: "spring", duration: 0.3 }}
             className={`fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-4 py-3 rounded-xl shadow-2xl md:backdrop-blur-md border min-w-[200px] max-w-[90vw] md:max-w-md ${
               showToast.type === "success"
-                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+                ? "bg-accent/10 border-accent/30 text-accent"
                 : "bg-red-500/10 border-red-500/20 text-red-300"
             }`}
           >
@@ -1071,3 +1112,7 @@ export function TVDetailPage({ tvId }: { tvId: string }) {
     </div>
   );
 }
+
+
+
+

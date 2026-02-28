@@ -20,15 +20,15 @@ interface ToastMessage {
 
 function CreatorCardSkeleton() {
   return (
-    <div className="bg-[#1A1A1A]/50 border border-[#2A2A2A] rounded-lg p-6 backdrop-blur-xl animate-pulse">
+    <div className="bg-card/50 border border-border rounded-lg p-6 backdrop-blur-xl animate-pulse">
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-16 h-16 bg-[#2A2A2A] rounded-full" />
+        <div className="w-16 h-16 bg-secondary rounded-full" />
         <div className="flex-1">
-          <div className="h-5 bg-[#2A2A2A] rounded w-32 mb-2" />
-          <div className="h-3 bg-[#2A2A2A] rounded w-24" />
+          <div className="h-5 bg-secondary rounded w-32 mb-2" />
+          <div className="h-3 bg-secondary rounded w-24" />
         </div>
       </div>
-      <div className="h-10 bg-[#2A2A2A] rounded-lg" />
+      <div className="h-10 bg-secondary rounded-lg" />
     </div>
   )
 }
@@ -90,17 +90,17 @@ function CreatorRequestModal({
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-[#1A1A1A]/90 border border-[#2A2A2A] rounded-lg max-w-md w-full p-8 backdrop-blur-xl relative overflow-hidden"
+          className="bg-card/90 border border-border rounded-lg max-w-md w-full p-8 backdrop-blur-xl relative overflow-hidden"
         >
           {/* Gradient glow background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50" />
           
           {/* Close button */}
           <motion.button
             onClick={onClose}
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#2A2A2A] text-[#A0A0A0] hover:text-[#F5F5F5] hover:bg-[#14B8A6]/20 transition-colors duration-200"
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-secondary text-muted-foreground hover:text-foreground hover:bg-primary/20 transition-colors duration-200"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -111,10 +111,10 @@ function CreatorRequestModal({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2">
+              <h2 className="text-2xl font-bold text-foreground mb-2">
                 Become a Creator
               </h2>
-              <p className="text-[#A0A0A0] text-sm mb-6">
+              <p className="text-muted-foreground text-sm mb-6">
                 Share your curated picks with our community
               </p>
             </motion.div>
@@ -129,7 +129,7 @@ function CreatorRequestModal({
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us why you'd be a great creator..."
-                  className="w-full bg-[#2A2A2A]/50 border border-[#2A2A2A] text-[#F5F5F5] rounded-lg px-4 py-3 resize-none focus:outline-none focus:border-[#14B8A6]/50 focus:bg-[#2A2A2A]/70 transition-all duration-200 placeholder:text-[#A0A0A0]/50 backdrop-blur-xl"
+                  className="w-full bg-secondary/50 border border-border text-foreground rounded-lg px-4 py-3 resize-none focus:outline-none focus:border-primary/50 focus:bg-secondary/70 transition-all duration-200 placeholder:text-muted-foreground/50 backdrop-blur-xl"
                   rows={4}
                   disabled={isLoading}
                 />
@@ -150,7 +150,7 @@ function CreatorRequestModal({
                   disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 bg-[#2A2A2A] text-white rounded-lg py-2.5 font-medium relative overflow-hidden group disabled:opacity-50"
+                  className="flex-1 bg-secondary text-white rounded-lg py-2.5 font-medium relative overflow-hidden group disabled:opacity-50"
                 >
                   {/* Ripple effect */}
                   {ripples['cancel']?.map((ripple) => (
@@ -164,7 +164,7 @@ function CreatorRequestModal({
                     />
                   ))}
                   
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#A0A0A0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-muted-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                   <span className="relative z-10">Cancel</span>
                 </motion.button>
 
@@ -174,7 +174,7 @@ function CreatorRequestModal({
                   disabled={isLoading || !message.trim()}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 bg-[#14B8A6] text-black rounded-lg py-2.5 flex items-center justify-center gap-2 font-semibold relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-primary text-black rounded-lg py-2.5 flex items-center justify-center gap-2 font-semibold relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {/* Ripple effect */}
                   {ripples['submit']?.map((ripple) => (
@@ -189,7 +189,7 @@ function CreatorRequestModal({
                   ))}
                   
                   {/* Gradient glow */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                   
                   {isLoading ? (
@@ -309,7 +309,7 @@ export default function CreatorPicksPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0F] pt-24 px-6">
+      <div className="min-h-screen bg-background pt-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -322,7 +322,7 @@ export default function CreatorPicksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] pt-24 pb-20 relative">
+    <div className="min-h-screen bg-background pt-24 pb-20 relative">
       {/* Toast Container */}
       <div className="fixed top-20 right-4 z-50 space-y-2">
         <AnimatePresence>
@@ -335,8 +335,8 @@ export default function CreatorPicksPage() {
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className={`px-4 py-3 rounded-lg border backdrop-blur-xl shadow-2xl flex items-center gap-3 min-w-[300px] ${
                 toast.type === 'success'
-                  ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]'
-                  : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  : 'bg-destructive/10 border-destructive/30 text-destructive'
               }`}
             >
               {toast.type === 'success' ? (
@@ -375,7 +375,7 @@ export default function CreatorPicksPage() {
               disabled={requestLoading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-[#14B8A6] text-black px-8 py-3 rounded-lg flex items-center gap-2 font-semibold relative overflow-hidden group"
+              className="bg-primary text-black px-8 py-3 rounded-lg flex items-center gap-2 font-semibold relative overflow-hidden group"
             >
               {/* Ripple effect */}
               {ripples['become-creator']?.map((ripple) => (
@@ -390,7 +390,7 @@ export default function CreatorPicksPage() {
               ))}
               
               {/* Gradient glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.5) 0%, transparent 70%)' }} />
               
               <Crown className="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform duration-200" />
@@ -442,13 +442,13 @@ export default function CreatorPicksPage() {
               transition={{ duration: 0.3, delay: index * 0.05 }}
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-[#1A1A1A]/50 border border-[#2A2A2A] rounded-lg p-6 text-left backdrop-blur-xl relative overflow-hidden group"
+              className="bg-card/50 border border-border rounded-lg p-6 text-left backdrop-blur-xl relative overflow-hidden group"
             >
               {/* Ripple effect */}
               {ripples[`creator-${creator.id}`]?.map((ripple) => (
                 <motion.span
                   key={ripple.id}
-                  className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                  className="absolute bg-primary/30 rounded-full pointer-events-none"
                   style={{ left: ripple.x, top: ripple.y }}
                   initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                   animate={{ width: 200, height: 200, opacity: 0 }}
@@ -457,30 +457,30 @@ export default function CreatorPicksPage() {
               ))}
               
               {/* Gradient glow on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/10 via-transparent to-[#0D9488]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ boxShadow: '0 0 30px rgba(20, 184, 166, 0.2)' }} />
 
               <div className="flex items-center gap-4 mb-6 relative z-10">
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="w-16 h-16 rounded-full bg-[#14B8A6]/10 flex items-center justify-center border border-[#14B8A6]/30 relative overflow-hidden group/avatar"
+                  className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30 relative overflow-hidden group/avatar"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/30 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
-                  <span className="text-xl font-bold text-[#14B8A6] relative z-10">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
+                  <span className="text-xl font-bold text-primary relative z-10">
                     {creator.username[0].toUpperCase()}
                   </span>
                 </motion.div>
                 <div>
-                  <p className="text-white font-semibold group-hover:text-[#14B8A6] transition-colors duration-200">
+                  <p className="text-white font-semibold group-hover:text-primary transition-colors duration-200">
                     {creator.username}
                   </p>
                   <p className="text-gray-400 text-sm">Curator</p>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center bg-[#2A2A2A]/50 px-4 py-3 rounded-lg relative z-10 group-hover:bg-[#14B8A6]/10 transition-all duration-200 border border-transparent group-hover:border-[#14B8A6]/30">
+              <div className="flex justify-between items-center bg-secondary/50 px-4 py-3 rounded-lg relative z-10 group-hover:bg-primary/10 transition-all duration-200 border border-transparent group-hover:border-primary/30">
                 <span className="text-white text-sm font-medium">View Picks</span>
-                <ArrowRight className="w-4 h-4 text-[#14B8A6] group-hover:translate-x-1 group-hover:scale-110 transition-all duration-200" />
+                <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 group-hover:scale-110 transition-all duration-200" />
               </div>
             </motion.button>
           ))}

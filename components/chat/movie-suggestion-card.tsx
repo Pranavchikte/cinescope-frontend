@@ -34,10 +34,10 @@ export function MovieSuggestionCard({ movie, onSelect }: MovieSuggestionCardProp
       onClick={handleClick}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="w-full flex items-start gap-3 p-3 bg-[#2A2A2A]/50 hover:bg-[#14B8A6]/10 border border-[#2A2A2A] hover:border-[#14B8A6]/50 md:transition-all duration-200 text-left group"
+      className="w-full flex items-start gap-3 p-3 bg-card/60 hover:bg-primary/10 border border-border/70 hover:border-primary/50 md:transition-all duration-200 text-left group"
     >
       {/* Poster */}
-      <div className="w-16 h-24 bg-[#1A1A1A] shrink-0 overflow-hidden rounded-lg border border-[#2A2A2A]">
+      <div className="w-16 h-24 bg-card shrink-0 overflow-hidden rounded-lg border border-border/70">
         {hasPoster ? (
           <Image
             src={movie.poster}
@@ -49,23 +49,23 @@ export function MovieSuggestionCard({ movie, onSelect }: MovieSuggestionCardProp
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Film className="w-6 h-6 text-[#808080]" />
+            <Film className="w-6 h-6 text-muted-foreground/70" />
           </div>
         )}
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0 pt-1">
-        <h3 className="text-sm font-medium text-[#F5F5F5] line-clamp-2 leading-tight mb-1 group-hover:text-[#14B8A6] transition-colors">
+        <h3 className="text-sm font-medium text-foreground line-clamp-2 leading-tight mb-1 group-hover:text-primary transition-colors">
           {movie.title}
         </h3>
-        <div className="flex items-center gap-2 text-xs text-[#A0A0A0]">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>{movie.year}</span>
           {movie.rating > 0 && (
             <>
               <span>•</span>
               <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 fill-[#14B8A6] text-[#14B8A6]" />
+                <Star className="w-3 h-3 fill-primary text-primary" />
                 <span>{movie.rating.toFixed(1)}</span>
               </div>
             </>
@@ -75,3 +75,4 @@ export function MovieSuggestionCard({ movie, onSelect }: MovieSuggestionCardProp
     </motion.button>
   );
 }
+

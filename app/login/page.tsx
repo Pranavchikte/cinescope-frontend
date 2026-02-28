@@ -71,7 +71,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0F0F0F] flex flex-col">
+    <div className="relative min-h-screen bg-background flex flex-col">
       <AuthBackground />
 
       {/* Header */}
@@ -80,7 +80,7 @@ export default function LoginPage() {
           <motion.span
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block text-2xl sm:text-3xl font-bold text-[#14B8A6] cursor-pointer"
+            className="inline-block text-2xl sm:text-3xl font-bold text-primary cursor-pointer"
           >
             CineScope
           </motion.span>
@@ -95,9 +95,9 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <div className="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-lg p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+          <div className="bg-card/80 backdrop-blur-xl border border-border rounded-lg p-8 sm:p-10 shadow-2xl relative overflow-hidden">
             {/* Gradient background glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-50 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
             
             <div className="relative z-10">
               <motion.div
@@ -106,8 +106,8 @@ export default function LoginPage() {
                 transition={{ delay: 0.1 }}
                 className="mb-8"
               >
-                <h1 className="text-4xl font-bold text-[#F5F5F5] mb-2">Welcome Back</h1>
-                <p className="text-[#A0A0A0]">Sign in to your account to continue</p>
+                <h1 className="text-4xl font-bold text-foreground mb-2">Welcome Back</h1>
+                <p className="text-muted-foreground">Sign in to your account to continue</p>
               </motion.div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -117,7 +117,7 @@ export default function LoginPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <label className="block text-sm font-medium text-[#F5F5F5] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Email Address
                   </label>
                   <div className="relative">
@@ -131,10 +131,10 @@ export default function LoginPage() {
                       })}
                       type="text"
                       placeholder="you@example.com"
-                      className={`w-full px-4 py-3 bg-[#2A2A2A]/50 border rounded-lg text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-all backdrop-blur-xl ${
+                      className={`w-full px-4 py-3 bg-secondary/50 border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none transition-all backdrop-blur-xl ${
                         errors.email
                           ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
-                          : 'border-[#2A2A2A] focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20'
+                          : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/20'
                       }`}
                     />
                     <div className="absolute inset-0 rounded-lg opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: errors.email ? '0 0 20px rgba(239, 68, 68, 0.2)' : '0 0 20px rgba(20, 184, 166, 0.2)' }} />
@@ -160,15 +160,15 @@ export default function LoginPage() {
                   transition={{ delay: 0.3 }}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-[#F5F5F5]">
+                    <label className="block text-sm font-medium text-foreground">
                       Password
                     </label>
                     <Link
                       href="/forgot-password"
-                      className="text-xs text-[#14B8A6] hover:text-[#0D9488] transition-colors relative group inline-block"
+                      className="text-xs text-primary hover:text-accent transition-colors relative group inline-block"
                     >
                       Forgot password?
-                      <span className="absolute bottom-0 left-0 w-0 h-px bg-[#14B8A6] group-hover:w-full transition-all duration-300" />
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
                     </Link>
                   </div>
                   <div className="relative">
@@ -182,16 +182,16 @@ export default function LoginPage() {
                       })}
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className={`w-full px-4 py-3 pr-12 bg-[#2A2A2A]/50 border rounded-lg text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:outline-none transition-all backdrop-blur-xl ${
+                      className={`w-full px-4 py-3 pr-12 bg-secondary/50 border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none transition-all backdrop-blur-xl ${
                         errors.password
                           ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
-                          : 'border-[#2A2A2A] focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20'
+                          : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/20'
                       }`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#A0A0A0] hover:text-[#F5F5F5] transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <AnimatePresence mode="wait">
                         {showPassword ? (
@@ -246,11 +246,11 @@ export default function LoginPage() {
                       type="checkbox"
                       checked={remember}
                       onChange={(e) => setRemember(e.target.checked)}
-                      className="w-4 h-4 rounded accent-[#14B8A6] bg-[#2A2A2A] border-[#2A2A2A] cursor-pointer peer"
+                      className="w-4 h-4 rounded accent-primary bg-secondary border-border cursor-pointer peer"
                     />
                     <div className="absolute inset-0 rounded opacity-0 peer-checked:opacity-100 transition-opacity duration-200 pointer-events-none" style={{ boxShadow: '0 0 10px rgba(20, 184, 166, 0.5)' }} />
                   </div>
-                  <span className="text-[#F5F5F5] group-hover:text-[#14B8A6] transition-colors">
+                  <span className="text-foreground group-hover:text-primary transition-colors">
                     Keep me signed in
                   </span>
                 </motion.label>
@@ -265,7 +265,7 @@ export default function LoginPage() {
                   transition={{ delay: 0.5 }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full h-12 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#2A2A2A] disabled:text-[#A0A0A0] text-[#0F0F0F] font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:cursor-not-allowed relative overflow-hidden"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 disabled:bg-secondary disabled:text-muted-foreground text-primary-foreground font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:cursor-not-allowed relative overflow-hidden"
                 >
                   {ripples['submit-button']?.map((ripple) => (
                     <motion.span
@@ -278,7 +278,7 @@ export default function LoginPage() {
                     />
                   ))}
                   
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                   
                   {isSubmitting ? (
@@ -297,15 +297,15 @@ export default function LoginPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-8 text-center text-[#A0A0A0]"
+                className="mt-8 text-center text-muted-foreground"
               >
                 Don't have an account?{" "}
                 <Link
                   href="/signup"
-                  className="text-[#14B8A6] hover:text-[#0D9488] font-semibold transition-colors relative group inline-block"
+                  className="text-primary hover:text-accent font-semibold transition-colors relative group inline-block"
                 >
                   Sign up
-                  <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-[#14B8A6] to-[#0D9488] group-hover:w-full transition-all duration-300" />
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
                 </Link>
               </motion.div>
 
@@ -314,15 +314,15 @@ export default function LoginPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="mt-6 text-xs text-[#A0A0A0]/60 text-center"
+                className="mt-6 text-xs text-muted-foreground/60 text-center"
               >
                 This page is protected by Google reCAPTCHA to ensure your security.{" "}
                 <a
                   href="#"
-                  className="text-[#14B8A6] hover:text-[#0D9488] transition-colors relative group inline-block"
+                  className="text-primary hover:text-accent transition-colors relative group inline-block"
                 >
                   Learn more
-                  <span className="absolute bottom-0 left-0 w-0 h-px bg-[#14B8A6] group-hover:w-full transition-all duration-300" />
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
                 </a>
               </motion.p>
             </div>

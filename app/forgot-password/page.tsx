@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0F0F0F] flex flex-col">
+    <div className="relative min-h-screen bg-background flex flex-col">
       <AuthBackground />
 
       {/* Header */}
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
           <motion.span
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block text-2xl sm:text-3xl font-bold text-[#14B8A6] cursor-pointer"
+            className="inline-block text-2xl sm:text-3xl font-bold text-primary cursor-pointer"
           >
             CineScope
           </motion.span>
@@ -82,9 +82,9 @@ export default function ForgotPasswordPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <div className="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-lg p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+          <div className="bg-card/80 backdrop-blur-xl border border-border rounded-lg p-8 sm:p-10 shadow-2xl relative overflow-hidden">
             {/* Gradient background glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-50 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
             
             <div className="relative z-10">
               <AnimatePresence mode="wait">
@@ -102,18 +102,18 @@ export default function ForgotPasswordPage() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                      className="w-16 h-16 rounded-lg bg-[#14B8A6]/10 border border-[#14B8A6]/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl relative overflow-hidden group"
+                      className="w-16 h-16 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl relative overflow-hidden group"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <Check className="w-8 h-8 text-[#14B8A6] relative z-10" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <Check className="w-8 h-8 text-primary relative z-10" />
                     </motion.div>
 
-                    <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] mb-3">
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
                       Check your email
                     </h1>
-                    <p className="text-sm md:text-base text-[#A0A0A0] mb-8 leading-relaxed">
+                    <p className="text-sm md:text-base text-muted-foreground mb-8 leading-relaxed">
                       If an account exists for{" "}
-                      <span className="text-[#F5F5F5] font-medium">{email}</span>, you'll receive a
+                      <span className="text-foreground font-medium">{email}</span>, you'll receive a
                       password reset link shortly.
                     </p>
 
@@ -124,7 +124,7 @@ export default function ForgotPasswordPage() {
                       <Link
                         href="/"
                         onClick={(e) => handleRipple(e as any, 'return-home')}
-                        className="inline-flex items-center justify-center w-full px-6 py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-all relative overflow-hidden group"
+                        className="inline-flex items-center justify-center w-full px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-all relative overflow-hidden group"
                       >
                         {/* Ripple effect */}
                         {ripples['return-home']?.map((ripple) => (
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
                         ))}
                         
                         {/* Gradient glow */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                         
                         <span className="relative z-10">Return to home</span>
@@ -158,15 +158,15 @@ export default function ForgotPasswordPage() {
                     <div className="mb-8">
                       <motion.div
                         whileHover={{ scale: 1.05, rotate: 5 }}
-                        className="w-14 h-14 rounded-lg bg-[#14B8A6]/10 border border-[#14B8A6]/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl relative overflow-hidden group cursor-default"
+                        className="w-14 h-14 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl relative overflow-hidden group cursor-default"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <Mail className="w-6 h-6 text-[#14B8A6] relative z-10" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <Mail className="w-6 h-6 text-primary relative z-10" />
                       </motion.div>
-                      <h1 className="text-3xl md:text-4xl font-bold text-[#F5F5F5] mb-2 text-center">
+                      <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 text-center">
                         Forgot password?
                       </h1>
-                      <p className="text-sm md:text-base text-[#A0A0A0] text-center">
+                      <p className="text-sm md:text-base text-muted-foreground text-center">
                         No worries, we'll send you reset instructions.
                       </p>
                     </div>
@@ -190,7 +190,7 @@ export default function ForgotPasswordPage() {
                       <div>
                         <label
                           htmlFor="email"
-                          className="text-sm font-medium text-[#F5F5F5] mb-2 block"
+                          className="text-sm font-medium text-foreground mb-2 block"
                         >
                           Email address
                         </label>
@@ -207,7 +207,7 @@ export default function ForgotPasswordPage() {
                               setError('')
                             }}
                             placeholder="you@example.com"
-                            className="w-full px-4 py-3 bg-[#2A2A2A]/50 border border-[#2A2A2A] focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none transition-all backdrop-blur-xl"
+                            className="w-full px-4 py-3 bg-secondary/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none transition-all backdrop-blur-xl"
                             required
                             disabled={isLoading}
                           />
@@ -222,7 +222,7 @@ export default function ForgotPasswordPage() {
                         disabled={isLoading || !email}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full h-12 flex items-center justify-center gap-2 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#2A2A2A] disabled:text-[#A0A0A0] text-[#0F0F0F] rounded-lg font-semibold transition-all disabled:cursor-not-allowed relative overflow-hidden group"
+                        className="w-full h-12 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-secondary disabled:text-muted-foreground text-primary-foreground rounded-lg font-semibold transition-all disabled:cursor-not-allowed relative overflow-hidden group"
                       >
                         {/* Ripple effect */}
                         {ripples['submit-button']?.map((ripple) => (
@@ -237,7 +237,7 @@ export default function ForgotPasswordPage() {
                         ))}
                         
                         {/* Gradient glow */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                         
                         {isLoading ? (
@@ -254,15 +254,15 @@ export default function ForgotPasswordPage() {
                     <div className="mt-6 text-center">
                       <Link
                         href="/login"
-                        className="text-sm text-[#A0A0A0] hover:text-[#F5F5F5] transition-colors inline-block group"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-block group"
                       >
                         <span className="relative">
                           Remember your password?{" "}
-                          <span className="font-medium text-[#14B8A6] group-hover:text-[#0D9488] transition-colors">
+                          <span className="font-medium text-primary group-hover:text-accent transition-colors">
                             Sign in
                           </span>
                           {/* Underline gradient on hover */}
-                          <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-[#14B8A6] to-[#0D9488] group-hover:w-full transition-all duration-300" />
+                          <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
                         </span>
                       </Link>
                     </div>
@@ -271,14 +271,14 @@ export default function ForgotPasswordPage() {
               </AnimatePresence>
 
               {/* Security Notice */}
-              <p className="mt-6 text-xs text-[#A0A0A0]/60 text-center">
+              <p className="mt-6 text-xs text-muted-foreground/60 text-center">
                 Having trouble? Contact{" "}
                 <a
                   href="mailto:support@cinescope.com"
-                  className="text-[#14B8A6] hover:text-[#0D9488] transition-colors relative group inline-block"
+                  className="text-primary hover:text-accent transition-colors relative group inline-block"
                 >
                   support@cinescope.com
-                  <span className="absolute bottom-0 left-0 w-0 h-px bg-[#14B8A6] group-hover:w-full transition-all duration-300" />
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
                 </a>
               </p>
             </div>

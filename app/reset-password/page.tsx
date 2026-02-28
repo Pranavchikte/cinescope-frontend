@@ -106,7 +106,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-background flex items-center justify-center p-4">
       <AuthBackground />
 
       <motion.div
@@ -115,9 +115,9 @@ function ResetPasswordContent() {
         transition={{ duration: 0.4 }}
         className="relative w-full max-w-md z-10"
       >
-        <div className="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#2A2A2A] rounded-lg p-6 md:p-8 shadow-2xl relative overflow-hidden">
+        <div className="bg-card/80 backdrop-blur-xl border border-border rounded-lg p-6 md:p-8 shadow-2xl relative overflow-hidden">
           {/* Gradient background glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/5 via-transparent to-[#0D9488]/5 opacity-50 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
           
           <div className="relative z-10">
             {/* Back Link */}
@@ -129,13 +129,13 @@ function ResetPasswordContent() {
               <Link
                 href="/"
                 onClick={(e) => handleRipple(e as any, 'back-link')}
-                className="inline-flex items-center gap-2 text-sm text-[#A0A0A0] hover:text-[#F5F5F5] transition-colors group relative overflow-hidden px-4 py-2 rounded-lg"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group relative overflow-hidden px-4 py-2 rounded-lg"
               >
                 {/* Ripple effect */}
                 {ripples['back-link']?.map((ripple) => (
                   <motion.span
                     key={ripple.id}
-                    className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                    className="absolute bg-primary/30 rounded-full pointer-events-none"
                     style={{ left: ripple.x, top: ripple.y }}
                     initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                     animate={{ width: 100, height: 100, opacity: 0 }}
@@ -143,7 +143,7 @@ function ResetPasswordContent() {
                   />
                 ))}
                 
-                <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
                 <ArrowLeft className="w-4 h-4 group-hover:scale-110 transition-transform relative z-10" />
                 <span className="relative z-10">Back to home</span>
               </Link>
@@ -164,20 +164,20 @@ function ResetPasswordContent() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                    className="w-16 h-16 rounded-lg bg-[#14B8A6]/10 border border-[#14B8A6]/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl relative overflow-hidden group"
+                    className="w-16 h-16 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-6 backdrop-blur-xl relative overflow-hidden group"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <Check className="w-8 h-8 text-[#14B8A6] relative z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <Check className="w-8 h-8 text-primary relative z-10" />
                   </motion.div>
 
-                  <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] mb-3">
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
                     Password reset!
                   </h1>
-                  <p className="text-sm md:text-base text-[#A0A0A0] mb-6 leading-relaxed">
+                  <p className="text-sm md:text-base text-muted-foreground mb-6 leading-relaxed">
                     Your password has been reset successfully. Redirecting to home...
                   </p>
 
-                  <div className="flex items-center justify-center gap-2 text-sm text-[#A0A0A0]">
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     <span>Redirecting...</span>
                   </div>
@@ -201,10 +201,10 @@ function ResetPasswordContent() {
                     <AlertCircle className="w-8 h-8 text-red-400" />
                   </motion.div>
 
-                  <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] mb-3">
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
                     Invalid link
                   </h1>
-                  <p className="text-sm md:text-base text-[#A0A0A0] mb-8 leading-relaxed">
+                  <p className="text-sm md:text-base text-muted-foreground mb-8 leading-relaxed">
                     This password reset link is invalid or has expired. Please request a new one.
                   </p>
 
@@ -215,7 +215,7 @@ function ResetPasswordContent() {
                     <Link
                       href="/forgot-password"
                       onClick={(e) => handleRipple(e as any, 'new-link')}
-                      className="inline-flex items-center justify-center w-full px-6 py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#0F0F0F] rounded-lg font-semibold transition-all relative overflow-hidden group"
+                      className="inline-flex items-center justify-center w-full px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-all relative overflow-hidden group"
                     >
                       {/* Ripple effect */}
                       {ripples['new-link']?.map((ripple) => (
@@ -230,7 +230,7 @@ function ResetPasswordContent() {
                       ))}
                       
                       {/* Gradient glow */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                       
                       <span className="relative z-10">Request new link</span>
@@ -249,15 +249,15 @@ function ResetPasswordContent() {
                   <div className="text-center mb-8">
                     <motion.div
                       whileHover={{ scale: 1.05, rotate: 5 }}
-                      className="w-14 h-14 rounded-lg bg-[#1A1A1A]/50 border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4 backdrop-blur-xl relative overflow-hidden group"
+                      className="w-14 h-14 rounded-lg bg-card/50 border border-border flex items-center justify-center mx-auto mb-4 backdrop-blur-xl relative overflow-hidden group"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#14B8A6]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <Lock className="w-6 h-6 text-[#14B8A6] relative z-10" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <Lock className="w-6 h-6 text-primary relative z-10" />
                     </motion.div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] mb-2">
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                       Set new password
                     </h1>
-                    <p className="text-sm md:text-base text-[#A0A0A0]">
+                    <p className="text-sm md:text-base text-muted-foreground">
                       Choose a strong password for your account.
                     </p>
                   </div>
@@ -267,7 +267,7 @@ function ResetPasswordContent() {
                     <div>
                       <label
                         htmlFor="password"
-                        className="text-sm font-medium text-[#F5F5F5] mb-2 block"
+                        className="text-sm font-medium text-foreground mb-2 block"
                       >
                         New password
                       </label>
@@ -284,9 +284,9 @@ function ResetPasswordContent() {
                             }
                           }}
                           placeholder="••••••••"
-                          className={`w-full px-4 py-3 bg-[#2A2A2A]/50 border ${
-                            passwordError ? 'border-red-500/50' : 'border-[#2A2A2A]'
-                          } rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all pr-10 backdrop-blur-xl`}
+                          className={`w-full px-4 py-3 bg-secondary/50 border ${
+                            passwordError ? 'border-red-500/50' : 'border-border'
+                          } rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pr-10 backdrop-blur-xl`}
                           required
                           disabled={isLoading}
                         />
@@ -298,14 +298,14 @@ function ResetPasswordContent() {
                           }}
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A0A0] hover:text-[#F5F5F5] transition-colors relative overflow-hidden"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors relative overflow-hidden"
                           tabIndex={-1}
                         >
                           {/* Ripple effect */}
                           {ripples['password-toggle']?.map((ripple) => (
                             <motion.span
                               key={ripple.id}
-                              className="absolute bg-[#14B8A6]/30 rounded-full pointer-events-none"
+                              className="absolute bg-primary/30 rounded-full pointer-events-none"
                               style={{ left: ripple.x, top: ripple.y }}
                               initial={{ width: 0, height: 0, x: '-50%', y: '-50%' }}
                               animate={{ width: 40, height: 40, opacity: 0 }}
@@ -354,7 +354,7 @@ function ResetPasswordContent() {
                           </motion.p>
                         )}
                       </AnimatePresence>
-                      <p className="text-xs text-[#A0A0A0] mt-2">
+                      <p className="text-xs text-muted-foreground mt-2">
                         Must be at least 8 characters long
                       </p>
                     </div>
@@ -363,7 +363,7 @@ function ResetPasswordContent() {
                     <div>
                       <label
                         htmlFor="confirmPassword"
-                        className="text-sm font-medium text-[#F5F5F5] mb-2 block"
+                        className="text-sm font-medium text-foreground mb-2 block"
                       >
                         Confirm password
                       </label>
@@ -377,9 +377,9 @@ function ResetPasswordContent() {
                             validateConfirm(password, e.target.value)
                           }}
                           placeholder="••••••••"
-                          className={`w-full px-4 py-3 bg-[#2A2A2A]/50 border ${
-                            confirmError ? 'border-red-500/50' : 'border-[#2A2A2A]'
-                          } rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all backdrop-blur-xl`}
+                          className={`w-full px-4 py-3 bg-secondary/50 border ${
+                            confirmError ? 'border-red-500/50' : 'border-border'
+                          } rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all backdrop-blur-xl`}
                           required
                           disabled={isLoading}
                         />
@@ -431,7 +431,7 @@ function ResetPasswordContent() {
                       }
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:bg-[#2A2A2A] disabled:text-[#A0A0A0] text-[#0F0F0F] rounded-lg font-semibold transition-all disabled:cursor-not-allowed relative overflow-hidden group"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-secondary disabled:text-muted-foreground text-primary-foreground rounded-lg font-semibold transition-all disabled:cursor-not-allowed relative overflow-hidden group"
                     >
                       {/* Ripple effect */}
                       {ripples['submit-button']?.map((ripple) => (
@@ -446,7 +446,7 @@ function ResetPasswordContent() {
                       ))}
                       
                       {/* Gradient glow */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" style={{ background: 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)' }} />
                       
                       {isLoading ? (
@@ -466,14 +466,14 @@ function ResetPasswordContent() {
         </div>
 
         {/* Additional help text */}
-        <p className="text-center text-xs text-[#A0A0A0]/60 mt-6">
+        <p className="text-center text-xs text-muted-foreground/60 mt-6">
           Having trouble? Contact{' '}
           <a
             href="mailto:support@example.com"
-            className="text-[#A0A0A0] hover:text-[#F5F5F5] underline underline-offset-2 transition-colors relative group inline-block"
+            className="text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors relative group inline-block"
           >
             support@example.com
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-[#14B8A6] group-hover:w-full transition-all duration-300" />
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
           </a>
         </p>
       </motion.div>
@@ -485,17 +485,17 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center gap-4"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] blur-xl opacity-50 animate-pulse" />
-              <Loader2 className="w-10 h-10 text-[#14B8A6] animate-spin relative z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-xl opacity-50 animate-pulse" />
+              <Loader2 className="w-10 h-10 text-primary animate-spin relative z-10" />
             </div>
-            <p className="text-sm text-[#A0A0A0] animate-pulse">Loading...</p>
+            <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
           </motion.div>
         </div>
       }

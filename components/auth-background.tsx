@@ -63,13 +63,13 @@ export function AuthBackground() {
   // MOBILE VERSION - Static grid, zero animations
   if (isMobile) {
     return (
-      <div className="fixed inset-0 overflow-hidden bg-[#0F0F0F]" style={{ zIndex: 0 }}>
+      <div className="fixed inset-0 overflow-hidden bg-background" style={{ zIndex: 0 }}>
         {/* Static grid of posters */}
         <div className="absolute inset-0 grid grid-cols-3 gap-2 p-2 opacity-30">
           {MOVIE_POSTERS.slice(0, 12).map((poster, index) => (
             <div
               key={index}
-              className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A]"
+              className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card"
             >
               <img
                 src={`https://image.tmdb.org/t/p/w500${poster}`}
@@ -86,14 +86,14 @@ export function AuthBackground() {
         </div>
 
         {/* Dark overlay - no blur, solid color */}
-        <div className="absolute inset-0 bg-[#0F0F0F]/85 pointer-events-none" />
+        <div className="absolute inset-0 bg-background/85 pointer-events-none" />
       </div>
     )
   }
 
   // DESKTOP VERSION - Unchanged, all animations intact
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#0F0F0F]" style={{ zIndex: 0 }}>
+    <div className="fixed inset-0 overflow-hidden bg-background" style={{ zIndex: 0 }}>
       {/* Animated poster columns */}
       <div className="absolute inset-0 flex gap-2 md:gap-3 -mx-8">
         {columns.map((column, colIndex) => (
@@ -124,15 +124,18 @@ export function AuthBackground() {
                   rotate: 0,
                   zIndex: 10,
                 }}
-                className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] flex-shrink-0 shadow-2xl group cursor-pointer"
+                className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card flex-shrink-0 shadow-2xl group cursor-pointer"
                 style={{
                   transform: `rotate(${(Math.random() - 0.5) * 4}deg)`,
                   opacity: colIndex === 2 ? 0.9 : 0.7, // Center brighter
                 }}
               >
                 {/* Gradient glow on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#14B8A6]/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: '0 0 20px rgba(20, 184, 166, 0.4)' }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{ boxShadow: "0 0 20px rgba(255, 183, 3, 0.35)" }}
+                />
                 
                 {/* Glass effect overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
@@ -162,7 +165,7 @@ export function AuthBackground() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(15,15,15,0.3)_40%,rgba(15,15,15,0.8)_100%)] pointer-events-none" />
       
       {/* Extra overlay for form area */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0F0F0F]/70 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/70 to-transparent pointer-events-none" />
 
       {/* Animated gradient orbs for depth */}
       <motion.div
@@ -175,7 +178,7 @@ export function AuthBackground() {
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="absolute top-20 left-20 w-96 h-96 bg-[#14B8A6] rounded-full blur-3xl pointer-events-none"
+        className="absolute top-20 left-20 w-96 h-96 bg-primary rounded-full blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ 
@@ -188,7 +191,7 @@ export function AuthBackground() {
           ease: "easeInOut",
           delay: 2
         }}
-        className="absolute bottom-20 right-20 w-96 h-96 bg-[#0D9488] rounded-full blur-3xl pointer-events-none"
+        className="absolute bottom-20 right-20 w-96 h-96 bg-accent rounded-full blur-3xl pointer-events-none"
       />
     </div>
   )

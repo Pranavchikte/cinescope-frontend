@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
 
 // Token management
 // Token management (localStorage + cookies for middleware)
@@ -26,6 +26,8 @@ export const setTokens = (accessToken: string, refreshToken: string, remember: b
         document.cookie = `access_token=${accessToken}; path=/`;
         document.cookie = `refresh_token=${refreshToken}; path=/`;
     }
+
+    window.dispatchEvent(new Event('auth-change'));
 };
 
 export const clearTokens = () => {
@@ -39,6 +41,9 @@ export const clearTokens = () => {
     // Clear cookies
     document.cookie = 'access_token=; path=/; max-age=0';
     document.cookie = 'refresh_token=; path=/; max-age=0';
+
+    resetUserCaches();
+    window.dispatchEvent(new Event('auth-change'));
 };
 // Refresh token logic
 let isRefreshing = false
@@ -158,6 +163,14 @@ let watchlistIdsPromise: Promise<MediaIdSets> | null = null
 let watchlistItemIdCache: MediaIdMaps | null = null
 let ratingIdsCache: MediaIdSets | null = null
 let ratingIdsPromise: Promise<MediaIdSets> | null = null
+
+function resetUserCaches() {
+    watchlistIdsCache = null
+    watchlistIdsPromise = null
+    watchlistItemIdCache = null
+    ratingIdsCache = null
+    ratingIdsPromise = null
+}
 
 export const getCachedWatchlistIds = async (): Promise<MediaIdSets> => {
     if (!getAccessToken()) return createEmptyMediaIdSets()
@@ -543,9 +556,28 @@ export const tvAPI = {
 // Watchlist API (protected)
 export const watchlistAPI = {
     get: async () => {
-        const res = await authFetch(`${API_BASE_URL}/watchlist`)
-        const data = await res.json()
-        return data.results || []  // <- CHANGED: extract results array
+        const limit = 100
+        let skip = 0
+        const allResults: any[] = []
+
+        while (true) {
+            const res = await authFetch(`${API_BASE_URL}/watchlist?skip=${skip}&limit=${limit}`)
+            if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
+            const data = await res.json()
+
+            if (Array.isArray(data)) {
+                allResults.push(...data)
+                break
+            }
+
+            const pageResults = data?.results || []
+            allResults.push(...pageResults)
+
+            if (pageResults.length < limit) break
+            skip += limit
+        }
+
+        return allResults
     },
 
     add: async (data: { tmdb_id: number; media_type: 'movie' | 'tv' }) => {
@@ -569,6 +601,21 @@ export const watchlistAPI = {
             method: 'DELETE',
         })
         if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
+        if (watchlistItemIdCache && watchlistIdsCache) {
+            (["movie", "tv"] as const).forEach((mediaType) => {
+                const map = watchlistItemIdCache?.[mediaType]
+
+                if (!map) return
+                
+                for (const [tmdbId, storedId] of map.entries()) {
+                    if (storedId === id) {
+                        map.delete(tmdbId)
+                        watchlistIdsCache?.[mediaType].delete(tmdbId)
+                        break
+                    }
+                }
+            })
+        }
         return res.json()
     },
 }
@@ -577,9 +624,28 @@ export const watchlistAPI = {
 // Ratings API (protected)
 export const ratingsAPI = {
     get: async () => {
-        const res = await authFetch(`${API_BASE_URL}/ratings`)
-        const data = await res.json()
-        return data.results || []  // <- CHANGED: extract results array
+        const limit = 100
+        let skip = 0
+        const allResults: any[] = []
+
+        while (true) {
+            const res = await authFetch(`${API_BASE_URL}/ratings?skip=${skip}&limit=${limit}`)
+            if (!res.ok) throw new Error(await getErrorMessageFromResponse(res))
+            const data = await res.json()
+
+            if (Array.isArray(data)) {
+                allResults.push(...data)
+                break
+            }
+
+            const pageResults = data?.results || []
+            allResults.push(...pageResults)
+
+            if (pageResults.length < limit) break
+            skip += limit
+        }
+
+        return allResults
     },
 
     create: async (data: { tmdb_id: number; media_type: 'movie' | 'tv'; rating: string }) => {
@@ -705,6 +771,51 @@ export const profileAPI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+}
+
+// Watch History API
+export const watchHistoryAPI = {
+    create: async (data: {
+        movie_id?: number;
+        tv_show_id?: number;
+        season_number?: number;
+        episode_number?: number;
+        progress?: number;
+        quality?: string;
+    }) => {
+        const res = await authFetch(`${API_BASE_URL}/watch-history`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+    
+    getAll: async () => {
+        try {
+            const res = await authFetch(`${API_BASE_URL}/watch-history`)
+            if (!res.ok) return []
+            return res.json()
+        } catch (e) {
+            return []
+        }
+    },
+    
+    getByMovie: async (movieId: number) => {
+        const res = await authFetch(`${API_BASE_URL}/watch-history/movie/${movieId}`)
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+    },
+    
+    getByTV: async (tvId: number, season?: number, episode?: number) => {
+        let url = `${API_BASE_URL}/watch-history/tv/${tvId}`
+        if (season) url += `?season=${season}`
+        if (episode) url += `&episode=${episode}`
+        const res = await authFetch(url)
         if (!res.ok) throw new Error(await res.text())
         return res.json()
     },
